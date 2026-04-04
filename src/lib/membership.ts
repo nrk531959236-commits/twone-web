@@ -1,6 +1,14 @@
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+function isMissingAuthSessionError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return error.name === "AuthSessionMissingError" || /auth session missing/i.test(error.message);
+}
+
 export type MembershipStatus = "guest" | "pending" | "inactive" | "active";
 
 export type MembershipSummary = {
@@ -198,7 +206,9 @@ export async function getMembershipSummary() {
   } = await supabase.auth.getUser();
 
   if (userError) {
-    throw userError;
+    if (!isMissingAuthSessionError(userError)) {
+      throw userError;
+    }
   }
 
   if (!user) {

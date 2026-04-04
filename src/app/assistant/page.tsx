@@ -9,6 +9,14 @@ import { AssistantChatShell } from "./assistant-chat-shell";
 import { AssistantQuotaPanel } from "./assistant-quota-panel";
 import { AssistantEntryCard } from "./assistant-entry-card";
 
+function isMissingAuthSessionError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return error.name === "AuthSessionMissingError" || /auth session missing/i.test(error.message);
+}
+
 export const metadata: Metadata = {
   title: "AI 助手 | Twone Web3.0 Community",
   description:
@@ -35,7 +43,12 @@ export default async function AssistantPage({
   const entryMode = resolvedSearchParams?.entry === "login" ? "login" : "assistant";
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
+
+  if (userError && !isMissingAuthSessionError(userError)) {
+    throw userError;
+  }
 
   return (
     <main className="page-shell">

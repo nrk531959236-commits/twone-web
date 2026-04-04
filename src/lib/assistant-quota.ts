@@ -2,6 +2,14 @@ import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildMembershipSummary, type MembershipSummary } from "@/lib/membership";
 
+function isMissingAuthSessionError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return error.name === "AuthSessionMissingError" || /auth session missing/i.test(error.message);
+}
+
 const DEFAULT_MONTHLY_QUOTA = 2;
 
 type MembershipQuotaRow = {
@@ -91,7 +99,9 @@ export async function getAssistantQuotaSummary() {
   } = await supabase.auth.getUser();
 
   if (userError) {
-    throw userError;
+    if (!isMissingAuthSessionError(userError)) {
+      throw userError;
+    }
   }
 
   if (!user) {
@@ -148,7 +158,9 @@ export async function consumeAssistantQuota() {
   } = await supabase.auth.getUser();
 
   if (userError) {
-    throw userError;
+    if (!isMissingAuthSessionError(userError)) {
+      throw userError;
+    }
   }
 
   if (!user) {

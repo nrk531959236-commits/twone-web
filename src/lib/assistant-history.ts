@@ -2,6 +2,14 @@ import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ChatMessage } from "@/lib/assistant/types";
 
+function isMissingAuthSessionError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return error.name === "AuthSessionMissingError" || /auth session missing/i.test(error.message);
+}
+
 const MAX_HISTORY_MESSAGES = 40;
 
 export type AssistantSessionRow = {
@@ -60,7 +68,7 @@ async function getCurrentUser() {
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
+  if (error && !isMissingAuthSessionError(error)) {
     throw error;
   }
 
