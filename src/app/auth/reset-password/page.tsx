@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
           <p className="section__intro">
             {mode === "update"
               ? "你已经通过邮件验证，可以直接设置新密码。设置完成后，后续登录优先使用邮箱 + 密码；magic link 仍保留为备用。"
-              : "如果你以前一直用邮箱登录链接，或者忘了密码，可以在这里补密码。填入你的邮箱后，系统会发送一封设置密码邮件给你。"}
+              : "如果你以前一直用邮箱登录链接，或者忘了密码，可以在这里补密码。填入你的邮箱后，系统会发送一封设置密码邮件给你。若你是刚通过审核的新测试员，也可以优先向管理员索取“网页内首次设密链接”，这样不依赖邮件。"}
           </p>
         </div>
       </section>
@@ -185,7 +185,7 @@ export default function ResetPasswordPage() {
           </div>
           <div className="auth-reset-help__item">
             <strong>设置后怎么登录</strong>
-            <p>以后直接去 AI 助手页，输入邮箱 + 密码登录即可；收邮件链接不再是主路径。</p>
+            <p>以后直接去 AI 助手页，输入邮箱 + 密码登录即可；收邮件链接不再是主路径。新测试员优先建议走管理员生成的一次性网页内设密链接。</p>
           </div>
         </div>
 

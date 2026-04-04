@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { getAdminAccess, createSupabaseAdminClient } from "@/lib/admin";
-import { approveApplicationAction, rejectApplicationAction, updateMembershipAction } from "./actions";
+import { approveApplicationAction, createPasswordSetupLinkAction, rejectApplicationAction, updateMembershipAction } from "./actions";
 
 export const metadata: Metadata = {
   title: "管理后台 | Twone Web3.0 Community",
@@ -115,7 +115,7 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
             <span className="section__label">审批操作</span>
             <h4>审批区</h4>
           </div>
-          <p>每条申请卡片底部固定显示：通过并开通、拒绝申请、目标用户 ID（Target user_id）、方案、AI 月额度。当前默认按申请登录邮箱直接审批：若该邮箱已登录过，会立即写入 memberships；若还没登录过，会先写入邮箱批准记录，等对方未来首次用该邮箱登录后自动生效。默认发放免费版（free）体验资格与 2 次 AI 对话，仍可在提交前手动调整。</p>
+          <p>每条申请卡片底部固定显示：通过并开通、生成首次设密链接、拒绝申请、目标用户 ID（Target user_id）、方案、AI 月额度。当前默认按申请登录邮箱直接审批：若该邮箱已登录过，会立即写入 memberships；若还没登录过，会先写入邮箱批准记录，等对方未来首次用该邮箱登录后自动生效。默认发放免费版（free）体验资格与 2 次 AI 对话，仍可在提交前手动调整。首次设密链接用于绕开用户端邮件链路，但前提是该邮箱已经存在对应的 Supabase Auth 用户。</p>
         </div>
 
         <form action={approveApplicationAction} className="admin-approve-form">
@@ -157,6 +157,27 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
               {normalizedStatus === "approved" ? "已通过并开通" : normalizedStatus === "rejected" ? "已拒绝，无法通过" : "通过并开通（按邮箱批准 / 立即生效）"}
             </button>
           </div>
+        </form>
+
+        <form action={createPasswordSetupLinkAction} className="admin-reject-form">
+          <input type="hidden" name="applicationId" value={application.id} />
+          <input type="hidden" name="applicationContact" value={application.contact ?? ""} />
+          <input type="hidden" name="plan" value="free" />
+          <input type="hidden" name="assistantMonthlyQuota" value="2" />
+          <label className="form-field admin-inline-field">
+            <span>首次设密 target user_id（可留空）</span>
+            <input
+              name="targetUserId"
+              type="text"
+              placeholder="优先按邮箱找现有 auth user；找不到时可手填 user_id"
+            />
+          </label>
+          <button type="submit" className="button button--ghost">
+            生成网页内首次设密链接
+          </button>
+          <p className="admin-reject-form__hint">
+            适用场景：用户已在 Supabase Auth 里存在，但不想再依赖邮件补密码。系统会撤销该用户旧的活动设密 token，并生成一个新的 24 小时一次性链接；链接用过即失效。若当前邮箱还没有对应 auth user，这一步会提示改走“先创建账号 / 先让用户成功登录一次”的最小替代方案。
+          </p>
         </form>
 
         <form action={rejectApplicationAction} className="admin-reject-form">

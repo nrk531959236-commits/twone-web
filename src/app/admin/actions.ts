@@ -1,8 +1,17 @@
 "use server";
 
+import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAdminAccess, createSupabaseAdminClient } from "@/lib/admin";
+import { getSiteUrl } from "@/lib/auth";
+import {
+  generatePasswordSetupToken,
+  getPasswordSetupExpiryDate,
+  normalizeEmail,
+  hashPasswordSetupToken,
+  PASSWORD_SETUP_TOKEN_TTL_HOURS,
+} from "@/lib/password-setup";
 
 type AuthUserLookup = {
   id: string;
@@ -36,8 +45,8 @@ function toText(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function normalizeEmail(value: string) {
-  return value.trim().toLowerCase();
+function sha256Text(value: string) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 function toNullableText(value: FormDataEntryValue | null) {
@@ -328,6 +337,97 @@ export async function approveApplicationAction(formData: FormData) {
 
   revalidatePath("/admin");
   redirect(`/admin?type=success&message=${encodeURIComponent("已通过并开通：申请状态已更新，会员资格已发放。")}`);
+}
+
+export async function createPasswordSetupLinkAction(formData: FormData) {
+  const access = await getAdminAccess();
+
+  if (!access.user || !access.isAdmin) {
+    throw new Error("无权限执行后台操作。");
+  }
+
+  const applicationId = toText(formData.get("applicationId"));
+  const contact = toText(formData.get("applicationContact"));
+  const manualUserId = toText(formData.get("targetUserId"));
+  const plan = toNullableText(formData.get("plan")) ?? "free";
+  const assistantMonthlyQuota = toNullableQuota(formData.get("assistantMonthlyQuota")) ?? 2;
+
+  if (!applicationId) {
+    throw new Error("缺少 applicationId。");
+  }
+
+  const target = await resolveApprovalTarget({ manualUserId, contact });
+
+  if (target.mode !== "membership_user") {
+    redirect(
+      `/admin?type=error&message=${encodeURIComponent(
+        "当前申请邮箱还没有对应的 Supabase Auth 用户，暂时不能生成网页内首次设密链接。最小可行替代：让管理员先在 Supabase 后台创建该邮箱账号（或先让测试员至少成功登录一次拿到 user_id），然后再回来生成一次性设密链接。",
+      )}`,
+    );
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const actor = access.email ?? access.user.id;
+  const now = new Date().toISOString();
+  const expiresAt = getPasswordSetupExpiryDate();
+  const rawToken = generatePasswordSetupToken();
+  const tokenHash = hashPasswordSetupToken(rawToken);
+  const email = target.matchedEmail ? normalizeEmail(target.matchedEmail) : contact ? normalizeEmail(contact) : null;
+
+  const { error: revokeError } = await supabase
+    .from("membership_password_setup_tokens")
+    .update({
+      status: "revoked",
+      updated_at: now,
+    })
+    .eq("user_id", target.userId)
+    .eq("status", "active");
+
+  if (revokeError) {
+    throw revokeError;
+  }
+
+  const { error: insertError } = await supabase.from("membership_password_setup_tokens").insert({
+    token_hash: tokenHash,
+    user_id: target.userId,
+    email,
+    application_id: applicationId,
+    plan,
+    assistant_monthly_quota: assistantMonthlyQuota,
+    status: "active",
+    expires_at: expiresAt.toISOString(),
+    created_by: actor,
+    updated_at: now,
+  });
+
+  if (insertError) {
+    throw insertError;
+  }
+
+  const setupUrl = new URL("/auth/first-password", getSiteUrl());
+  setupUrl.searchParams.set("token", rawToken);
+  setupUrl.searchParams.set("email", email ?? "");
+
+  await appendApplicationReviewNote({
+    applicationId,
+    reviewStatus: "approved",
+    actor,
+    reviewedAt: now,
+    extraNotes: [
+      "first_password_setup=generated",
+      `first_password_setup_for_user_id=${target.userId}`,
+      email ? `first_password_setup_email=${email}` : null,
+      `first_password_setup_expires_at=${expiresAt.toISOString()}`,
+      `first_password_setup_token_hint=${sha256Text(rawToken).slice(0, 12)}`,
+    ],
+  });
+
+  revalidatePath("/admin");
+  redirect(
+    `/admin?type=success&message=${encodeURIComponent(
+      `已生成一次性首次设密链接（${PASSWORD_SETUP_TOKEN_TTL_HOURS} 小时有效）：${setupUrl.toString()}`,
+    )}`,
+  );
 }
 
 export async function rejectApplicationAction(formData: FormData) {

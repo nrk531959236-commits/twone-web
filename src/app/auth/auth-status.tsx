@@ -329,7 +329,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota, initi
                 {isSubmitting ? "登录中..." : "邮箱 + 密码登录"}
               </button>
               <Link href="/auth/reset-password" className="button button--ghost">
-                设置密码 / 忘记密码
+                忘记密码 / 邮件重置
               </Link>
               <Link href="/apply" className="button button--ghost">
                 我还没申请，先去申请 Free Trial
@@ -361,7 +361,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota, initi
       </form>
 
       <p className="auth-card__hint">
-        现在主路径是邮箱 + 密码登录；magic link 继续保留为备用。无论你用哪种方式登录，系统都会继续按登录邮箱校验申请、审核、Free Trial、membership 与 AI 配额，不影响现有资格流程。
+        现在主路径是邮箱 + 密码登录；magic link 继续保留为备用。无论你用哪种方式登录，系统都会继续按登录邮箱校验申请、审核、Free Trial、membership 与 AI 配额，不影响现有资格流程。若你是刚通过审核的新测试员，管理员也可以直接给你生成“网页内首次设密链接”，这样就不必依赖邮件补密码。
       </p>
 
       {message ? <div className="form-status form-status--success">{message}</div> : null}

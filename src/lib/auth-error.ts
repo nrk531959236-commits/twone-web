@@ -43,6 +43,14 @@ export function getReadableAuthErrorMessage(rawMessage: string | null | undefine
     return "未找到对应账号，请确认邮箱后重试。";
   }
 
+  if (normalized.includes("same_password")) {
+    return "新密码不能与当前密码相同，请换一个。";
+  }
+
+  if (normalized.includes("password should be at least")) {
+    return "密码长度不够，请至少设置 8 位。";
+  }
+
   if (normalized.includes("invalid login credentials")) {
     return "邮箱或密码不正确，请重新输入。";
   }
