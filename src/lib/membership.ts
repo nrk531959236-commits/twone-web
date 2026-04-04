@@ -1,4 +1,5 @@
 import type { User } from "@supabase/supabase-js";
+import { createSupabaseAdminClient } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function isMissingAuthSessionError(error: unknown) {
@@ -132,10 +133,10 @@ export async function ensureMembershipForUser(user: User) {
     return null;
   }
 
-  const supabase = await createSupabaseServerClient();
+  const serverSupabase = await createSupabaseServerClient();
   const normalizedEmail = user.email.trim().toLowerCase();
 
-  const { data: approval, error: approvalError } = await supabase
+  const { data: approval, error: approvalError } = await serverSupabase
     .from("membership_email_approvals")
     .select("email, plan, status, assistant_monthly_quota, started_at, expires_at")
     .eq("email", normalizedEmail)
@@ -160,7 +161,8 @@ export async function ensureMembershipForUser(user: User) {
     updated_at: now,
   };
 
-  const { error: upsertError } = await supabase.from("memberships").upsert(membershipPayload, { onConflict: "user_id" });
+  const adminSupabase = createSupabaseAdminClient();
+  const { error: upsertError } = await adminSupabase.from("memberships").upsert(membershipPayload, { onConflict: "user_id" });
 
   if (upsertError) {
     throw upsertError;
