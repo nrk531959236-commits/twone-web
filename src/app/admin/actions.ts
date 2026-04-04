@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getAdminAccess, createSupabaseAdminClient } from "@/lib/admin";
 
 type AuthUserLookup = {
@@ -9,6 +10,11 @@ type AuthUserLookup = {
 };
 
 type ReviewStatus = "pending" | "approved" | "rejected";
+
+type ApplicationReviewSnapshot = {
+  review_status: ReviewStatus | null;
+  notes: string | null;
+};
 
 type ApprovalTarget =
   | {
@@ -162,24 +168,34 @@ export async function updateMembershipAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
+async function getApplicationReviewSnapshot(applicationId: string) {
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("member_applications")
+    .select("review_status, notes")
+    .eq("id", applicationId)
+    .maybeSingle<ApplicationReviewSnapshot>();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error("未找到对应申请记录，无法完成审批操作。");
+  }
+
+  return data;
+}
+
 async function appendApplicationReviewNote(params: {
   applicationId: string;
   reviewStatus: ReviewStatus;
   actor: string;
   reviewedAt: string;
+  existingNotes?: string | null;
   extraNotes?: Array<string | null | undefined>;
 }) {
   const supabase = createSupabaseAdminClient();
-  const { data: currentApplication, error: applicationFetchError } = await supabase
-    .from("member_applications")
-    .select("notes")
-    .eq("id", params.applicationId)
-    .maybeSingle<{ notes: string | null }>();
-
-  if (applicationFetchError) {
-    throw applicationFetchError;
-  }
-
   const reviewNote = [
     `review_status=${params.reviewStatus}`,
     `reviewed_at=${params.reviewedAt}`,
@@ -189,7 +205,13 @@ async function appendApplicationReviewNote(params: {
     .filter(Boolean)
     .join(" | ");
 
-  const mergedNotes = [currentApplication?.notes?.trim(), reviewNote].filter(Boolean).join("\n\n");
+  const currentNotes = params.existingNotes?.trim() ?? "";
+
+  if (currentNotes.includes(reviewNote)) {
+    return;
+  }
+
+  const mergedNotes = [currentNotes, reviewNote].filter(Boolean).join("\n\n");
 
   const { error: applicationUpdateError } = await supabase
     .from("member_applications")
@@ -216,6 +238,16 @@ export async function approveApplicationAction(formData: FormData) {
 
   if (!applicationId) {
     throw new Error("缺少 applicationId。");
+  }
+
+  const snapshot = await getApplicationReviewSnapshot(applicationId);
+
+  if (snapshot.review_status === "approved") {
+    redirect(`/admin?type=info&message=${encodeURIComponent("这条申请已经通过并开通，无需重复操作。")}`);
+  }
+
+  if (snapshot.review_status === "rejected") {
+    redirect(`/admin?type=error&message=${encodeURIComponent("这条申请已被拒绝，不能再执行通过并开通。")}`);
   }
 
   const target = await resolveApprovalTarget({ manualUserId, contact });
@@ -282,6 +314,7 @@ export async function approveApplicationAction(formData: FormData) {
     reviewStatus: "approved",
     actor,
     reviewedAt: now,
+    existingNotes: snapshot.notes,
     extraNotes: [
       `matched_by=${target.matchedBy}`,
       `approval_mode=${target.mode}`,
@@ -294,6 +327,7 @@ export async function approveApplicationAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  redirect(`/admin?type=success&message=${encodeURIComponent("已通过并开通：申请状态已更新，会员资格已发放。")}`);
 }
 
 export async function rejectApplicationAction(formData: FormData) {
@@ -307,6 +341,16 @@ export async function rejectApplicationAction(formData: FormData) {
 
   if (!applicationId) {
     throw new Error("缺少 applicationId。");
+  }
+
+  const snapshot = await getApplicationReviewSnapshot(applicationId);
+
+  if (snapshot.review_status === "rejected") {
+    redirect(`/admin?type=info&message=${encodeURIComponent("这条申请已经是已拒绝状态，无需重复操作。")}`);
+  }
+
+  if (snapshot.review_status === "approved") {
+    redirect(`/admin?type=error&message=${encodeURIComponent("这条申请已通过并开通，不能再执行拒绝。")}`);
   }
 
   const supabase = createSupabaseAdminClient();
@@ -331,7 +375,9 @@ export async function rejectApplicationAction(formData: FormData) {
     reviewStatus: "rejected",
     actor,
     reviewedAt: now,
+    existingNotes: snapshot.notes,
   });
 
   revalidatePath("/admin");
+  redirect(`/admin?type=success&message=${encodeURIComponent("已拒绝该申请，状态已更新。")}`);
 }

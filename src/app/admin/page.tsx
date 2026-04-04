@@ -97,6 +97,16 @@ function formatStatusWithValue(status: string | null | undefined) {
 }
 
 function ApplicationReviewFooter({ application }: { application: ApplicationRow }) {
+  const normalizedStatus = normalizeReviewStatus(application.review_status);
+  const approveDisabled = normalizedStatus !== "pending";
+  const rejectDisabled = normalizedStatus !== "pending";
+  const statusHint =
+    normalizedStatus === "approved"
+      ? "这条申请已通过并开通，审批按钮已锁定。"
+      : normalizedStatus === "rejected"
+        ? "这条申请已拒绝，审批按钮已锁定。"
+        : "待处理申请可执行通过并开通或拒绝。";
+
   return (
     <footer className="admin-record-card__footer">
       <section className="admin-review-actions" aria-label={`审批区-${application.nickname || application.contact || application.id}`}>
@@ -143,18 +153,18 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
           </div>
 
           <div className="admin-edit-form__actions">
-            <button type="submit" className="button button--primary">
-              通过并开通（按邮箱批准 / 立即生效）
+            <button type="submit" className="button button--primary" disabled={approveDisabled} aria-disabled={approveDisabled}>
+              {normalizedStatus === "approved" ? "已通过并开通" : normalizedStatus === "rejected" ? "已拒绝，无法通过" : "通过并开通（按邮箱批准 / 立即生效）"}
             </button>
           </div>
         </form>
 
         <form action={rejectApplicationAction} className="admin-reject-form">
           <input type="hidden" name="applicationId" value={application.id} />
-          <button type="submit" className="button button--ghost button--danger">
-            拒绝申请
+          <button type="submit" className="button button--ghost button--danger" disabled={rejectDisabled} aria-disabled={rejectDisabled}>
+            {normalizedStatus === "rejected" ? "已拒绝" : normalizedStatus === "approved" ? "已通过，无法拒绝" : "拒绝申请"}
           </button>
-          <p className="admin-reject-form__hint">拒绝申请只会修改审核状态，不会改动 memberships。</p>
+          <p className="admin-reject-form__hint">{statusHint} 拒绝申请只会修改审核状态，不会改动 memberships。</p>
         </form>
       </section>
     </footer>
@@ -286,7 +296,22 @@ function AdminDeniedState({ email, allowedEmails }: { email: string | null; allo
   );
 }
 
-export default async function AdminPage() {
+function getFlashTypeClassName(type: string | undefined) {
+  switch (type) {
+    case "success":
+      return "form-status form-status--success";
+    case "error":
+      return "form-status form-status--error";
+    default:
+      return "form-status";
+  }
+}
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ type?: string; message?: string }>;
+}) {
   const access = await getAdminAccess();
 
   if (!access.user || !access.isAdmin) {
@@ -298,6 +323,9 @@ export default async function AdminPage() {
     );
   }
 
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const flashMessage = resolvedSearchParams?.message?.trim() || null;
+  const flashType = resolvedSearchParams?.type?.trim();
   const { applications, memberships } = await getAdminDashboardData();
   const pendingCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "pending").length;
   const approvedCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "approved").length;
@@ -355,6 +383,14 @@ export default async function AdminPage() {
           </aside>
         </div>
       </section>
+
+      {flashMessage ? (
+        <section className="section admin-flash-section">
+          <div className={getFlashTypeClassName(flashType)} role="status" aria-live="polite">
+            {flashMessage}
+          </div>
+        </section>
+      ) : null}
 
       <section className="section admin-tabs-section">
         <div className="section-heading admin-tabs-heading">
