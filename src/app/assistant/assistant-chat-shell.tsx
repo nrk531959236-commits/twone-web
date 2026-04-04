@@ -290,7 +290,7 @@ export function AssistantChatShell({
                     : "未登录状态下可浏览，不可发送。先用申请时填写的登录邮箱登录后再提问。"
                   : quota.monthlyRemaining > 0
                     ? "输入你的问题，例如：分析 BTC 4H 结构 / 帮我复盘这笔交易 / 给我一个今天的 watchlist 框架"
-                    : "本月 Free 体验版 AI 对话额度已用尽，请下月重置或联系管理员调整后再试。"
+                    : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
               disabled={!isMember || quota.monthlyRemaining <= 0}

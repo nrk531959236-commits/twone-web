@@ -9,7 +9,6 @@ const navItems = [
   { href: "/", label: "首页", key: "home" },
   { href: "/apply", label: "会员申请", key: "apply" },
   { href: "/assistant", label: "AI 助手", key: "assistant" },
-  { href: "/admin", label: "管理后台", key: "admin" },
 ] as const;
 
 export function SiteHeader({ current }: SiteHeaderProps) {

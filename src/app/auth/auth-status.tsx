@@ -227,7 +227,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota, initi
 
       <p className="auth-card__text">
         /assistant 当前支持公开浏览，但发送能力仅对有效体验资格开放。未申请用户先走申请；已通过审核的用户可直接用申请时填写的邮箱登录。
-        登录后服务端会继续校验 memberships 状态与剩余 AI 配额；如果该邮箱已被后台批准，系统也会在登录后自动兑现对应资格。默认审批会发放 Free 体验版与 2 次 AI 对话。
+        登录后服务端会继续校验 memberships 状态与剩余 AI 配额；如果该邮箱已获得通过资格，系统也会在登录后自动兑现对应权益。默认会发放 Free 体验版与 2 次 AI 对话。
       </p>
 
       <form className="auth-form" onSubmit={handleMagicLinkLogin}>
@@ -253,7 +253,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota, initi
       </form>
 
       <p className="auth-card__hint">
-        当前采用邮箱登录链接方案：邮箱批准记录可自动兑现 membership，并结合 assistant_usage 做月度计数。无需单独密码流，也能拿到服务端可验证的登录 session。当前默认审批通过即发放 Free 体验版与 2 次 AI 对话。
+        当前采用邮箱登录链接方案：邮箱资格记录可自动兑现 membership，并结合 assistant_usage 做月度计数。无需单独密码流，也能拿到服务端可验证的登录 session。当前默认审核通过即发放 Free 体验版与 2 次 AI 对话。
       </p>
 
       {message ? <div className="form-status form-status--success">{message}</div> : null}

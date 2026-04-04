@@ -65,7 +65,7 @@ export default async function AssistantPage({
           </div>
           <p className="section__intro">
             这一版把最轻量可行的体验权限补齐：未登录可浏览、不可发送；已登录但未通过审核仍不可用；
-            只有有效体验资格或会员资格且本月额度未耗尽才放行。当前默认审批会按登录邮箱发放 Free 体验版与 2 次 AI 对话，已接入真实 AI 后端接口，并在服务端同时校验 Supabase Auth 会话、
+            只有有效体验资格或会员资格且本月额度未耗尽才放行。当前默认会按登录邮箱发放 Free 体验版与 2 次 AI 对话，已接入真实 AI 后端接口，并在服务端同时校验 Supabase Auth 会话、
             memberships 状态与 assistant_usage 月度使用次数，并在用户首次用已获批邮箱登录时自动兑现资格。
           </p>
         </div>

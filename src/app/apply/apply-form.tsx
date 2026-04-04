@@ -219,7 +219,7 @@ export function ApplyForm() {
             value={form.contact}
             onChange={(event) => updateField("contact", event.target.value)}
           />
-          <small>后台会直接按这个登录邮箱审批；审核通过后默认发放 Free 体验版 + 2 次 AI 对话。之后你只需用同一个邮箱登录 Twone，资格就会自动生效；不是邮箱将无法提交。</small>
+          <small>系统会按这个登录邮箱同步审核结果；审核通过后默认发放 Free 体验版 + 2 次 AI 对话。之后你只需用同一个邮箱登录 Twone，资格就会自动生效；不是邮箱将无法提交。</small>
         </label>
         <label className="form-field">
           <span>所在地区 *</span>

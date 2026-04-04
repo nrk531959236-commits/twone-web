@@ -33,7 +33,7 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
             </h1>
             <p className="hero__description">
               我们已经收到你的会员申请信息。接下来会根据你的交易背景、关注方向与加入动机进行人工筛选。
-              后台会直接按你填写的登录邮箱进行审批；若审核通过，默认会先发放 Free 体验版与 2 次 AI 对话额度。你之后只需用同一个邮箱登录 Twone，资格就会自动生效。
+              审核结果会按你填写的登录邮箱同步生效；若审核通过，默认会先发放 Free 体验版与 2 次 AI 对话额度。你之后只需用同一个邮箱登录 Twone，资格就会自动生效。
             </p>
 
             <div className="success-inline-status form-status form-status--success" role="status" aria-live="polite">
@@ -95,7 +95,7 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
               <span className="success-step__index">Step 02</span>
               <h3>留意登录邮箱</h3>
               <p>
-                请确保你填写的就是未来登录 Twone 使用的邮箱。后台会按这个邮箱审批；审核通过后，你只需用同一个邮箱登录，
+                请确保你填写的就是未来登录 Twone 使用的邮箱。审核结果会按这个邮箱同步；审核通过后，你只需用同一个邮箱登录，
                 资格就会自动兑现到你的账号。
               </p>
             </article>
@@ -103,7 +103,7 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
               <span className="success-step__index">Step 03</span>
               <h3>审核通过后直接登录</h3>
               <p>
-                不需要先注册别的资料，也不需要额外找管理员手动绑账号。等审核通过后，直接用申请时填写的登录邮箱登录 Twone 即可。
+                不需要先注册别的资料，也不需要额外处理绑定流程。等审核通过后，直接用申请时填写的登录邮箱登录 Twone 即可。
               </p>
             </article>
           </div>
@@ -114,14 +114,14 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
             <p className="section__label">Login Email</p>
             <h2>登录邮箱说明</h2>
             <p>
-              后台审批默认以你填写的 <strong>登录邮箱</strong> 为准，请确保这个邮箱就是你登录 Twone 时使用的邮箱；
+              审核结果默认以你填写的 <strong>登录邮箱</strong> 为准，请确保这个邮箱就是你登录 Twone 时使用的邮箱；
               审核通过后默认会发放 <strong>Free 体验版</strong> 与 <strong>2 次 AI 对话</strong>，之后你只需用该邮箱登录即可自动生效。
             </p>
             <div className="quota-grid">
               <div className="quota-card">
                 <span>审批依据</span>
                 <strong>登录邮箱</strong>
-                <p>后台按你申请时填写的登录邮箱审批，并在你首次用该邮箱登录时自动兑现。</p>
+                <p>系统会按你申请时填写的登录邮箱同步资格，并在你首次用该邮箱登录时自动兑现。</p>
               </div>
               <div className="quota-card">
                 <span>下一步</span>

@@ -24,7 +24,7 @@ export default function ApplyPage() {
             </h1>
             <p className="hero__description">
               现在已经接入真实提交链路。你可以在这里补齐成员基础信息、交易背景、加入动机，以及是否希望使用 AI
-              助手协同研究，提交后会直接写入申请表。请务必填写你登录 Twone 时使用的邮箱，后台会直接按该邮箱审批；申请通过后默认会发放 Free 体验版与 2 次 AI 对话额度，之后你用同一邮箱登录即可自动生效。
+              助手协同研究，提交后会直接写入申请表。请务必填写你登录 Twone 时使用的邮箱，系统会按该邮箱同步审核结果；申请通过后默认会发放 Free 体验版与 2 次 AI 对话额度，之后你用同一邮箱登录即可自动生效。
             </p>
             <div className="hero__stats">
               <div>
@@ -72,8 +72,8 @@ export default function ApplyPage() {
           <h2>填写你的成员画像</h2>
           <p>
             当前页面已连接 Supabase。提交时会把表单内容写入 <code>member_applications</code>
-            ，新申请默认进入 <code>pending</code> 审核状态，并在前端显示提交中、成功或失败状态。为了让后台审批后能直接按邮箱兑现资格，请直接填写你登录 Twone
-            时使用的邮箱；当前申请表已启用严格邮箱校验，不是邮箱格式将无法提交。当前审核通过的默认权益是 <code>free</code> 体验版 + <code>2</code> 次 AI 对话，后台仍可手动调整。
+            ，新申请默认进入 <code>pending</code> 审核状态，并在前端显示提交中、成功或失败状态。为了让审核通过后能直接按邮箱兑现资格，请直接填写你登录 Twone
+            时使用的邮箱；当前申请表已启用严格邮箱校验，不是邮箱格式将无法提交。当前审核通过的默认权益是 <code>free</code> 体验版 + <code>2</code> 次 AI 对话，必要时系统侧可再调整。
           </p>
         </div>
 
