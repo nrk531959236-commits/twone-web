@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createAssistantReply, fetchAssistantQuota } from "@/lib/assistant/runtime";
 import type { AssistantQuotaView, ChatMessage } from "@/lib/assistant/types";
@@ -7,6 +8,7 @@ import type { AssistantQuotaView, ChatMessage } from "@/lib/assistant/types";
 type AssistantChatShellProps = {
   isAuthenticated: boolean;
   isMember: boolean;
+  isPending: boolean;
   canUseAssistant: boolean;
   gateMessage: string;
   initialSessionId?: string | null;
@@ -21,7 +23,7 @@ const starterMessages: ChatMessage[] = [
     role: "assistant",
     title: "Twone AI Assistant",
     content:
-      "欢迎回来。你可以直接问 BTC / ETH / 山寨结构、复盘某笔交易，或者让我帮你整理研究思路。我会先给出结构化判断，再提示风险点。",
+      "欢迎回来。当前默认审批通过会发放 Free 体验版与 2 次 AI 对话。你可以直接问 BTC / ETH / 山寨结构、复盘某笔交易，或者让我帮你整理研究思路。我会先给出结构化判断，再提示风险点。",
     createdAt: new Date().toISOString(),
   },
 ];
@@ -51,6 +53,7 @@ function dispatchQuotaUpdated(quota: AssistantQuotaView, isAuthenticated: boolea
 export function AssistantChatShell({
   isAuthenticated,
   isMember,
+  isPending,
   canUseAssistant: initialCanUseAssistant,
   gateMessage,
   initialSessionId,
@@ -197,7 +200,39 @@ export function AssistantChatShell({
       <div className="assistant-input card-glow">
         {!isMember ? (
           <div className="form-status assistant-gate-banner" role="status">
-            {gateMessage}
+            <div className="assistant-gate-banner__content">
+              <p>{gateMessage}</p>
+              <div className="assistant-gate-banner__actions">
+                {!isAuthenticated ? (
+                  <>
+                    <Link href="#member-login" className="button button--secondary">
+                      已有账号，先登录
+                    </Link>
+                    <Link href="/apply" className="button button--ghost">
+                      还没申请，去申请
+                    </Link>
+                  </>
+                ) : isPending ? (
+                  <>
+                    <Link href="#member-login" className="button button--secondary">
+                      保持当前邮箱登录
+                    </Link>
+                    <Link href="/apply/success" className="button button--ghost">
+                      查看审核说明
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/apply" className="button button--secondary">
+                      去提交申请
+                    </Link>
+                    <Link href="#member-login" className="button button--ghost">
+                      换已有会员账号登录
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         ) : null}
 
@@ -221,7 +256,7 @@ export function AssistantChatShell({
           <div className="upload-placeholder__icon">📊</div>
           <div>
             <strong>图表上传将在下一版接入</strong>
-            <p>当前先把文本对话流程跑通，后续这里可接截图上传、TradingView 图片分析与批注返回。</p>
+            <p>当前先把文本对话流程跑通。默认 Free 体验版为 2 次文本对话，后续这里可接截图上传、TradingView 图片分析与批注返回。</p>
           </div>
         </div>
 
@@ -249,11 +284,13 @@ export function AssistantChatShell({
               placeholder={
                 !isMember
                   ? isAuthenticated
-                    ? "已登录，但未开通会员。开通后才可发送。"
-                    : "未登录状态下可浏览，不可发送。先用右侧会员邮箱登录后再提问。"
+                    ? isPending
+                      ? "你的申请正在审核中。当前可浏览，不可发送；请等待审核完成，并继续使用申请时填写的同一邮箱登录。"
+                      : "已登录，但当前账号还未开通体验资格。若你已通过审核，请确认当前登录的是申请时填写的邮箱。"
+                    : "未登录状态下可浏览，不可发送。先用申请时填写的登录邮箱登录后再提问。"
                   : quota.monthlyRemaining > 0
                     ? "输入你的问题，例如：分析 BTC 4H 结构 / 帮我复盘这笔交易 / 给我一个今天的 watchlist 框架"
-                    : "本月 AI 对话额度已用尽，请下月重置后再试。"
+                    : "本月 Free 体验版 AI 对话额度已用尽，请下月重置或联系管理员调整后再试。"
               }
               rows={4}
               disabled={!isMember || quota.monthlyRemaining <= 0}
@@ -264,10 +301,12 @@ export function AssistantChatShell({
             <p>
               {isMember
                 ? quota.monthlyRemaining > 0
-                  ? "Enter 发送，Shift + Enter 换行。成功调用一次后会在服务端记录并扣减本月 AI 次数。"
-                  : "当前会员有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
+                  ? "Enter 发送，Shift + Enter 换行。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。"
+                  : "当前资格有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
                 : isAuthenticated
-                  ? "当前账号已登录，但没有有效会员权限。/api/assistant 会在服务端直接拒绝。"
+                  ? isPending
+                    ? "你的申请正在审核中。当前阶段可浏览页面，但不能发送消息；审核通过后继续使用同一邮箱登录即可自动生效。"
+                    : "当前账号已登录，但没有有效体验资格。/api/assistant 会在服务端直接拒绝。"
                   : "当前为只读浏览模式。真正的发送权限由 /api/assistant 在服务端校验，未登录会直接拒绝。"}
             </p>
             <button type="submit" className="button button--primary" disabled={!canSend}>
@@ -275,8 +314,10 @@ export function AssistantChatShell({
                 ? "发送中..."
                 : !isMember
                   ? isAuthenticated
-                    ? "开通会员后可发送"
-                    : "会员登录后可发送"
+                    ? isPending
+                      ? "审核中，暂不可发送"
+                      : "审核通过后可发送"
+                    : "登录后可发送"
                   : quota.monthlyRemaining > 0
                     ? "发送"
                     : "本月额度已用尽"}
@@ -285,7 +326,7 @@ export function AssistantChatShell({
         </form>
 
         {error ? (
-          <div className="form-status form-status--error" role="alert">
+          <div className="form-status assistant-inline-notice" role="alert">
             {error}
           </div>
         ) : null}

@@ -15,7 +15,7 @@ type ApplySuccessPageProps = {
 
 export default async function ApplySuccessPage({ searchParams }: ApplySuccessPageProps) {
   const params = await searchParams;
-  const successMessage = params?.status || "申请已提交成功，我们会尽快完成筛选与回访。";
+  const successMessage = params?.status || "状态：等待审核中。审核通过后，默认可获得 Free 体验版与 2 次 AI 对话。";
 
   return (
     <main className="page-shell">
@@ -25,19 +25,23 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
         <div className="hero__badge">Application Received · Next Steps</div>
         <div className="hero__grid success-hero__grid">
           <div className="hero__content">
-            <p className="eyebrow">申请已进入审核队列，接下来只需要等我们联系你</p>
+            <p className="eyebrow">当前状态：等待审核中。接下来只需要等审核并用同一邮箱登录</p>
             <h1>
               申请已收到，
               <br />
               下一步我们会继续跟进。
             </h1>
             <p className="hero__description">
-              我们已经收到你的会员申请信息。接下来会根据你的交易背景、关注方向与加入动机进行人工筛选，
-              再决定后续沟通和入群安排。
+              我们已经收到你的会员申请信息。接下来会根据你的交易背景、关注方向与加入动机进行人工筛选。
+              后台会直接按你填写的登录邮箱进行审批；若审核通过，默认会先发放 Free 体验版与 2 次 AI 对话额度。你之后只需用同一个邮箱登录 Twone，资格就会自动生效。
             </p>
 
             <div className="success-inline-status form-status form-status--success" role="status" aria-live="polite">
-              <div>{successMessage}</div>
+              <div>
+                <strong>等待审核中</strong>
+                <br />
+                {successMessage}
+              </div>
             </div>
 
             <div className="hero__actions">
@@ -55,10 +59,10 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
               <span className="status-dot" />
               Review Timeline
             </div>
-            <div className="panel__title">预计 24-72 小时内完成首轮审核</div>
+            <div className="panel__title">当前状态：等待审核中</div>
             <div className="panel__list">
               <article>
-                <span>01 / 已收到</span>
+                <span>01 / 等待审核中</span>
                 <strong>你的申请已成功进入待审核队列，无需重复提交。</strong>
               </article>
               <article>
@@ -66,8 +70,8 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
                 <strong>我们会优先查看交易经验、关注方向、长期投入意愿与匹配度。</strong>
               </article>
               <article>
-                <span>03 / 联系通知</span>
-                <strong>若通过初筛，会通过你填写的 Telegram / 微信 / 邮箱联系你。</strong>
+                <span>03 / 审核完成后登录</span>
+                <strong>若通过初筛，会直接按你填写的登录邮箱完成批准，并默认发放 Free 体验版 + 2 次 AI 对话；之后你只需用该邮箱登录，资格会自动生效。</strong>
               </article>
             </div>
           </aside>
@@ -84,22 +88,22 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
               <h3>等待审核结果</h3>
               <p>
                 正常情况下，首轮审核会在 <strong>24-72 小时</strong> 内完成；如果申请量较大，可能顺延，
-                但无需重复提交。
+                但无需重复提交。审核通过后默认会先拿到 Free 体验版与 2 次 AI 对话。
               </p>
             </article>
             <article className="success-step card-glow">
               <span className="success-step__index">Step 02</span>
-              <h3>留意联系方式</h3>
+              <h3>留意登录邮箱</h3>
               <p>
-                后续我们会优先通过你表单里填写的联系方式通知你，包括审核结果、补充沟通、
-                入群方式或下一步安排。
+                请确保你填写的就是未来登录 Twone 使用的邮箱。后台会按这个邮箱审批；审核通过后，你只需用同一个邮箱登录，
+                资格就会自动兑现到你的账号。
               </p>
             </article>
             <article className="success-step card-glow">
               <span className="success-step__index">Step 03</span>
-              <h3>可先加入 Telegram / 等待回访</h3>
+              <h3>审核通过后直接登录</h3>
               <p>
-                如果你已经有 Telegram，可以先准备好账号并保持可联系状态；后续若适合，我们会发送进一步说明或回访邀请。
+                不需要先注册别的资料，也不需要额外找管理员手动绑账号。等审核通过后，直接用申请时填写的登录邮箱登录 Twone 即可。
               </p>
             </article>
           </div>
@@ -107,22 +111,22 @@ export default async function ApplySuccessPage({ searchParams }: ApplySuccessPag
 
         <aside className="success-sidebar">
           <div className="sidebar-card section">
-            <p className="section__label">Contact & Notice</p>
-            <h2>通知方式说明</h2>
+            <p className="section__label">Login Email</p>
+            <h2>登录邮箱说明</h2>
             <p>
-              我们主要通过你填写的 <strong>Telegram / 微信 / 邮箱</strong> 做后续联系，请确保联系方式可用，
-              也注意查收陌生消息或邮件。
+              后台审批默认以你填写的 <strong>登录邮箱</strong> 为准，请确保这个邮箱就是你登录 Twone 时使用的邮箱；
+              审核通过后默认会发放 <strong>Free 体验版</strong> 与 <strong>2 次 AI 对话</strong>，之后你只需用该邮箱登录即可自动生效。
             </p>
             <div className="quota-grid">
               <div className="quota-card">
-                <span>通知内容</span>
-                <strong>审核结果</strong>
-                <p>包括通过、补充信息、暂不匹配或后续等待名单。</p>
+                <span>审批依据</span>
+                <strong>登录邮箱</strong>
+                <p>后台按你申请时填写的登录邮箱审批，并在你首次用该邮箱登录时自动兑现。</p>
               </div>
               <div className="quota-card">
                 <span>下一步</span>
-                <strong>回访 / 入群 / 说明</strong>
-                <p>根据匹配情况安排一对一沟通、社群入口或后续指引。</p>
+                <strong>审核通过后直接登录</strong>
+                <p>若已通过审批，直接用申请时填写的邮箱登录 Twone，即可拿到 Free Trial 与 AI 次数。</p>
               </div>
             </div>
           </div>

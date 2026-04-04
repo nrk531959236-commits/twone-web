@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -9,8 +10,9 @@ type AuthStatusUser = {
 };
 
 type MembershipView = {
-  status: "guest" | "inactive" | "active";
+  status: "guest" | "pending" | "inactive" | "active";
   isMember: boolean;
+  isPending: boolean;
   message: string;
   detail: string;
   plan: string | null;
@@ -70,8 +72,9 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
         setMembership({
           status: "guest",
           isMember: false,
+          isPending: false,
           message: "未登录，仅可浏览。",
-          detail: "请先登录会员邮箱；服务端会在登录态基础上继续校验会员状态。",
+          detail: "请先登录申请时填写的邮箱；服务端会在登录态基础上继续校验资格状态，并自动兑现该邮箱已获批的资格。审核通过后默认发放 Free 体验版与 2 次 AI 对话。",
           plan: null,
           expiresAt: null,
         });
@@ -79,7 +82,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
           monthlyQuota: initialQuota.monthlyQuota,
           monthlyUsed: 0,
           monthlyRemaining: initialQuota.monthlyQuota,
-          quotaMessage: "未登录状态下仅可浏览，登录后才会显示并消耗 AI 配额。",
+          quotaMessage: "未登录状态下仅可浏览，登录后才会显示并消耗 AI 配额。默认 Free 体验版为 2 次。",
         });
       }
     });
@@ -116,7 +119,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
     }
 
     setMessage(
-      "登录链接已发送。打开邮箱点击链接后，会自动回到 /assistant。\n如果本地测试，确认 Supabase Auth 的 redirect URL 已加入当前域名。",
+      "登录链接已发送。打开邮箱点击链接后，会自动回到 /assistant。\n如果这个邮箱已经通过审核，系统会在你登录后自动兑现 Free 体验版与 2 次 AI 对话额度；本地测试时也请确认 Supabase Auth 的 redirect URL 已加入当前域名。",
     );
     setIsSubmitting(false);
   }
@@ -138,8 +141,9 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
     setMembership({
       status: "guest",
       isMember: false,
+      isPending: false,
       message: "未登录，仅可浏览。",
-      detail: "请先登录会员邮箱；服务端会在登录态基础上继续校验会员状态。",
+      detail: "请先登录申请时填写的邮箱；服务端会在登录态基础上继续校验资格状态。审核通过后默认发放 Free 体验版与 2 次 AI 对话。",
       plan: null,
       expiresAt: null,
     });
@@ -147,7 +151,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
       monthlyQuota: initialQuota.monthlyQuota,
       monthlyUsed: 0,
       monthlyRemaining: initialQuota.monthlyQuota,
-      quotaMessage: "未登录状态下仅可浏览，登录后才会显示并消耗 AI 配额。",
+      quotaMessage: "未登录状态下仅可浏览，登录后才会显示并消耗 AI 配额。默认 Free 体验版为 2 次。",
     });
     setMessage("你已退出登录。现在可以浏览页面，但不能发送消息。");
     setIsSubmitting(false);
@@ -158,18 +162,18 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
       <div className="auth-card__header">
         <div>
           <p className="section__label">Member Access</p>
-          <h2>{membership.isMember ? "已登录且会员有效" : "已登录，但未开通会员"}</h2>
+          <h2>{membership.isMember ? "已登录且资格有效" : membership.isPending ? "已登录，你的申请正在审核中" : "已登录，但未开通体验资格"}</h2>
         </div>
         <span className="assistant-chat__badge">
           <span className={`status-dot${membership.isMember ? "" : " status-dot--muted"}`} />
-          {membership.isMember ? "Member Active" : "Member Locked"}
+          {membership.isMember ? "Access Active" : membership.isPending ? "Review Pending" : "Access Locked"}
         </span>
       </div>
 
       <p className="auth-card__text">
         当前登录身份：<strong>{user.email || "已验证会员"}</strong>
         <br />
-        会员状态：<strong>{membership.message}</strong>
+        当前状态：<strong>{membership.message}</strong>
         {membership.plan ? (
           <>
             <br />
@@ -206,11 +210,11 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
       {error ? <div className="form-status form-status--error">{error}</div> : null}
     </div>
   ) : (
-    <div className="auth-card card-glow">
+    <div className="auth-card card-glow" id="member-login">
       <div className="auth-card__header">
         <div>
           <p className="section__label">Members Only</p>
-          <h2>未登录可浏览，会员开通后可发送</h2>
+          <h2>未登录可浏览，审核通过后可发送</h2>
         </div>
         <span className="assistant-chat__badge auth-card__badge auth-card__badge--locked">
           <span className="status-dot status-dot--muted" />
@@ -219,13 +223,13 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
       </div>
 
       <p className="auth-card__text">
-        /assistant 当前支持公开浏览，但发送能力仅对有效会员开放。登录后只代表拿到会话，
-        <code>/api/assistant</code> 还会继续在服务端校验 memberships 状态与剩余 AI 配额，前端禁用只是体验层提示。
+        /assistant 当前支持公开浏览，但发送能力仅对有效体验资格开放。未申请用户先走申请；已通过审核的用户可直接用申请时填写的邮箱登录。
+        登录后服务端会继续校验 memberships 状态与剩余 AI 配额；如果该邮箱已被后台批准，系统也会在登录后自动兑现对应资格。默认审批会发放 Free 体验版与 2 次 AI 对话。
       </p>
 
       <form className="auth-form" onSubmit={handleMagicLinkLogin}>
         <label className="assistant-form__field">
-          <span>会员邮箱</span>
+          <span>登录邮箱</span>
           <input
             type="email"
             value={email}
@@ -239,11 +243,14 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
           <button type="submit" className="button button--primary" disabled={isSubmitting}>
             {isSubmitting ? "发送中..." : "发送魔法登录链接"}
           </button>
+          <Link href="/apply" className="button button--ghost">
+            我还没申请，先去申请 Free Trial
+          </Link>
         </div>
       </form>
 
       <p className="auth-card__hint">
-        最轻量可行方案：Supabase Auth Email OTP / Magic Link + memberships 单表校验 + assistant_usage 月度计数。无需单独做密码流，也能拿到服务端可验证的登录 session。
+        最轻量可行方案：Supabase Auth Email OTP / Magic Link + 邮箱批准记录自动兑现 membership + assistant_usage 月度计数。无需单独做密码流，也能拿到服务端可验证的登录 session。当前默认审批通过即发放 Free 体验版与 2 次 AI 对话。
       </p>
 
       {message ? <div className="form-status form-status--success">{message}</div> : null}

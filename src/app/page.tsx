@@ -51,6 +51,7 @@ const aiFeatures = [
 ];
 
 import { SiteHeader } from "@/components/site-header";
+import { AccessEntryLink } from "@/components/access-entry-link";
 
 export default function Home() {
   return (
@@ -68,7 +69,7 @@ export default function Home() {
             </h1>
             <p className="hero__description">
               Twone 致力于打造一个偏高质量、偏长期主义、偏实战导向的 Web3 私人会员空间。
-              在这里，你获得的不只是内容，而是更清晰的框架、更可信的讨论环境，以及更高效的 AI 辅助入口。
+              现在优先开放 Free 体验版做内测：申请通过后默认可获得免费体验版与 2 次 AI 对话，用更低门槛先体验整体节奏，再决定是否继续深入。
             </p>
             <div className="hero__actions">
               <a href="/apply" className="button button--primary">
@@ -77,9 +78,9 @@ export default function Home() {
               <a href="#courses" className="button button--ghost">
                 浏览课程入口
               </a>
-              <a href="/assistant" className="button button--ghost">
+              <AccessEntryLink href="/assistant" mode="assistant" className="button button--ghost">
                 查看 AI 助手
-              </a>
+              </AccessEntryLink>
             </div>
             <div className="hero__stats">
               <div>
@@ -118,7 +119,7 @@ export default function Home() {
               </article>
               <article>
                 <span>AI Layer</span>
-                <strong>信息整理 / 策略助手 / 智能入口</strong>
+                <strong>申请通过默认送 Free Trial，含 2 次 AI 对话体验</strong>
               </article>
             </div>
           </div>
@@ -131,7 +132,7 @@ export default function Home() {
           <h2>一个面向私人会员的高信噪比平台</h2>
         </div>
         <p className="section__intro">
-          我们不把首页做成发币项目站，也不追求夸张叙事。这个平台强调的是：内容有深度、关系有筛选、工具能落地、AI 真正能提高效率。
+          我们不把首页做成发币项目站，也不追求夸张叙事。这个平台强调的是：内容有深度、关系有筛选、工具能落地、AI 真正能提高效率。现在先用 Free 体验版把门槛降下来，方便真实用户先上手测试。
         </p>
       </section>
 
@@ -150,7 +151,7 @@ export default function Home() {
           <p className="section__label">会员权益</p>
           <h2>加入后，你将进入一个持续更新的会员体系</h2>
           <p>
-            从课程、研究、社群到 AI 辅助工具，Twone 的设计目标是让每一位成员都能拥有更稳定的成长路径，而不是依赖单点信息刺激。
+            从课程、研究、社群到 AI 辅助工具，Twone 的设计目标是让每一位成员都能拥有更稳定的成长路径，而不是依赖单点信息刺激。当前申请通过后会先发放 Free 体验版，默认附带 2 次 AI 对话额度。
           </p>
         </div>
         <div className="membership-list card-glow">
@@ -190,7 +191,7 @@ export default function Home() {
           <p className="section__label">AI 助手入口</p>
           <h2>让 AI 成为你的研究副驾驶，而不是噪音制造机</h2>
           <p>
-            平台后续将集成面向会员的 AI 入口，用于行情整理、交易复盘、研究摘要、知识库检索与策略提醒，帮助你更快完成从信息到判断的转换。
+            平台后续将集成面向会员的 AI 入口，用于行情整理、交易复盘、研究摘要、知识库检索与策略提醒，帮助你更快完成从信息到判断的转换。当前申请审核通过后，默认会先开通 Free 体验版，含 2 次 AI 对话，方便快速试用。
           </p>
         </div>
         <div className="ai-block__right card-glow">
@@ -200,9 +201,9 @@ export default function Home() {
               <li key={feature}>{feature}</li>
             ))}
           </ul>
-          <a href="/assistant" className="button button--secondary">
+          <AccessEntryLink href="/assistant" mode="assistant" className="button button--secondary">
             进入 AI 助手原型
-          </a>
+          </AccessEntryLink>
         </div>
       </section>
 
@@ -210,15 +211,15 @@ export default function Home() {
         <p className="section__label">Call To Action</p>
         <h2>如果你想进入一个更克制、更有质量的 Web3 成长环境，现在可以先留下入口。</h2>
         <p>
-          当前页面为首页原型，后续可继续扩展会员登录、支付、内容系统、活动报名、AI 对话界面与 Vercel 部署配置。
+          当前页面为首页原型，后续可继续扩展会员登录、支付、内容系统、活动报名、AI 对话界面与 Vercel 部署配置。现阶段优先把 Free Trial 路径跑通：申请通过即可拿到免费体验版，默认 2 次 AI 对话。
         </p>
         <div className="hero__actions">
           <a href="/apply" className="button button--primary">
             前往会员申请
           </a>
-          <a href="/assistant" className="button button--ghost">
+          <AccessEntryLink href="/assistant" mode="assistant" className="button button--ghost">
             查看 AI 助手页
-          </a>
+          </AccessEntryLink>
         </div>
       </section>
 

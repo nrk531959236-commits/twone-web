@@ -164,14 +164,21 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("/api/assistant error", error);
 
-    const message =
-      error instanceof Error
-        ? error.message
-        : "AI 服务暂时不可用，请稍后再试。";
+    const message = error instanceof Error ? error.message : "AI 服务暂时不可用，请稍后再试。";
+    const knownStatus =
+      message.includes("请先登录") ? 401
+      : message.includes("未开通有效会员") ? 403
+      : message.includes("额度已用尽") ? 429
+      : 500;
 
     return NextResponse.json(
-      { error: message || "AI 服务暂时不可用，请稍后再试。" },
-      { status: 500 },
+      {
+        error:
+          knownStatus === 500
+            ? "AI 服务当前不可用，请稍后再试；如果你还没申请会员，也可以先走申请入口。"
+            : message,
+      },
+      { status: knownStatus },
     );
   }
 }

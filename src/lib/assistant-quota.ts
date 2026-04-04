@@ -2,7 +2,7 @@ import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildMembershipSummary, type MembershipSummary } from "@/lib/membership";
 
-const DEFAULT_MONTHLY_QUOTA = 30;
+const DEFAULT_MONTHLY_QUOTA = 2;
 
 type MembershipQuotaRow = {
   user_id: string;
@@ -39,10 +39,10 @@ function getQuotaMessage(summary: MembershipSummary, remaining: number, quota: n
   }
 
   if (remaining <= 0) {
-    return `本月 AI 对话额度已用尽（0 / ${quota} 剩余），请下月重置或提升额度。`;
+    return `免费体验版本月 AI 对话额度已用尽（0 / ${quota} 剩余），请等待下月重置或联系管理员手动调整次数。`;
   }
 
-  return `本月 AI 对话还可使用 ${remaining} 次，共 ${quota} 次。`;
+  return `当前 AI 对话还可使用 ${remaining} 次，共 ${quota} 次。默认 Free 体验版为 ${quota} 次。`;
 }
 
 function normalizeQuota(value: number | null | undefined) {

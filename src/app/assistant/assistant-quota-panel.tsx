@@ -65,14 +65,14 @@ export function AssistantQuotaPanel({
 
   const quotaCards = [
     {
-      label: "本月 AI 对话额度",
+      label: "当前 AI 对话额度",
       value: `${quota.monthlyRemaining} / ${quota.monthlyQuota}`,
       detail: `已用 ${quota.monthlyUsed} 次 · 周期 ${quota.currentPeriod}`,
     },
     {
-      label: "会员方案",
+      label: "当前方案",
       value: membershipPlan,
-      detail: membershipActive ? "会员有效" : "当前未开通或已过期",
+      detail: membershipActive ? "资格有效，可继续使用" : "当前未开通或已过期",
     },
     {
       label: "额度状态",

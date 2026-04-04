@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { AccessEntryLink } from "@/components/access-entry-link";
 
 type SiteHeaderProps = {
-  current?: "home" | "apply" | "assistant";
+  current?: "home" | "apply" | "assistant" | "admin";
 };
 
 const navItems = [
   { href: "/", label: "首页", key: "home" },
   { href: "/apply", label: "会员申请", key: "apply" },
   { href: "/assistant", label: "AI 助手", key: "assistant" },
+  { href: "/admin", label: "管理后台", key: "admin" },
 ] as const;
 
 export function SiteHeader({ current }: SiteHeaderProps) {
@@ -38,9 +40,9 @@ export function SiteHeader({ current }: SiteHeaderProps) {
       </nav>
 
       <div className="site-header__actions">
-        <Link href="/assistant" className="button button--secondary">
+        <AccessEntryLink href="/assistant" mode="login" className="button button--secondary">
           会员登录
-        </Link>
+        </AccessEntryLink>
         <Link href="/apply" className="button button--primary">
           立即申请
         </Link>

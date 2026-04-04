@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const focusOptions = [
   "BTC / ETH 主流趋势交易",
   "山寨轮动与热点叙事",
@@ -80,10 +82,13 @@ export function ApplyForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<SubmitStatus | null>(null);
 
+  const normalizedContact = form.contact.trim();
+  const isValidLoginEmail = EMAIL_PATTERN.test(normalizedContact);
+
   const canSubmit = useMemo(() => {
     return Boolean(
       form.nickname.trim() &&
-        form.contact.trim() &&
+        isValidLoginEmail &&
         form.region.trim() &&
         form.identity.trim() &&
         form.tradingExperience &&
@@ -91,7 +96,7 @@ export function ApplyForm() {
         form.wantsAi &&
         form.budget,
     );
-  }, [form]);
+  }, [form, isValidLoginEmail]);
 
   const updateField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -114,6 +119,16 @@ export function ApplyForm() {
     event.preventDefault();
     setStatus(null);
 
+    if (!normalizedContact) {
+      setStatus({ type: "error", message: "请先填写你登录 Twone 时使用的邮箱。" });
+      return;
+    }
+
+    if (!isValidLoginEmail) {
+      setStatus({ type: "error", message: "请输入有效的登录邮箱格式，非邮箱地址不能提交申请。" });
+      return;
+    }
+
     if (!canSubmit) {
       setStatus({ type: "error", message: "请先补齐必填项，再提交申请。" });
       return;
@@ -123,7 +138,7 @@ export function ApplyForm() {
 
     const payload = {
       nickname: form.nickname.trim(),
-      contact: form.contact.trim(),
+      contact: normalizedContact,
       region: form.region.trim(),
       identity: form.identity.trim(),
       trading_experience: form.tradingExperience,
@@ -132,6 +147,7 @@ export function ApplyForm() {
       wants_ai: form.wantsAi === "true",
       budget: form.budget,
       notes: form.notes.trim() || null,
+      review_status: "pending",
     };
 
     console.log("[apply] inserting member_application", payload);
@@ -156,7 +172,7 @@ export function ApplyForm() {
         return;
       }
 
-      const successMessage = "申请已提交成功，我们会尽快完成筛选与回访。";
+      const successMessage = "申请已提交成功。审核通过后，默认可获得 Free 体验版与 2 次 AI 对话。";
 
       setStatus({ type: "success", message: successMessage });
       setForm(initialState);
@@ -194,13 +210,16 @@ export function ApplyForm() {
           />
         </label>
         <label className="form-field">
-          <span>联系方式 *</span>
+          <span>登录邮箱 *</span>
           <input
-            type="text"
-            placeholder="Telegram / 微信 / 邮箱"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="请填写你登录 Twone 时使用的邮箱"
             value={form.contact}
             onChange={(event) => updateField("contact", event.target.value)}
           />
+          <small>后台会直接按这个登录邮箱审批；审核通过后默认发放 Free 体验版 + 2 次 AI 对话。之后你只需用同一个邮箱登录 Twone，资格就会自动生效；不是邮箱将无法提交。</small>
         </label>
         <label className="form-field">
           <span>所在地区 *</span>
@@ -225,7 +244,7 @@ export function ApplyForm() {
       <div className="form-section">
         <div className="form-section__header">
           <h3>交易经验 *</h3>
-          <p>选择更接近你的阶段，便于后续内容与社群匹配。</p>
+          <p>选择更接近你的阶段，便于后续内容、社群与 Free Trial 体验反馈匹配。</p>
         </div>
         <div className="tag-list">
           {experienceTags.map((tag) => {
@@ -277,7 +296,7 @@ export function ApplyForm() {
       <div className="form-section">
         <div className="form-section__header">
           <h3>关注主题</h3>
-          <p>可多选，提交时会一并写入你的申请记录。</p>
+          <p>可多选，提交时会一并写入你的申请记录，也方便后续定向开放更合适的试用内容。</p>
         </div>
         <div className="tag-list">
           {focusOptions.map((tag) => {
@@ -339,7 +358,11 @@ export function ApplyForm() {
         <button type="submit" className="button button--primary" disabled={isSubmitting}>
           {isSubmitting ? "提交中..." : "提交申请"}
         </button>
-        <p>{isSubmitting ? "正在写入申请数据，请稍候。" : "提交后将进入人工筛选与回访流程。"}</p>
+        <p>
+          {isSubmitting
+            ? "正在写入申请数据，请稍候。"
+            : "提交后将进入人工筛选流程；审核通过默认发放 Free 体验版与 2 次 AI 对话，请确认填写的是你登录 Twone 时使用的邮箱，之后用同一邮箱登录即可自动生效。"}
+        </p>
       </div>
 
       {status ? (
