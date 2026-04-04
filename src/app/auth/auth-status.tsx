@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getAuthCallbackUrl } from "@/lib/auth";
 
 type AuthStatusUser = {
   id: string;
@@ -103,7 +104,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
     setError(null);
     setMessage(null);
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=/assistant`;
+    const redirectTo = getAuthCallbackUrl("/assistant");
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email: email.trim(),
@@ -119,7 +120,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
     }
 
     setMessage(
-      "登录链接已发送。打开邮箱点击链接后，会自动回到 /assistant。\n如果这个邮箱已经通过审核，系统会在你登录后自动兑现 Free 体验版与 2 次 AI 对话额度；本地测试时也请确认 Supabase Auth 的 redirect URL 已加入当前域名。",
+      `登录链接已发送。打开邮箱点击链接后，会先进入 ${redirectTo}，然后自动回到 /assistant。\n如果这个邮箱已经通过审核，系统会在你登录后自动兑现 Free 体验版与 2 次 AI 对话额度；本地测试时也请确认 Supabase Auth 的 redirect URL 已加入当前域名。`,
     );
     setIsSubmitting(false);
   }
