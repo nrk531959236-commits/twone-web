@@ -22,12 +22,13 @@ export type MembershipSummary = {
   plan: string | null;
 };
 
-type MembershipRow = {
+export type MembershipRow = {
   user_id: string;
   plan: string | null;
   status: string | null;
   started_at: string | null;
   expires_at: string | null;
+  assistant_monthly_quota?: number | null;
 };
 
 type MembershipEmailApprovalRow = {
@@ -126,7 +127,7 @@ export function buildMembershipSummary(
   };
 }
 
-async function syncApprovedEmailMembership(user: User) {
+export async function ensureMembershipForUser(user: User) {
   if (!user.email) {
     return null;
   }
@@ -171,6 +172,7 @@ async function syncApprovedEmailMembership(user: User) {
     status: membershipPayload.status,
     started_at: membershipPayload.started_at,
     expires_at: membershipPayload.expires_at,
+    assistant_monthly_quota: membershipPayload.assistant_monthly_quota,
   } satisfies MembershipRow;
 }
 
@@ -227,9 +229,7 @@ export async function getMembershipSummary() {
 
   let row = existingMembershipRow;
 
-  if (!row) {
-    row = await syncApprovedEmailMembership(user);
-  }
+  row = await ensureMembershipForUser(user) ?? row;
 
   const hasPendingApplication = row ? false : await hasPendingApplicationByEmail(user);
 

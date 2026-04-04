@@ -1,6 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { buildMembershipSummary, type MembershipSummary } from "@/lib/membership";
+import { buildMembershipSummary, ensureMembershipForUser, type MembershipSummary } from "@/lib/membership";
 
 function isMissingAuthSessionError(error: unknown) {
   if (!(error instanceof Error)) {
@@ -62,6 +62,12 @@ function normalizeQuota(value: number | null | undefined) {
 }
 
 async function getMembershipQuotaRow(user: User) {
+  const syncedRow = await ensureMembershipForUser(user);
+
+  if (syncedRow) {
+    return syncedRow satisfies MembershipQuotaRow;
+  }
+
   const supabase = await createSupabaseServerClient();
   const { data: row, error } = await supabase
     .from("memberships")

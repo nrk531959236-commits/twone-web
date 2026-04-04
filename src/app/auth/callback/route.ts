@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/auth";
+import { ensureMembershipForUser } from "@/lib/membership";
 
 function getSafeNextPath(next: string | null) {
   if (!next || !next.startsWith("/")) {
@@ -30,6 +31,15 @@ export async function GET(request: Request) {
 
   if (error) {
     redirectUrl.searchParams.set("authError", error.message);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    await ensureMembershipForUser(user);
   }
 
   return NextResponse.redirect(redirectUrl);
