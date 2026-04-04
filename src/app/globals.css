@@ -1313,6 +1313,35 @@ button {
   }
 }
 
+.admin-login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
+  gap: 24px;
+}
+
+.admin-login-hero__grid {
+  align-items: stretch;
+}
+
+.admin-login-panel,
+.admin-login-help {
+  min-width: 0;
+}
+
+.admin-login-panel__intro {
+  margin-top: 10px;
+}
+
+.admin-login-form input[type="password"] {
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 960px) {
+  .admin-login-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .page-shell {
     width: min(100vw - 20px, 1200px);

@@ -256,7 +256,7 @@ function AdminDeniedState({ email, allowedEmails }: { email: string | null; allo
             <h1>/admin 暂未对该账号开放。</h1>
             <p className="hero__description">
               这是一个最小可用的后台保护方案：先基于登录邮箱 + <code>ADMIN_EMAILS</code> 白名单放行。
-              只有登录态邮箱命中白名单，才允许进入后台并执行修改操作。
+              只有登录态邮箱命中白名单，才允许进入后台并执行修改操作。管理员可先从 <code>/admin-login</code> 用邮箱 + 密码登录，再访问这里。
             </p>
           </div>
 
@@ -276,7 +276,7 @@ function AdminDeniedState({ email, allowedEmails }: { email: string | null; allo
               </article>
               <article>
                 <span>下一步</span>
-                <strong>补充 ADMIN_EMAILS，并用对应 Supabase 登录邮箱访问 /admin。</strong>
+                <strong>补充 ADMIN_EMAILS，并用对应 Supabase 登录邮箱从 /admin-login 进入后台。</strong>
               </article>
             </div>
           </aside>

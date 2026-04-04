@@ -43,6 +43,10 @@ export function getReadableAuthErrorMessage(rawMessage: string | null | undefine
     return "未找到对应账号，请确认邮箱后重试。";
   }
 
+  if (normalized.includes("invalid login credentials")) {
+    return "邮箱或密码不正确，请重新输入。";
+  }
+
   if (normalized.includes("email not confirmed")) {
     return "邮箱尚未确认，请先完成邮箱验证。";
   }
