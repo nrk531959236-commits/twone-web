@@ -46,16 +46,66 @@ type MembershipRow = {
   updated_at?: string | null;
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  guest: "访客",
+  inactive: "未启用",
+  active: "已启用",
+  pending: "待审核",
+  approved: "已通过",
+  rejected: "已拒绝",
+};
+
+const PLAN_LABELS: Record<string, string> = {
+  free: "免费版",
+  pro: "专业版",
+  core: "核心版",
+  vip: "VIP",
+};
+
+function getStatusLabel(status: string | null | undefined) {
+  if (!status) {
+    return "—";
+  }
+
+  return STATUS_LABELS[status.toLowerCase()] ?? status;
+}
+
+function getPlanLabel(plan: string | null | undefined) {
+  if (!plan) {
+    return "—";
+  }
+
+  return PLAN_LABELS[plan.toLowerCase()] ?? plan;
+}
+
+function formatPlanWithValue(plan: string | null | undefined) {
+  if (!plan) {
+    return "—";
+  }
+
+  const label = getPlanLabel(plan);
+  return label === plan ? plan : `${label}（${plan}）`;
+}
+
+function formatStatusWithValue(status: string | null | undefined) {
+  if (!status) {
+    return "—";
+  }
+
+  const label = getStatusLabel(status);
+  return label === status ? status : `${label}（${status}）`;
+}
+
 function ApplicationReviewFooter({ application }: { application: ApplicationRow }) {
   return (
     <footer className="admin-record-card__footer">
       <section className="admin-review-actions" aria-label={`审批区-${application.nickname || application.contact || application.id}`}>
         <div className="admin-review-actions__header">
           <div>
-            <span className="section__label">Review</span>
+            <span className="section__label">审批操作</span>
             <h4>审批区</h4>
           </div>
-          <p>每条申请卡片底部固定显示：Approve / Reject、Target user_id、Plan、assistant_monthly_quota。当前默认按申请登录邮箱直接审批：若该邮箱已登录过，会立即写入 memberships；若还没登录过，会先写入邮箱批准记录，等对方未来首次用该邮箱登录后自动生效。默认发放 free 体验版与 2 次 AI 对话，仍可在提交前手动改。</p>
+          <p>每条申请卡片底部固定显示：通过并开通、拒绝申请、目标用户 ID（Target user_id）、方案、AI 月额度。当前默认按申请登录邮箱直接审批：若该邮箱已登录过，会立即写入 memberships；若还没登录过，会先写入邮箱批准记录，等对方未来首次用该邮箱登录后自动生效。默认发放免费版（free）体验资格与 2 次 AI 对话，仍可在提交前手动调整。</p>
         </div>
 
         <form action={approveApplicationAction} className="admin-approve-form">
@@ -68,7 +118,7 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
           </label>
 
           <label className="form-field">
-            <span>Target user_id（兜底）</span>
+            <span>目标用户 ID（Target user_id，兜底）</span>
             <input
               name="targetUserId"
               type="text"
@@ -77,24 +127,24 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
           </label>
 
           <label className="form-field">
-            <span>Plan</span>
-            <input name="plan" type="text" defaultValue="free" placeholder="例如：free / pro" />
+            <span>方案</span>
+            <input name="plan" type="text" defaultValue="free" placeholder="例如：free / pro / core / vip" />
           </label>
 
           <label className="form-field">
-            <span>assistant_monthly_quota</span>
+            <span>AI 月额度（assistant_monthly_quota）</span>
             <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue="2" />
           </label>
 
           <div className="admin-approve-form__hint">
             {looksLikeEmail(application.contact)
-              ? "Approve 时会优先按申请里的登录邮箱处理：如果 auth.users 已有该邮箱，会立即开通 membership；如果还没有，则先记为邮箱已批准，等对方未来第一次用这个邮箱登录 Twone 后自动兑现。当前默认发放 free 体验版 + 2 次 AI 对话。"
+              ? "审批通过时会优先按申请里的登录邮箱处理：如果 auth.users 已有该邮箱，会立即开通会员资格；如果还没有，则先记为邮箱已批准，等对方未来第一次用这个邮箱登录 Twone 后自动兑现。当前默认发放免费版（free）体验资格 + 2 次 AI 对话。"
               : "当前申请登录邮箱缺失或格式异常，无法走邮箱审批。建议先让申请人重新提交登录邮箱，或直接在这里手动填目标 user_id。"}
           </div>
 
           <div className="admin-edit-form__actions">
             <button type="submit" className="button button--primary">
-              Approve（按邮箱批准 / 立即开通）
+              通过并开通（按邮箱批准 / 立即生效）
             </button>
           </div>
         </form>
@@ -102,9 +152,9 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
         <form action={rejectApplicationAction} className="admin-reject-form">
           <input type="hidden" name="applicationId" value={application.id} />
           <button type="submit" className="button button--ghost button--danger">
-            Reject
+            拒绝申请
           </button>
-          <p className="admin-reject-form__hint">Reject 只修改申请审核状态，不会动 memberships。</p>
+          <p className="admin-reject-form__hint">拒绝申请只会修改审核状态，不会改动 memberships。</p>
         </form>
       </section>
     </footer>
@@ -143,11 +193,11 @@ function normalizeReviewStatus(status: ReviewStatus | null) {
 function getReviewStatusLabel(status: ReviewStatus | null) {
   switch (normalizeReviewStatus(status)) {
     case "approved":
-      return "Approved";
+      return "已通过";
     case "rejected":
-      return "Rejected";
+      return "已拒绝";
     default:
-      return "Pending";
+      return "待处理";
   }
 }
 
@@ -199,7 +249,7 @@ function AdminDeniedState({ email, allowedEmails }: { email: string | null; allo
   return (
     <>
       <section className="section hero page-hero">
-        <div className="hero__badge">Admin Access · Restricted</div>
+        <div className="hero__badge">后台访问 · 受限</div>
         <div className="hero__grid">
           <div className="hero__content">
             <p className="eyebrow">当前账号不在后台白名单内</p>
@@ -213,7 +263,7 @@ function AdminDeniedState({ email, allowedEmails }: { email: string | null; allo
           <aside className="hero__panel card-glow">
             <div className="panel__topline">
               <span className="status-dot status-dot--muted" />
-              Access Check
+              访问检查
             </div>
             <div className="panel__list">
               <article>
@@ -258,7 +308,7 @@ export default async function AdminPage() {
       <SiteHeader />
 
       <section className="section hero page-hero admin-hero">
-        <div className="hero__badge">Admin Console · V1</div>
+        <div className="hero__badge">后台控制台 · V1</div>
         <div className="hero__grid">
           <div className="hero__content">
             <p className="eyebrow">先把手工 SQL 替换成可用后台</p>
@@ -274,7 +324,7 @@ export default async function AdminPage() {
               </div>
               <div>
                 <strong>{pendingCount} / {approvedCount} / {rejectedCount}</strong>
-                <span>Pending / Approved / Rejected</span>
+                <span>待处理 / 已通过 / 已拒绝</span>
               </div>
               <div>
                 <strong>{access.email}</strong>
@@ -286,19 +336,19 @@ export default async function AdminPage() {
           <aside className="hero__panel card-glow">
             <div className="panel__topline">
               <span className="status-dot" />
-              Admin Scope
+              后台范围
             </div>
             <div className="panel__list">
               <article>
                 <span>申请管理</span>
-                <strong>读取 member_applications，显示 pending / approved / rejected，并支持按邮箱直接审批默认 free / 2 或手动改额度。</strong>
+                <strong>读取 member_applications，显示待处理 / 已通过 / 已拒绝，并支持按邮箱直接审批默认免费版（free）/ 2 次，或手动改额度。</strong>
               </article>
               <article>
                 <span>会员管理</span>
                 <strong>读取 memberships，直接修改状态 / 方案 / AI 月额度。</strong>
               </article>
               <article>
-                <span>Guardrail</span>
+                <span>访问保护</span>
                 <strong>页面与 Server Action 双重检查管理员邮箱白名单。</strong>
               </article>
             </div>
@@ -309,7 +359,7 @@ export default async function AdminPage() {
       <section className="section admin-tabs-section">
         <div className="section-heading admin-tabs-heading">
           <div>
-            <p className="section__label">Admin Tabs</p>
+            <p className="section__label">后台导航</p>
             <h2>后台区块</h2>
           </div>
           <p className="section__intro">先做两个核心块：申请管理 + 会员管理，足够替掉大部分手工查表和更新 SQL。</p>
@@ -328,13 +378,13 @@ export default async function AdminPage() {
       <section className="section admin-section" id="applications">
         <div className="section-heading admin-section__heading">
           <div>
-            <p className="section__label">Applications</p>
+            <p className="section__label">申请管理</p>
             <h2>申请管理</h2>
           </div>
           <p className="section__intro">
             直接读取 <code>member_applications</code>，优先看最近提交。现在后台用 <code>review_status</code> 区分
-            <code>pending</code> / <code>approved</code> / <code>rejected</code>：待处理、已通过、已拒绝。Approve 时优先按申请里的登录邮箱处理：若该邮箱对应用户已存在，则立即写入
-            <code>memberships</code>；若该邮箱还没登录过，则先写入邮箱批准记录，等对方未来首次用这个邮箱登录后再自动兑现。当前默认发放 <code>free</code> 体验版与 <code>2</code> 次 AI 对话额度，必要时也可手动填写目标 <code>user_id</code>，或直接改方案与额度。
+            <code>pending</code> / <code>approved</code> / <code>rejected</code>：待处理、已通过、已拒绝。通过并开通时会优先按申请里的登录邮箱处理：若该邮箱对应用户已存在，则立即写入
+            <code>memberships</code>；若该邮箱还没登录过，则先写入邮箱批准记录，等对方未来首次用这个邮箱登录后再自动兑现。当前默认发放 <code>free</code> 免费版与 <code>2</code> 次 AI 对话额度，必要时也可手动填写目标 <code>user_id</code>，或直接改方案与额度。
           </p>
         </div>
 
@@ -412,11 +462,11 @@ export default async function AdminPage() {
       <section className="section admin-section" id="memberships">
         <div className="section-heading admin-section__heading">
           <div>
-            <p className="section__label">Memberships</p>
+            <p className="section__label">会员管理</p>
             <h2>会员管理</h2>
           </div>
           <p className="section__intro">
-            直接读取 <code>memberships</code>。当前支持修改 <code>status</code>、<code>plan</code>、<code>assistant_monthly_quota</code>，也就是可以随时把 free 体验版次数手动加减，或切换到其他方案。
+            直接读取 <code>memberships</code>。当前支持修改 <code>status</code>、<code>plan</code>、<code>assistant_monthly_quota</code>，也就是可以随时把免费版次数手动加减，或切换到其他方案。
           </p>
         </div>
 
@@ -438,11 +488,11 @@ export default async function AdminPage() {
                 <div className="admin-data-grid">
                   <div>
                     <span>当前状态</span>
-                    <strong>{membership.status || "—"}</strong>
+                    <strong>{formatStatusWithValue(membership.status)}</strong>
                   </div>
                   <div>
                     <span>当前方案</span>
-                    <strong>{membership.plan || "—"}</strong>
+                    <strong>{formatPlanWithValue(membership.plan)}</strong>
                   </div>
                   <div>
                     <span>AI 月额度</span>
@@ -458,22 +508,23 @@ export default async function AdminPage() {
                   <input type="hidden" name="membershipUserId" value={membership.user_id} />
 
                   <label className="form-field">
-                    <span>Status</span>
+                    <span>状态</span>
                     <select name="status" defaultValue={membership.status ?? ""}>
                       <option value="">空</option>
-                      <option value="guest">guest</option>
-                      <option value="inactive">inactive</option>
-                      <option value="active">active</option>
+                      <option value="guest">访客</option>
+                      <option value="inactive">未启用</option>
+                      <option value="active">已启用</option>
                     </select>
                   </label>
 
                   <label className="form-field">
-                    <span>Plan</span>
-                    <input name="plan" type="text" defaultValue={membership.plan ?? ""} placeholder="例如：core" />
+                    <span>方案</span>
+                    <input name="plan" type="text" defaultValue={membership.plan ?? ""} placeholder="例如：free / pro / core / vip" />
+                    <small>常见显示：免费版（free）/ 专业版（pro）/ 核心版（core）/ VIP（vip）</small>
                   </label>
 
                   <label className="form-field">
-                    <span>assistant_monthly_quota</span>
+                    <span>AI 月额度（assistant_monthly_quota）</span>
                     <input
                       name="assistantMonthlyQuota"
                       type="number"

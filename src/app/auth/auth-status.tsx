@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getAuthCallbackUrl } from "@/lib/auth";
+import { getReadableAuthErrorMessage } from "@/lib/auth-error";
 
 type AuthStatusUser = {
   id: string;
@@ -31,6 +32,7 @@ type AuthStatusProps = {
   initialUser: AuthStatusUser | null;
   initialMembership: MembershipView;
   initialQuota: QuotaView;
+  initialAuthError?: string | null;
 };
 
 function formatExpiry(value: string | null) {
@@ -45,7 +47,7 @@ function formatExpiry(value: string | null) {
   }).format(new Date(value));
 }
 
-export function AuthStatus({ initialUser, initialMembership, initialQuota }: AuthStatusProps) {
+export function AuthStatus({ initialUser, initialMembership, initialQuota, initialAuthError }: AuthStatusProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [user, setUser] = useState<AuthStatusUser | null>(initialUser);
   const [email, setEmail] = useState(initialUser?.email ?? "");
@@ -53,7 +55,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
   const [quota, setQuota] = useState<QuotaView>(initialQuota);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialAuthError ?? null);
 
   useEffect(() => {
     const {
@@ -114,7 +116,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
     });
 
     if (signInError) {
-      setError(signInError.message || "登录链接发送失败，请稍后再试。");
+      setError(getReadableAuthErrorMessage(signInError.message));
       setIsSubmitting(false);
       return;
     }
@@ -133,7 +135,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
     const { error: signOutError } = await supabase.auth.signOut();
 
     if (signOutError) {
-      setError(signOutError.message || "退出登录失败，请稍后再试。");
+      setError(getReadableAuthErrorMessage(signOutError.message));
       setIsSubmitting(false);
       return;
     }
@@ -242,7 +244,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
 
         <div className="auth-card__actions">
           <button type="submit" className="button button--primary" disabled={isSubmitting}>
-            {isSubmitting ? "发送中..." : "发送魔法登录链接"}
+            {isSubmitting ? "发送中..." : "发送登录链接"}
           </button>
           <Link href="/apply" className="button button--ghost">
             我还没申请，先去申请 Free Trial
@@ -251,7 +253,7 @@ export function AuthStatus({ initialUser, initialMembership, initialQuota }: Aut
       </form>
 
       <p className="auth-card__hint">
-        最轻量可行方案：Supabase Auth Email OTP / Magic Link + 邮箱批准记录自动兑现 membership + assistant_usage 月度计数。无需单独做密码流，也能拿到服务端可验证的登录 session。当前默认审批通过即发放 Free 体验版与 2 次 AI 对话。
+        当前采用邮箱登录链接方案：邮箱批准记录可自动兑现 membership，并结合 assistant_usage 做月度计数。无需单独密码流，也能拿到服务端可验证的登录 session。当前默认审批通过即发放 Free 体验版与 2 次 AI 对话。
       </p>
 
       {message ? <div className="form-status form-status--success">{message}</div> : null}

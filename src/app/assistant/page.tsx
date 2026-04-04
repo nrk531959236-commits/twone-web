@@ -8,6 +8,7 @@ import { toAssistantQuotaView } from "@/lib/assistant/view";
 import { AssistantChatShell } from "./assistant-chat-shell";
 import { AssistantQuotaPanel } from "./assistant-quota-panel";
 import { AssistantEntryCard } from "./assistant-entry-card";
+import { getAuthCallbackErrorMessage } from "@/lib/auth-error";
 
 function isMissingAuthSessionError(error: unknown) {
   if (!(error instanceof Error)) {
@@ -33,7 +34,7 @@ const capabilityCards = [
 export default async function AssistantPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ entry?: string }>;
+  searchParams?: Promise<{ entry?: string; authError?: string }>;
 }) {
   const quota = await getAssistantQuotaSummary();
   const membership = quota.membership;
@@ -41,6 +42,7 @@ export default async function AssistantPage({
   const supabase = await createSupabaseServerClient();
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const entryMode = resolvedSearchParams?.entry === "login" ? "login" : "assistant";
+  const initialAuthError = getAuthCallbackErrorMessage(resolvedSearchParams?.authError ?? null);
   const {
     data: { user },
     error: userError,
@@ -118,6 +120,7 @@ export default async function AssistantPage({
               monthlyRemaining: quota.monthlyRemaining,
               quotaMessage: quota.quotaMessage,
             }}
+            initialAuthError={initialAuthError}
           />
 
           <section className="section card-glow sidebar-card">
