@@ -1,8 +1,17 @@
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
+}
+
+function isMissingAuthSession(error: { name?: string; message?: string } | null | undefined) {
+  if (!error) {
+    return false;
+  }
+
+  return error.name === "AuthSessionMissingError" || /auth session missing/i.test(error.message ?? "");
 }
 
 export function getAdminEmails() {
@@ -14,13 +23,19 @@ export function getAdminEmails() {
 
 export async function getAdminAccess() {
   const supabase = await createSupabaseServerClient();
+  let user: User | null = null;
+
   const {
-    data: { user },
+    data: { user: currentUser },
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
+  if (error && !isMissingAuthSession(error)) {
     throw error;
+  }
+
+  if (!error) {
+    user = currentUser;
   }
 
   const email = user?.email ? normalizeEmail(user.email) : null;
