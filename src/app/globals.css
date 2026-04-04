@@ -616,6 +616,68 @@ button {
   margin-top: 16px;
 }
 
+.auth-login-mode-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.auth-login-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.auth-login-mode-tab--active {
+  color: var(--text);
+  border-color: rgba(124, 140, 255, 0.42);
+  background: rgba(124, 140, 255, 0.14);
+  box-shadow: 0 10px 24px rgba(124, 140, 255, 0.18);
+}
+
+.auth-password-help,
+.auth-reset-help__item {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(124, 140, 255, 0.16);
+  background: rgba(124, 140, 255, 0.08);
+}
+
+.auth-password-help strong,
+.auth-reset-help__item strong {
+  font-size: 15px;
+}
+
+.auth-password-help p,
+.auth-reset-help__item p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.auth-password-help--inline {
+  margin-top: 16px;
+}
+
+.auth-reset-card {
+  display: grid;
+  gap: 20px;
+}
+
+.auth-reset-help {
+  display: grid;
+  gap: 14px;
+}
+
 .auth-card__badge--locked {
   color: #9caec6;
 }
@@ -1066,6 +1128,10 @@ button {
 
   .footer__meta {
     justify-content: flex-start;
+  }
+
+  .auth-login-mode-tabs {
+    width: 100%;
   }
 }
 

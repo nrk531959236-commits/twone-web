@@ -81,7 +81,7 @@ export function buildMembershipSummary(
       isMember: false,
       isPending: false,
       message: "未登录，仅可浏览。",
-      detail: "请先登录申请时填写的邮箱；服务端会在登录态基础上继续校验会员状态，并自动兑现该邮箱已获批的资格。审核通过后默认发放 Free 体验版与 2 次 AI 对话。",
+      detail: "请先登录申请时填写的邮箱；现在优先支持邮箱 + 密码登录，magic link 作为备用。服务端会在登录态基础上继续校验会员状态，并自动兑现该邮箱已获批的资格。审核通过后默认发放 Free 体验版与 2 次 AI 对话。",
       expiresAt: null,
       plan: null,
     };
@@ -109,7 +109,7 @@ export function buildMembershipSummary(
       isMember: false,
       isPending: true,
       message: "你的申请正在审核中。",
-      detail: "当前登录邮箱已存在待审核申请。审核完成前，AI 助手仍为只读状态，无需重复提交；请等待审核结果，并继续使用申请时填写的同一邮箱登录。若审核通过，资格会自动生效。",
+      detail: "当前登录邮箱已存在待审核申请。审核完成前，AI 助手仍为只读状态，无需重复提交；请等待审核结果，并继续使用申请时填写的同一邮箱登录。若审核通过，资格会自动生效；老用户也可以顺手补一个密码，后续登录更方便。",
       expiresAt: row?.expires_at ?? null,
       plan: row?.plan ?? null,
     };
@@ -121,7 +121,7 @@ export function buildMembershipSummary(
     isMember: false,
     isPending: false,
     message: "已登录，但当前账号还没有可用体验资格。",
-    detail: "当前账号已有登录会话，但没有有效会员权限，AI 助手暂不可用。若你还没申请，请先提交申请；若你已通过审核，请确认现在登录的就是申请时填写的邮箱，系统会按该邮箱自动兑现资格。默认审批会开通 Free 体验版与 2 次 AI 对话。",
+    detail: "当前账号已有登录会话，但没有有效会员权限，AI 助手暂不可用。若你还没申请，请先提交申请；若你已通过审核，请确认现在登录的就是申请时填写的邮箱，系统会按该邮箱自动兑现资格。若你以前只靠邮箱链接登录，也可以先补一个密码。默认审批会开通 Free 体验版与 2 次 AI 对话。",
     expiresAt: row?.expires_at ?? null,
     plan: row?.plan ?? null,
   };

@@ -65,7 +65,7 @@ export default async function AssistantPage({
           </div>
           <p className="section__intro">
             这一版把最轻量可行的体验权限补齐：未登录可浏览、不可发送；已登录但未通过审核仍不可用；
-            只有有效体验资格或会员资格且本月额度未耗尽才放行。当前默认会按登录邮箱发放 Free 体验版与 2 次 AI 对话，已接入真实 AI 后端接口，并在服务端同时校验 Supabase Auth 会话、
+            只有有效体验资格或会员资格且本月额度未耗尽才放行。现在普通用户优先支持邮箱 + 密码登录，magic link 保留为备用；当前默认会按登录邮箱发放 Free 体验版与 2 次 AI 对话，已接入真实 AI 后端接口，并在服务端同时校验 Supabase Auth 会话、
             memberships 状态与 assistant_usage 月度使用次数，并在用户首次用已获批邮箱登录时自动兑现资格。
           </p>
         </div>
@@ -129,12 +129,12 @@ export default async function AssistantPage({
             <p>
               当前先开放文本对话体验。未登录用户可以查看页面和默认欢迎内容，但发送入口会锁定；
               已登录且申请仍在审核中的用户，会明确看到“你的申请正在审核中”与下一步说明；未申请用户会被明确引导去申请或使用已有账号登录；
-              审核通过后默认按登录邮箱发放 Free 体验版与 2 次 AI 对话，用户未来首次用该邮箱登录后会自动生效；若本月次数耗尽，也会被前后端同时拦截。
+              审核通过后默认按登录邮箱发放 Free 体验版与 2 次 AI 对话，用户未来首次用该邮箱登录后会自动生效；现在默认登录方式为邮箱 + 密码，老用户也可从页面直接进入“设置密码 / 忘记密码”；若本月次数耗尽，也会被前后端同时拦截。
             </p>
             <div className="membership-list">
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>未登录：可浏览 AI 助手页面，不可发送消息</span>
+                <span>未登录：可浏览 AI 助手页面，不可发送消息；已获批用户优先用邮箱 + 密码登录</span>
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
@@ -142,7 +142,7 @@ export default async function AssistantPage({
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>已登录但未申请或未获批：/assistant 与 /api/assistant 仍会拒绝发送；若已通过审核，请确认当前邮箱就是申请时填写的登录邮箱</span>
+                <span>已登录但未申请或未获批：/assistant 与 /api/assistant 仍会拒绝发送；若已通过审核，请确认当前邮箱就是申请时填写的登录邮箱；老用户可先补密码再试</span>
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
