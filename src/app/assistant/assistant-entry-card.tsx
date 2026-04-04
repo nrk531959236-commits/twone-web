@@ -14,7 +14,7 @@ function getEntryCopy(membership: MembershipSummary, entryMode: "login" | "assis
           label: "Member Sign-in",
           title: "先登录已有会员账号",
           description:
-            "如果你已经通过审核并开通 Free 体验版或其他会员方案，现在可以直接用申请时的邮箱 + 密码登录。登录后系统会自动校验状态，并自动兑现该邮箱对应的资格，再把你带回 AI 助手入口。",
+            "如果你已经通过审核并开通 Free 体验版或其他会员方案，现在可以直接用申请时的邮箱登录。若系统识别到你已通过审核但还没完成激活，会直接在站内显示首次设置密码表单；填完后会立即登录并进入 AI 助手。",
           primaryHref: "#member-login",
           primaryText: "已有账号，立即登录",
           secondaryHref: "/apply",
@@ -24,7 +24,7 @@ function getEntryCopy(membership: MembershipSummary, entryMode: "login" | "assis
           label: "AI Copilot Access",
           title: "AI 助手目前优先面向已通过审核的 Free 体验用户开放",
           description:
-            "未申请或未登录用户可以先浏览页面说明，但不会直接进入可发送状态。先提交申请；如果你已经有账号，也可以直接用邮箱 + 密码登录。审核通过后默认会获得 Free 体验版与 2 次 AI 对话。",
+            "未申请或未登录用户可以先浏览页面说明，但不会直接进入可发送状态。先提交申请；如果你已经通过审核，输入申请邮箱后系统会自动判断你是该直接登录，还是先在站内完成首次设置密码。审核通过后默认会获得 Free 体验版与 2 次 AI 对话。",
           primaryHref: "/apply",
           primaryText: "先申请加入",
           secondaryHref: "#member-login",
@@ -38,7 +38,7 @@ function getEntryCopy(membership: MembershipSummary, entryMode: "login" | "assis
         label: "Pending Review",
         title: "你的申请正在审核中",
         description:
-          "当前登录邮箱已匹配到待审核申请。AI 助手暂时保持只读，无需重复提交；请等待审核完成，并继续使用申请时填写的同一邮箱登录。审核通过后，资格会自动生效。",
+          "当前登录邮箱已匹配到待审核申请。AI 助手暂时保持只读，无需重复提交；请等待审核完成，并继续使用申请时填写的同一邮箱登录。审核通过后，系统会直接让你进入站内首次激活或自动兑现资格。",
         primaryHref: "/apply/success",
         primaryText: "查看审核说明",
         secondaryHref: "/auth/reset-password",

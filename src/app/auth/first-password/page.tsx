@@ -12,14 +12,14 @@ export default async function FirstPasswordPage({
   return (
     <main className="page-shell">
       <section className="section hero page-hero">
-        <div className="hero__badge">First Password Setup</div>
+        <div className="hero__badge">First Password Setup · 备用入口</div>
         <div className="section-heading assistant-heading">
           <div>
-            <p className="eyebrow">网页内一次性首次设密</p>
+            <p className="eyebrow">旧版一次性网页内设密入口（备用）</p>
             <h1>首次设置登录密码</h1>
           </div>
           <p className="section__intro">
-            这是给已审核通过测试用户的网页内设密入口。你需要一条由管理员生成的一次性链接；不是“知道邮箱就能设密码”。链接有效期 24 小时，用过就失效。设置完成后，后续直接用邮箱 + 密码登录即可，不再依赖邮件补密码。
+            这是保留给旧流程的备用入口：仅在你手里已经有管理员生成的一次性链接时才使用。现在主流程已经切到站内自动识别审核结果：已通过但未激活的新老用户，直接去 /assistant 或等待审核页，系统会自动显示首次设置密码表单；设置完成后会立即登录，不再把“管理员生成网页内首次设密链接”作为主路径。
           </p>
         </div>
       </section>

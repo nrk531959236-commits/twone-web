@@ -115,7 +115,7 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
             <span className="section__label">审批操作</span>
             <h4>审批区</h4>
           </div>
-          <p>每条申请卡片底部固定显示：通过并开通、生成首次设密链接、拒绝申请、目标用户 ID（Target user_id）、方案、AI 月额度。当前默认按申请登录邮箱直接审批：若该邮箱已登录过，会立即写入 memberships；若还没登录过，会先写入邮箱批准记录，等对方未来首次用该邮箱登录后自动生效。默认发放免费版（free）体验资格与 2 次 AI 对话，仍可在提交前手动调整。首次设密链接用于绕开用户端邮件链路，但前提是该邮箱已经存在对应的 Supabase Auth 用户。</p>
+          <p>每条申请卡片底部固定显示：通过并开通、生成首次设密链接（备用）、拒绝申请、目标用户 ID（Target user_id）、方案、AI 月额度。当前默认按申请登录邮箱直接审批：若该邮箱已登录过，会立即写入 memberships；若还没登录过，会先写入邮箱批准记录，等对方下次来到站内时直接进入“首次设置密码”并立即激活。默认发放免费版（free）体验资格与 2 次 AI 对话，仍可在提交前手动调整。生成首次设密链接仅保留给旧流程/特殊场景，不再是主路径。</p>
         </div>
 
         <form action={approveApplicationAction} className="admin-approve-form">
@@ -176,7 +176,7 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
             生成网页内首次设密链接
           </button>
           <p className="admin-reject-form__hint">
-            适用场景：用户已在 Supabase Auth 里存在，但不想再依赖邮件补密码。系统会撤销该用户旧的活动设密 token，并生成一个新的 24 小时一次性链接；链接用过即失效。若当前邮箱还没有对应 auth user，这一步会提示改走“先创建账号 / 先让用户成功登录一次”的最小替代方案。
+            适用场景：仅限旧流程或特殊兜底。系统会撤销该用户旧的活动设密 token，并生成一个新的 24 小时一次性链接；链接用过即失效。现在正常情况下，不需要再走这一步：用户下次直接来站内，系统会自动显示首次设置密码表单并完成激活。
           </p>
         </form>
 

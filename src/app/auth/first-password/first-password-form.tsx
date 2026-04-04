@@ -60,7 +60,7 @@ export function FirstPasswordForm({ token, presetEmail }: { token: string; prese
         return;
       }
 
-      setMessage(payload?.message ?? "密码已设置完成。现在可以直接去登录页，用邮箱 + 密码登录。");
+      setMessage(payload?.message ?? "密码已设置完成。现在可以直接去 /assistant 用邮箱 + 密码登录；若你是新流程用户，今后通常不再需要这个备用入口。");
       setPassword("");
       setConfirmPassword("");
     } catch {
@@ -113,7 +113,7 @@ export function FirstPasswordForm({ token, presetEmail }: { token: string; prese
       <div className="auth-reset-help">
         <div className="auth-reset-help__item">
           <strong>适合谁用</strong>
-          <p>已经通过审核、管理员已为你生成一次性网页内设密链接的测试用户。</p>
+          <p>仅适合已经拿到管理员一次性设密链接的旧流程用户。新老已通过用户现在优先直接去站内完成首次激活。</p>
         </div>
         <div className="auth-reset-help__item">
           <strong>安全边界</strong>

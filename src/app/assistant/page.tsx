@@ -9,6 +9,7 @@ import { AssistantChatShell } from "./assistant-chat-shell";
 import { AssistantQuotaPanel } from "./assistant-quota-panel";
 import { AssistantEntryCard } from "./assistant-entry-card";
 import { getAuthCallbackErrorMessage } from "@/lib/auth-error";
+import { getFirstActivationContextForCurrentVisitor } from "@/lib/first-activation";
 
 function isMissingAuthSessionError(error: unknown) {
   if (!(error instanceof Error)) {
@@ -51,6 +52,8 @@ export default async function AssistantPage({
   if (userError && !isMissingAuthSessionError(userError)) {
     throw userError;
   }
+
+  const firstActivation = user ? await getFirstActivationContextForCurrentVisitor(user) : null;
 
   return (
     <main className="page-shell">
@@ -105,22 +108,23 @@ export default async function AssistantPage({
 
         <aside className="assistant-sidebar">
           <AuthStatus
-            initialUser={
-              user
-                ? {
-                    id: user.id,
-                    email: user.email ?? null,
-                  }
-                : null
-            }
-            initialMembership={membership}
-            initialQuota={{
-              monthlyQuota: quota.monthlyQuota,
-              monthlyUsed: quota.monthlyUsed,
-              monthlyRemaining: quota.monthlyRemaining,
-              quotaMessage: quota.quotaMessage,
-            }}
-            initialAuthError={initialAuthError}
+             initialUser={
+               user
+                 ? {
+                     id: user.id,
+                     email: user.email ?? null,
+                   }
+                 : null
+             }
+             initialMembership={membership}
+             initialFirstActivation={firstActivation}
+             initialQuota={{
+               monthlyQuota: quota.monthlyQuota,
+               monthlyUsed: quota.monthlyUsed,
+               monthlyRemaining: quota.monthlyRemaining,
+               quotaMessage: quota.quotaMessage,
+             }}
+             initialAuthError={initialAuthError}
           />
 
           <section className="section card-glow sidebar-card">
