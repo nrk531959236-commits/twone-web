@@ -28,6 +28,14 @@ const indicatorToneLabel = {
   neutral: "中性",
 } as const;
 
+const marketBiasTheme = {
+  "偏多": "bullish-strong",
+  "中性偏多": "bullish-soft",
+  "震荡": "neutral",
+  "中性偏空": "bearish-soft",
+  "偏空": "bearish-strong",
+} as const;
+
 function formatCountdown(targetIso: string) {
   const now = new Date();
   const target = new Date(targetIso);
@@ -53,6 +61,7 @@ export default function Home() {
   const workflow = getDailyAiMarketWorkflowNote();
   const nextUpdateCountdown = formatCountdown(dailyAnalysis.publishAtJst);
   const tradeSetups = [dailyAnalysis.tradeSetups.shortTerm, dailyAnalysis.tradeSetups.longTerm];
+  const biasTheme = marketBiasTheme[dailyAnalysis.marketBias];
 
   return (
     <main className="page-shell home-minimal-shell">
@@ -79,11 +88,11 @@ export default function Home() {
         <div className="home-daily-grid">
           <article className="home-daily-main card-glow">
             <div className="home-daily-main__top">
-              <div>
+              <div className="home-daily-main__summary-block">
                 <p className="home-chip">每日结论</p>
                 <h2>{dailyAnalysis.headline}</h2>
               </div>
-              <div className="home-bias-box">
+              <div className={`home-bias-box home-bias-box--${biasTheme}`}>
                 <div className="home-bias-box__head">
                   <span className="home-highlight-label">今日偏向</span>
                   <strong>{dailyAnalysis.marketBias}</strong>
