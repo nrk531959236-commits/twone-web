@@ -1,42 +1,35 @@
 import { SiteHeader } from "@/components/site-header";
-import { AccessEntryLink } from "@/components/access-entry-link";
 import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote } from "@/lib/daily-ai-market";
 
-const insightCards = [
+const instantMarkets = ["BTC", "ETH", "黄金"];
+const instantTimeframes = ["15M", "1H", "4H", "1D"];
+const instantAnalysisTypes = ["方向判断", "支撑 / 阻力", "进场计划", "风险扫描"];
+
+const membershipPlans = [
   {
-    title: "先看结论",
-    description: "第一屏先给方向、关键位和执行判断，不把用户扔进品牌介绍或空白聊天框。",
+    name: "Free",
+    description: "看每日分析 + 用即时判断预设入口。",
+    rights: ["可选 BTC / ETH / 黄金", "可选级别与分析类型", "一键发起即时判断"],
   },
   {
-    title: "再看计划",
-    description: "把开单建议与宏观事件拆开，短线、波段与事件风险各看各的，减少信息打架。",
-  },
-  {
-    title: "最后再深入",
-    description: "想继续拆级别结构和推演计划，再进入 AI 助手，而不是首页一次把所有能力堆满。",
+    name: "Pro / VIP",
+    description: "在预设入口之外，额外开放自由输入与连续追问。",
+    rights: ["保留全部即时预设入口", "增加自由输入框", "支持补充上下文继续追问"],
   },
 ];
 
-const assistantEntrances = ["BTC 15M 快速节奏", "BTC 1H 结构判断", "BTC 4H 主交易计划", "BTC 1D 大级别方向"];
-
-const executionNotes = [
-  "普通 / 免费用户默认可用 BTC 固定分析主入口。",
-  "Pro / VIP 在固定分析之外，额外开放自由输入与连续追问。",
-  "首页只保留交易判断、执行计划和进入助手的承接入口，不再把无关信息堆在首屏。",
-];
-
-const cleanHighlights = [
+const contactChannels = [
   {
-    label: "主次更清楚",
-    text: "首屏只留“今日判断 + 关键位 + 进入更细分析”，用户不需要先读一堆解释。",
+    name: "Discord",
+    detail: "加入社区，接收盘中讨论与会员通知",
+    href: "/apply",
+    cta: "加入 Discord",
   },
   {
-    label: "信息更分层",
-    text: "方向判断、执行计划、事件节奏分别成块，避免重点信息互相抢注意力。",
-  },
-  {
-    label: "留白更充足",
-    text: "收紧说明文字、减少重复卡片，让页面呼吸感更强，看起来不再满屏都在说话。",
+    name: "Telegram",
+    detail: "直接联系团队，处理会员咨询与开通问题",
+    href: "/apply",
+    cta: "打开 Telegram",
   },
 ];
 
@@ -66,114 +59,54 @@ export default function Home() {
   const nextUpdateCountdown = formatCountdown(dailyAnalysis.publishAtJst);
 
   return (
-    <main className="page-shell">
+    <main className="page-shell home-minimal-shell">
       <SiteHeader current="home" />
 
-      <section className="section hero ai-market-hero" id="daily-ai-market">
-        <div className="hero__badge">首页主视觉 · AI 今日行情分析</div>
-
-        <div className="ai-market-hero__frame card-glow">
-          <div className="ai-market-hero__topbar">
-            <div className="ai-market-hero__intro">
-              <p className="eyebrow">先看结论，再决定是否进入更细分析</p>
-              <h1>
-                AI 今日行情分析
-                <br />
-                <span>首页第一眼先给方向，不先给空输入框</span>
-              </h1>
-              <p className="hero__description">
-                Twone 首页首屏已经改成聚焦型交易面板：用户进来先看到今晚判断、偏向、关键位和执行建议；如果要继续拆 BTC 多级别结构，再点高亮 AI 助手入口深挖。
-              </p>
-            </div>
-
-            <AccessEntryLink href="/assistant" mode="assistant" className="ai-assistant-banner card-glow">
-              <div className="ai-assistant-banner__chip">高亮入口</div>
-              <div className="ai-assistant-banner__body">
-                <div>
-                  <p className="ai-assistant-banner__title">打开 AI 助手，做更详细分析</p>
-                  <p className="ai-assistant-banner__text">
-                    进去后继续看 BTC 多级别结构、确认位 / 否定位、交易计划与更细的节奏拆解。
-                  </p>
-                </div>
-                <span className="ai-assistant-banner__cta">立即深入分析 →</span>
-              </div>
-            </AccessEntryLink>
+      <section className="section home-minimal-section home-daily-section" id="daily-ai-market">
+        <div className="home-section-heading">
+          <div>
+            <p className="section__label">A · 首页核心</p>
+            <h1>每日 AI 行情分析</h1>
           </div>
-
-          <div className="daily-update-strip">
-            <div>
-              <span className="daily-update-strip__label">更新提示</span>
-              <strong>每日美股开盘前更新</strong>
-            </div>
-            <div className="daily-update-strip__meta">
-              <span>预设发布时间：{dailyAnalysis.publishAtJst}</span>
-              <span>
-                下次更新倒计时：<strong>{nextUpdateCountdown}</strong>
-              </span>
-            </div>
+          <div className="home-daily-meta">
+            <span>{workflow.preferredPublishTime} 固定更新</span>
+            <span>下次更新：{nextUpdateCountdown}</span>
           </div>
+        </div>
 
-          <div className="daily-market-hero-card daily-market-hero-card--focused">
-            <div className="daily-market-hero-card__head daily-market-hero-card__head--focused">
-              <div className="daily-market-hero-card__headline-wrap">
-                <p className="daily-market-hero-card__eyebrow">{dailyAnalysis.title}</p>
-                <h2 className="daily-market-hero-card__headline">{dailyAnalysis.headline}</h2>
-                <p className="daily-market-hero-card__summary">{dailyAnalysis.summary}</p>
+        <div className="home-daily-grid">
+          <article className="home-daily-main card-glow">
+            <div className="home-daily-main__top">
+              <div>
+                <p className="home-chip">每日结论</p>
+                <h2>{dailyAnalysis.headline}</h2>
+                <p className="home-daily-main__summary">{dailyAnalysis.summary}</p>
               </div>
-
-              <div className="daily-market-hero-card__signal">
-                <span className="daily-market-signal-label">策略主题</span>
-                <span className="daily-market-bias">{dailyAnalysis.marketBias}</span>
-                <span className="daily-market-signal-label">主结论</span>
-                <strong className="daily-market-conviction">{dailyAnalysis.conviction}</strong>
-                <div className="daily-market-hero-card__meta">
-                  <span>{workflow.timezone}</span>
-                  <span>{workflow.preferredPublishTime} 固定更新</span>
-                </div>
+              <div className="home-bias-box">
+                <span>今日偏向</span>
+                <strong>{dailyAnalysis.marketBias}</strong>
+                <em>{dailyAnalysis.conviction}</em>
               </div>
             </div>
 
-            <div className="hero-keyline-grid">
-              <article className="hero-keyline-card hero-keyline-card--primary">
+            <div className="home-key-levels">
+              <article>
                 <span>上方确认</span>
                 <strong>{dailyAnalysis.keyLevels[0]}</strong>
               </article>
-              <article className="hero-keyline-card">
+              <article>
                 <span>核心承接</span>
                 <strong>{dailyAnalysis.keyLevels[1]}</strong>
               </article>
-              <article className="hero-keyline-card hero-keyline-card--danger">
+              <article>
                 <span>下方否定</span>
                 <strong>{dailyAnalysis.keyLevels[2]}</strong>
               </article>
             </div>
 
-            <div className="analysis-metrics-grid">
-              <article className="analysis-metric-card">
-                <span>时间级别</span>
-                <strong>{dailyAnalysis.timeframe}</strong>
-              </article>
-              <article className="analysis-metric-card analysis-metric-card--wide">
-                <span>结构分析</span>
-                <strong>{dailyAnalysis.structure}</strong>
-              </article>
-              <article className="analysis-metric-card">
-                <span>VWAP</span>
-                <strong>{dailyAnalysis.vwap}</strong>
-              </article>
-              <article className="analysis-metric-card">
-                <span>MACD</span>
-                <strong>{dailyAnalysis.macd}</strong>
-              </article>
-              <article className="analysis-metric-card">
-                <span>RSI</span>
-                <strong>{dailyAnalysis.rsi}</strong>
-              </article>
-            </div>
-
-            <div className="daily-market-columns daily-market-columns--hero">
+            <div className="home-daily-columns">
               <div>
-                <h3>今晚重点</h3>
+                <p className="home-chip">今晚重点</p>
                 <ul>
                   {dailyAnalysis.focus.map((item) => (
                     <li key={item}>{item}</li>
@@ -181,7 +114,7 @@ export default function Home() {
                 </ul>
               </div>
               <div>
-                <h3>风险提示</h3>
+                <p className="home-chip">风险提示</p>
                 <ul>
                   {dailyAnalysis.riskTips.map((item) => (
                     <li key={item}>{item}</li>
@@ -189,194 +122,161 @@ export default function Home() {
                 </ul>
               </div>
             </div>
-          </div>
-
-          <div className="hero-insight-grid">
-            <article className="hero-focus-panel">
-              <div className="hero-focus-panel__header">
-                <div>
-                  <p className="trade-setup-card__chip">首页阅读顺序</p>
-                  <h2>先判断，再执行，再深入分析</h2>
-                </div>
-                <p className="hero-focus-panel__note">把首页压缩成交易决策面板，而不是功能展览区。</p>
-              </div>
-
-              <div className="hero-focus-panel__grid">
-                {cleanHighlights.map((item) => (
-                  <article key={item.label} className="hero-focus-point">
-                    <span>{item.label}</span>
-                    <strong>{item.text}</strong>
-                  </article>
-                ))}
-              </div>
-            </article>
-
-            <article className="trade-setup-card trade-setup-card--highlight card-glow">
-              <div className="trade-setup-card__header trade-setup-card__header--split">
-                <div>
-                  <p className="trade-setup-card__chip">高亮执行模块</p>
-                  <h2>开单建议</h2>
-                </div>
-                <p className="trade-setup-card__note">拆成短线 / 长线两栏，避免把不同节奏混成一套计划。</p>
-              </div>
-
-              <div className="trade-setup-dual-grid">
-                {Object.values(dailyAnalysis.tradeSetups).map((setup) => (
-                  <article key={setup.label} className="trade-plan-column">
-                    <div className="trade-plan-column__top">
-                      <div>
-                        <span className="trade-plan-column__label">{setup.label}</span>
-                        <div className="trade-plan-column__stance-row">
-                          <span className="trade-plan-column__stance">{setup.stance}</span>
-                        </div>
-                        <h3>{setup.direction}</h3>
-                      </div>
-                    </div>
-
-                    <div className="trade-plan-list">
-                      <div className="trade-plan-item trade-plan-item--accent">
-                        <span>理由 / 条件</span>
-                        <strong>{setup.rationale}</strong>
-                      </div>
-                      <div className="trade-plan-item">
-                        <span>触发区间</span>
-                        <strong>{setup.triggerZone}</strong>
-                      </div>
-                      <div className="trade-plan-item trade-plan-item--danger">
-                        <span>止损位</span>
-                        <strong>{setup.stopLoss}</strong>
-                      </div>
-                      <div className="trade-plan-item">
-                        <span>目标位</span>
-                        <strong>{setup.targets.join(" / ")}</strong>
-                      </div>
-                      <div className="trade-plan-item">
-                        <span>失效条件</span>
-                        <strong>{setup.invalidation}</strong>
-                      </div>
-                      <div className="trade-plan-item trade-plan-item--accent">
-                        <span>一句话执行建议</span>
-                        <strong>{setup.executionLine}</strong>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </article>
-
-            <article className="macro-events-card">
-              <div className="macro-events-card__header">
-                <div>
-                  <p className="trade-setup-card__chip">事件节奏卡</p>
-                  <h2>宏观事件时间卡</h2>
-                </div>
-                <p className="macro-events-card__note">至少先盯 FOMC / CPI / 非农，不在大事件前后盲追。</p>
-              </div>
-
-              <div className="macro-events-list">
-                {dailyAnalysis.macroEvents.map((event) => (
-                  <article key={event.name} className="macro-event-item">
-                    <div className="macro-event-item__top">
-                      <div>
-                        <span className="macro-event-item__label">{event.name}</span>
-                        <strong>{event.nextTimeJst}</strong>
-                      </div>
-                      <span className="macro-event-item__status">{event.status}</span>
-                    </div>
-
-                    <div className="macro-event-item__stats">
-                      <div>
-                        <span>当前</span>
-                        <strong>{event.current ?? "待接入"}</strong>
-                      </div>
-                      <div>
-                        <span>预期</span>
-                        <strong>{event.forecast ?? "待接入"}</strong>
-                      </div>
-                      <div>
-                        <span>前值</span>
-                        <strong>{event.previous ?? "待接入"}</strong>
-                      </div>
-                    </div>
-
-                    <p>{event.note}</p>
-                  </article>
-                ))}
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section className="section section--split compact-split home-strategy-strip">
-        <div>
-          <p className="section__label">页面策略</p>
-          <h2>首页先完成交易判断，再引导用户进入更深分析</h2>
-        </div>
-        <p className="section__intro">
-          这一版把首页收敛成更干净的三段式路径：先看 AI 今日行情分析，再看执行建议与风险节奏，最后再进入 AI 助手继续深挖。这样主次更稳，重点更集中。
-        </p>
-      </section>
-
-      <section className="section card-grid compact-card-grid home-strategy-grid">
-        {insightCards.map((item, index) => (
-          <article className="info-card" key={item.title}>
-            <div className="info-card__index">0{index + 1}</div>
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
           </article>
-        ))}
+
+          <aside className="home-daily-side">
+            <article className="home-side-card">
+              <p className="home-chip">每日分析定位</p>
+              <h3>这是每天统一更新的主判断</h3>
+              <p>适合先快速掌握今天主方向、关键位、风险事件和整体执行框架。</p>
+            </article>
+
+            <article className="home-side-card">
+              <p className="home-chip">更新时间</p>
+              <h3>{dailyAnalysis.publishAtJst}</h3>
+              <p>{workflow.timezone} / 美股开盘前更新，不是盘中即时请求。</p>
+            </article>
+          </aside>
+        </div>
       </section>
 
-      <section className="section ai-home-focus ai-home-focus--compact">
-        <div>
-          <p className="section__label">AI 助手入口</p>
-          <h2>高亮按钮负责承接“更详细分析”</h2>
+      <section className="section home-minimal-section home-instant-section" id="instant-check">
+        <div className="home-section-heading home-section-heading--split">
+          <div>
+            <p className="section__label">B · 即时工具</p>
+            <h2>即时行情判断入口</h2>
+          </div>
           <p className="section__intro">
-            首页不抢着让用户聊天，而是明确告诉用户：如果你已经看完今日结论，想继续拆 BTC 结构、级别节奏和执行计划，就点 AI 助手进去做更深分析。
+            和“每日 AI 行情分析”不同，这里是即时发起的工具入口：你先选交易对、级别、分析类型，再点击发送，拿到当下这一刻的判断。
           </p>
         </div>
-        <div className="assistant-entrance-grid">
-          {assistantEntrances.map((item) => (
-            <article key={item} className="assistant-entrance-card">
-              <span className="assistant-entrance-card__label">详细分析入口</span>
-              <strong>{item}</strong>
+
+        <div className="home-instant-grid">
+          <article className="home-instant-tool card-glow">
+            <div className="home-tool-header">
+              <div>
+                <p className="home-chip">普通用户可用</p>
+                <h3>用预设参数快速发起即时分析</h3>
+              </div>
+              <span className="home-tool-badge">即时请求，不等每日更新</span>
+            </div>
+
+            <div className="home-tool-fields">
+              <div className="home-tool-field">
+                <span>交易对</span>
+                <div className="home-pill-row">
+                  {instantMarkets.map((item, index) => (
+                    <button key={item} type="button" className={`home-select-pill ${index === 0 ? "home-select-pill--active" : ""}`}>
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="home-tool-field">
+                <span>级别</span>
+                <div className="home-pill-row">
+                  {instantTimeframes.map((item, index) => (
+                    <button key={item} type="button" className={`home-select-pill ${index === 1 ? "home-select-pill--active" : ""}`}>
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="home-tool-field">
+                <span>分析类型</span>
+                <div className="home-pill-row">
+                  {instantAnalysisTypes.map((item, index) => (
+                    <button key={item} type="button" className={`home-select-pill ${index === 0 ? "home-select-pill--active" : ""}`}>
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="home-tool-actions">
+              <a href="/assistant?entry=assistant" className="button button--primary">
+                发送并开始即时分析
+              </a>
+              <span>适合盘中快速确认，不重复讲整天总观点。</span>
+            </div>
+          </article>
+
+          <article className="home-pro-panel">
+            <div className="home-pro-panel__head">
+              <p className="home-chip">Pro / VIP 额外能力</p>
+              <h3>自由输入只对 Pro / VIP 开放</h3>
+              <p>普通用户使用上面的预设入口就能发起即时判断；Pro / VIP 才额外开放自由输入和连续追问。</p>
+            </div>
+
+            <div className="home-pro-input is-locked">
+              <span>自由输入</span>
+              <div>
+                例如：<em>“帮我看 ETH 4H 假突破后的回踩承接是否有效”</em>
+              </div>
+              <strong>会员专属</strong>
+            </div>
+
+            <ul className="home-diff-list">
+              <li>每日分析：统一发布，回答“今天整体怎么看”。</li>
+              <li>即时判断：按你当前选择，回答“这一刻这笔怎么看”。</li>
+              <li>Pro / VIP：在预设之外，再开放自由输入。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="section home-minimal-section home-membership-section" id="membership">
+        <div className="home-section-heading home-section-heading--split">
+          <div>
+            <p className="section__label">C · 开通会员</p>
+            <h2>会员入口只保留必要信息</h2>
+          </div>
+          <p className="section__intro">不再堆叠宣传话术，只直接说明普通用户能做什么，以及 Pro / VIP 多开放什么。</p>
+        </div>
+
+        <div className="home-membership-grid">
+          {membershipPlans.map((plan) => (
+            <article key={plan.name} className="home-membership-card">
+              <p className="home-chip">{plan.name}</p>
+              <h3>{plan.name}</h3>
+              <p>{plan.description}</p>
+              <ul>
+                {plan.rights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </article>
           ))}
         </div>
-      </section>
 
-      <section className="section membership-block membership-block--compact" id="benefits">
-        <div className="membership-block__content">
-          <p className="section__label">产品路径</p>
-          <h2>先固定分析，再分层开放能力</h2>
-          <p>
-            当前首页明确不走“什么都能问”的泛 AI 叙事。普通 / 免费用户先用固定交易分析主入口；Pro / VIP 再额外获得自由输入、连续追问和更深度研究能力。这样首页承诺、按钮文案和后续体验保持一致。
-          </p>
-        </div>
-        <div className="membership-list card-glow">
-          {executionNotes.map((item) => (
-            <div key={item} className="membership-list__item">
-              <span className="membership-list__icon">✦</span>
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section cta-block card-glow" id="cta">
-        <p className="section__label">继续深入</p>
-        <h2>看完首页结论后，再进 AI 助手做更细致推演</h2>
-        <p>
-          当前 daily-ai-market 模块已经被直接抬到首页主视觉。后续只要接后台发布或定时任务，每晚更新一条新的 AI 行情分析，首页主视觉就会自动切到当天版本，用户一进来先看到判断，再决定是否深入。
-        </p>
         <div className="hero__actions">
-          <AccessEntryLink href="/assistant" mode="assistant" className="button button--primary">
-            打开 AI 助手做详细分析
-          </AccessEntryLink>
-          <a href="/apply" className="button button--ghost">
-            申请会员
+          <a href="/apply" className="button button--primary">
+            开通 Pro / VIP
           </a>
+        </div>
+      </section>
+
+      <section className="section home-minimal-section home-contact-section" id="contact">
+        <div className="home-section-heading home-section-heading--split">
+          <div>
+            <p className="section__label">D · 联系方式</p>
+            <h2>Discord / Telegram</h2>
+          </div>
+          <p className="section__intro">首页最后只留联系入口，方便用户加入社区或直接咨询会员开通。</p>
+        </div>
+
+        <div className="home-contact-grid">
+          {contactChannels.map((item) => (
+            <a key={item.name} href={item.href} className="home-contact-card">
+              <p className="home-chip">{item.name}</p>
+              <h3>{item.name}</h3>
+              <p>{item.detail}</p>
+              <span>{item.cta} →</span>
+            </a>
+          ))}
         </div>
       </section>
     </main>
