@@ -1930,7 +1930,11 @@ button {
 .home-instant-grid,
 .home-tool-fields,
 .home-membership-grid,
-.home-contact-grid {
+.home-contact-grid,
+.home-trade-grid,
+.home-trade-columns,
+.home-events-grid,
+.home-event-stats {
   display: grid;
   gap: 18px;
 }
@@ -1988,6 +1992,7 @@ button {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
   gap: 18px;
+  align-items: stretch;
 }
 
 .home-daily-main,
@@ -1995,7 +2000,10 @@ button {
 .home-pro-panel,
 .home-membership-card,
 .home-contact-card,
-.home-instant-tool {
+.home-instant-tool,
+.home-trade-card,
+.home-event-card {
+  min-width: 0;
   padding: 22px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2003,7 +2011,7 @@ button {
 }
 
 .home-daily-main__top {
-  grid-template-columns: minmax(0, 1fr) 220px;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 220px);
   align-items: start;
 }
 
@@ -2012,7 +2020,9 @@ button {
 .home-pro-panel h3,
 .home-membership-card h3,
 .home-contact-card h3,
-.home-side-card h3 {
+.home-side-card h3,
+.home-trade-card h3,
+.home-event-card h3 {
   font-size: 24px;
   line-height: 1.15;
 }
@@ -2025,7 +2035,11 @@ button {
 .home-diff-list li,
 .home-daily-columns li,
 .home-tool-actions span,
-.home-section-heading .section__intro {
+.home-section-heading .section__intro,
+.home-trade-rationale,
+.home-trade-columns li,
+.home-trade-columns p,
+.home-event-note {
   color: var(--muted);
   line-height: 1.75;
 }
@@ -2151,6 +2165,107 @@ button {
   color: #c7b6ff;
 }
 
+.home-trade-grid,
+.home-events-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.home-trade-card,
+.home-event-card {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.home-trade-card__header,
+.home-event-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.home-trade-stance,
+.home-event-status {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.home-trade-stance {
+  color: #ffe7a8;
+  border: 1px solid rgba(255, 190, 92, 0.2);
+  background: rgba(255, 190, 92, 0.1);
+}
+
+.home-event-status {
+  color: #a7f5e7;
+  border: 1px solid rgba(77, 226, 197, 0.18);
+  background: rgba(77, 226, 197, 0.1);
+}
+
+.home-trade-points,
+.home-event-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-trade-points article,
+.home-event-stats article {
+  min-width: 0;
+  padding: 15px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.home-trade-points span,
+.home-event-stats span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.home-trade-points strong,
+.home-event-stats strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 17px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.home-trade-columns {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.home-trade-columns div {
+  min-width: 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.home-trade-columns ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+}
+
+.home-trade-columns li + li {
+  margin-top: 8px;
+}
+
 .home-contact-card {
   display: grid;
   gap: 10px;
@@ -2187,7 +2302,12 @@ button {
   .home-key-levels,
   .home-daily-columns,
   .home-membership-grid,
-  .home-contact-grid {
+  .home-contact-grid,
+  .home-trade-grid,
+  .home-trade-points,
+  .home-trade-columns,
+  .home-events-grid,
+  .home-event-stats {
     grid-template-columns: 1fr;
   }
 
@@ -2216,7 +2336,9 @@ button {
     justify-content: flex-start;
   }
 
-  .home-tool-header {
+  .home-tool-header,
+  .home-trade-card__header,
+  .home-event-card__header {
     flex-direction: column;
   }
 

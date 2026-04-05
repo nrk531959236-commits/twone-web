@@ -33,6 +33,12 @@ const contactChannels = [
   },
 ];
 
+const macroEventMetricLabels = {
+  current: "当前 / 实际",
+  forecast: "预期",
+  previous: "前值",
+} as const;
+
 function formatCountdown(targetIso: string) {
   const now = new Date();
   const target = new Date(targetIso);
@@ -57,6 +63,7 @@ export default function Home() {
   const dailyAnalysis = getDailyAiMarketAnalysis();
   const workflow = getDailyAiMarketWorkflowNote();
   const nextUpdateCountdown = formatCountdown(dailyAnalysis.publishAtJst);
+  const tradeSetups = [dailyAnalysis.tradeSetups.shortTerm, dailyAnalysis.tradeSetups.longTerm];
 
   return (
     <main className="page-shell home-minimal-shell">
@@ -228,10 +235,107 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section home-minimal-section home-trade-section" id="trade-setups">
+        <div className="home-section-heading home-section-heading--split">
+          <div>
+            <p className="section__label">C · 开单建议</p>
+            <h2>短线 / 长线分开执行</h2>
+          </div>
+          <p className="section__intro">
+            恢复首页开单建议，但不做成喊单区。只保留触发区、止损、目标、失效条件和执行备注，避免信息发散。
+          </p>
+        </div>
+
+        <div className="home-trade-grid">
+          {tradeSetups.map((setup) => (
+            <article key={setup.label} className="home-trade-card">
+              <div className="home-trade-card__header">
+                <div>
+                  <p className="home-chip">{setup.label}</p>
+                  <h3>{setup.direction}</h3>
+                </div>
+                <span className="home-trade-stance">{setup.stance}</span>
+              </div>
+
+              <p className="home-trade-rationale">{setup.rationale}</p>
+
+              <div className="home-trade-points">
+                <article>
+                  <span>触发区</span>
+                  <strong>{setup.triggerZone}</strong>
+                </article>
+                <article>
+                  <span>止损</span>
+                  <strong>{setup.stopLoss}</strong>
+                </article>
+                <article>
+                  <span>失效条件</span>
+                  <strong>{setup.invalidation}</strong>
+                </article>
+              </div>
+
+              <div className="home-trade-columns">
+                <div>
+                  <p className="home-chip">目标位</p>
+                  <ul>
+                    {setup.targets.map((target) => (
+                      <li key={target}>{target}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="home-chip">执行备注</p>
+                  <p>{setup.executionLine}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section home-minimal-section home-events-section" id="macro-events">
+        <div className="home-section-heading home-section-heading--split">
+          <div>
+            <p className="section__label">D · 宏观事件</p>
+            <h2>FOMC / CPI / 非农</h2>
+          </div>
+          <p className="section__intro">恢复首页事件表，放在开单建议后面，用来解释今晚波动驱动，不再额外堆宣传模块。</p>
+        </div>
+
+        <div className="home-events-grid">
+          {dailyAnalysis.macroEvents.map((event) => (
+            <article key={event.name} className="home-event-card">
+              <div className="home-event-card__header">
+                <div>
+                  <p className="home-chip">{event.name}</p>
+                  <h3>{event.nextTimeJst}</h3>
+                </div>
+                <span className="home-event-status">{event.status}</span>
+              </div>
+
+              <div className="home-event-stats">
+                {([
+                  ["current", event.current],
+                  ["forecast", event.forecast],
+                  ["previous", event.previous],
+                ] as const).map(([key, value]) => (
+                  <article key={key}>
+                    <span>{macroEventMetricLabels[key]}</span>
+                    <strong>{value ?? "待补充"}</strong>
+                  </article>
+                ))}
+              </div>
+
+              <p className="home-event-note">{event.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="section home-minimal-section home-membership-section" id="membership">
         <div className="home-section-heading home-section-heading--split">
           <div>
-            <p className="section__label">C · 开通会员</p>
+            <p className="section__label">E · 开通会员</p>
             <h2>会员入口只保留必要信息</h2>
           </div>
           <p className="section__intro">不再堆叠宣传话术，只直接说明普通用户能做什么，以及 Pro / VIP 多开放什么。</p>
@@ -262,7 +366,7 @@ export default function Home() {
       <section className="section home-minimal-section home-contact-section" id="contact">
         <div className="home-section-heading home-section-heading--split">
           <div>
-            <p className="section__label">D · 联系方式</p>
+            <p className="section__label">F · 联系方式</p>
             <h2>Discord / Telegram</h2>
           </div>
           <p className="section__intro">首页最后只留联系入口，方便用户加入社区或直接咨询会员开通。</p>
