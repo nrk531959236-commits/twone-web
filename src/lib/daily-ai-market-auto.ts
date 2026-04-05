@@ -116,6 +116,68 @@ function buildAutoPayload(
     `自动稿里的 RSI 提醒是：先看能否进入强势区并站稳，否则反抽仍按弱修复处理。`,
     `RSI 若只是低位回升，优先理解为跌势放缓，而不是方向反转。`,
   ];
+  const indicatorPanels = [
+    {
+      timeframe: "4H" as const,
+      bias: pickByDate(`${input.analysisDate}-4h-bias`, ["bearish", "neutral", "bullish"] as const),
+      vwap: {
+        value: pickByDate(`${input.analysisDate}-4h-vwap`, ["67,180", "67,420", "67,660", "67,920"]),
+        val: pickByDate(`${input.analysisDate}-4h-val`, ["66,740", "66,980", "67,120", "67,280"]),
+        vah: pickByDate(`${input.analysisDate}-4h-vah`, ["67,820", "68,060", "68,240", "68,420"]),
+        stance: pickByDate(`${input.analysisDate}-4h-stance`, ["价位仍压 VWAP 下", "贴近 VWAP 反复争夺", "重新站回 VWAP 上方"]),
+      },
+      macd: {
+        direction: pickByDate(`${input.analysisDate}-4h-macd-direction`, ["死叉后缩口", "零轴下方走平", "金叉后放缓"]),
+        divergence: pickByDate(`${input.analysisDate}-4h-macd-divergence`, ["无明显背离", "轻微底背离", "轻微顶背离"]),
+        bias: pickByDate(`${input.analysisDate}-4h-macd-bias`, ["bearish", "neutral", "bullish"] as const),
+      },
+      rsi: {
+        value: Number(pickByDate(`${input.analysisDate}-4h-rsi-value`, [42, 45, 48, 52])),
+        divergence: pickByDate(`${input.analysisDate}-4h-rsi-divergence`, ["无背离", "轻微底背离", "轻微顶背离"]),
+        bias: pickByDate(`${input.analysisDate}-4h-rsi-bias`, ["bearish", "neutral", "bullish"] as const),
+      },
+    },
+    {
+      timeframe: "D" as const,
+      bias: pickByDate(`${input.analysisDate}-d-bias`, ["neutral", "bearish", "bullish"] as const),
+      vwap: {
+        value: pickByDate(`${input.analysisDate}-d-vwap`, ["67,860", "68,040", "68,280", "68,520"]),
+        val: pickByDate(`${input.analysisDate}-d-val`, ["67,120", "67,340", "67,560", "67,880"]),
+        vah: pickByDate(`${input.analysisDate}-d-vah`, ["68,920", "69,080", "69,260", "69,480"]),
+        stance: pickByDate(`${input.analysisDate}-d-stance`, ["贴近 VWAP 中轴", "仍在 VWAP 下方偏弱", "重新回到 VWAP 上方"]),
+      },
+      macd: {
+        direction: pickByDate(`${input.analysisDate}-d-macd-direction`, ["零轴下方走平", "死叉后缩口", "零轴附近回暖"]),
+        divergence: pickByDate(`${input.analysisDate}-d-macd-divergence`, ["轻微底背离", "无明显背离", "轻微顶背离"]),
+        bias: pickByDate(`${input.analysisDate}-d-macd-bias`, ["neutral", "bearish", "bullish"] as const),
+      },
+      rsi: {
+        value: Number(pickByDate(`${input.analysisDate}-d-rsi-value`, [46, 49, 52, 55])),
+        divergence: pickByDate(`${input.analysisDate}-d-rsi-divergence`, ["轻微底背离", "无背离", "轻微顶背离"]),
+        bias: pickByDate(`${input.analysisDate}-d-rsi-bias`, ["neutral", "bearish", "bullish"] as const),
+      },
+    },
+    {
+      timeframe: "W" as const,
+      bias: pickByDate(`${input.analysisDate}-w-bias`, ["bullish", "neutral", "bearish"] as const),
+      vwap: {
+        value: pickByDate(`${input.analysisDate}-w-vwap`, ["65,880", "66,120", "66,420", "66,760"]),
+        val: pickByDate(`${input.analysisDate}-w-val`, ["63,940", "64,220", "64,580", "64,920"]),
+        vah: pickByDate(`${input.analysisDate}-w-vah`, ["68,740", "69,020", "69,360", "69,620"]),
+        stance: pickByDate(`${input.analysisDate}-w-stance`, ["仍守 VWAP 上", "贴近 VWAP 中轴", "回落到 VWAP 下方"]),
+      },
+      macd: {
+        direction: pickByDate(`${input.analysisDate}-w-macd-direction`, ["多头柱体放缓", "零轴上方走平", "高位缩口"]),
+        divergence: pickByDate(`${input.analysisDate}-w-macd-divergence`, ["无背离", "轻微顶背离", "轻微底背离"]),
+        bias: pickByDate(`${input.analysisDate}-w-macd-bias`, ["bullish", "neutral", "bearish"] as const),
+      },
+      rsi: {
+        value: Number(pickByDate(`${input.analysisDate}-w-rsi-value`, [54, 57, 60, 62])),
+        divergence: pickByDate(`${input.analysisDate}-w-rsi-divergence`, ["无背离", "轻微顶背离", "轻微底背离"]),
+        bias: pickByDate(`${input.analysisDate}-w-rsi-bias`, ["bullish", "neutral", "bearish"] as const),
+      },
+    },
+  ];
 
   return {
     ...fallback,
@@ -130,6 +192,7 @@ function buildAutoPayload(
     vwap: pickByDate(`${input.analysisDate}-vwap`, vwapOptions),
     macd: pickByDate(`${input.analysisDate}-macd`, macdOptions),
     rsi: pickByDate(`${input.analysisDate}-rsi`, rsiOptions),
+    indicatorPanels,
     focus: [
       `确认 ${dateLabel} 的正式分析是否已补齐；当前首页已切到新的自动版本。`,
       `优先检查确认位与否定位是否仍成立，不在自动稿基础上直接放大仓位。`,
