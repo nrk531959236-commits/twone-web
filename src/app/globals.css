@@ -2878,30 +2878,34 @@ button {
 .trade-review-modal {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 9999;
   display: grid;
   place-items: center;
   padding: 24px;
+  isolation: isolate;
 }
 
 .trade-review-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(4, 8, 15, 0.78);
-  backdrop-filter: blur(8px);
+  z-index: 0;
+  background: rgba(4, 8, 15, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .trade-review-modal__panel {
   position: relative;
   z-index: 1;
+  isolation: isolate;
   width: min(1280px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   overflow: auto;
   padding: 26px;
   border-radius: 28px;
-  border: 1px solid rgba(124, 140, 255, 0.2);
-  background: linear-gradient(180deg, rgba(9, 17, 29, 0.98), rgba(6, 11, 20, 0.98));
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(124, 140, 255, 0.24);
+  background: linear-gradient(180deg, rgba(9, 17, 29, 0.995), rgba(6, 11, 20, 0.995));
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.58);
 }
 
 .trade-review-modal__header {
