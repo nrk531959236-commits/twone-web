@@ -25,15 +25,18 @@ export function SiteHeader({ current }: SiteHeaderProps) {
       <nav className="site-header__nav" aria-label="主导航">
         {navItems.map((item) => {
           const isActive = current === item.key;
+          const isAssistant = item.key === "assistant";
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`site-header__link ${isActive ? "site-header__link--active" : ""}`}
-            >
-              {item.label}
-            </Link>
+            <div key={item.href} className={`site-header__nav-item ${isAssistant ? "site-header__nav-item--assistant" : ""}`}>
+              <Link
+                href={item.href}
+                className={`site-header__link ${isActive ? "site-header__link--active" : ""} ${isAssistant ? "site-header__link--assistant" : ""}`}
+              >
+                {item.label}
+              </Link>
+              {isAssistant ? <span className="site-header__assistant-note">开通会员即可使用</span> : null}
+            </div>
           );
         })}
       </nav>
