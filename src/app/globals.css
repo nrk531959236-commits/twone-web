@@ -2880,8 +2880,10 @@ button {
   inset: 0;
   z-index: 9999;
   display: grid;
-  place-items: center;
+  align-items: flex-start;
+  justify-items: center;
   padding: 24px;
+  overflow-y: auto;
   isolation: isolate;
 }
 
@@ -2899,8 +2901,7 @@ button {
   z-index: 1;
   isolation: isolate;
   width: min(1280px, calc(100vw - 32px));
-  max-height: calc(100vh - 32px);
-  overflow: auto;
+  margin: 0 auto;
   padding: 26px;
   border-radius: 28px;
   border: 1px solid rgba(124, 140, 255, 0.24);
@@ -3153,7 +3154,6 @@ button {
 
   .trade-review-modal__panel {
     width: calc(100vw - 24px);
-    max-height: calc(100vh - 24px);
     padding: 20px;
   }
 
