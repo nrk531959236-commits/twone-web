@@ -178,6 +178,90 @@ function buildAutoPayload(
       },
     },
   ];
+  const shortTermStance = pickByDate(`${input.analysisDate}-short-stance`, ["短线偏多", "短线偏空", "短线震荡", "短线观望"] as const);
+  const longTermStance = pickByDate(`${input.analysisDate}-long-stance`, ["长线偏多", "长线偏空", "长线震荡", "长线观望"] as const);
+  const shortTermDirection = pickByDate(`${input.analysisDate}-short-direction`, ["回落承接做多", "反弹承压做空", "区间低吸做多", "观望等待"] as const);
+  const longTermDirection = pickByDate(`${input.analysisDate}-long-direction`, ["回落承接做多", "反弹承压做空", "突破追多", "观望等待"] as const);
+  const tradeSetups = {
+    shortTerm: {
+      label: "短线策略",
+      stance: shortTermStance,
+      direction: shortTermDirection,
+      rationale: pickByDate(`${input.analysisDate}-short-rationale`, [
+        "自动版本更偏向先等确认后的短线执行，不在中位直接追单。",
+        "短线只看确认后的承接或反抽承压，不把日更自动稿当即时喊单。",
+        "当前短线建议以节奏交易为主，优先小仓位、快进快出。",
+        "自动版本下，短线执行先定义失效位，再考虑是否跟随。",
+      ]),
+      triggerZone: pickByDate(`${input.analysisDate}-short-trigger`, [
+        "确认位附近出现承接后再执行。",
+        "回踩关键位不破后再考虑进场。",
+        "跌不动或冲不过后的二次确认区。",
+        "先等 15M 收线确认，再处理下一步。",
+      ]),
+      stopLoss: pickByDate(`${input.analysisDate}-short-stop`, [
+        "失守短线确认位后离场。",
+        "跌破承接区且收不回时止损。",
+        "若冲高后快速回落到失效区，直接撤退。",
+        "确认失败就离场，不拖。",
+      ]),
+      targets: [
+        pickByDate(`${input.analysisDate}-short-target-1`, ["第一目标：先看前高附近减仓", "第一目标：先看箱体中上沿", "第一目标：先看日内压力位", "第一目标：先看反弹第一阻力区"]),
+        pickByDate(`${input.analysisDate}-short-target-2`, ["第二目标：延续则看上沿突破", "第二目标：若放量再看更高压力区", "第二目标：若承接延续再推保护止盈", "第二目标：冲高不放量就收缩预期"]),
+      ],
+      invalidation: pickByDate(`${input.analysisDate}-short-invalidation`, [
+        "确认位失守后，短线计划失效。",
+        "若承接不成立且量能转弱，短线撤销。",
+        "出现假突破后快速回落，则放弃追随。",
+        "若波动突然放大但没有收线确认，短线不执行。",
+      ]),
+      executionLine: pickByDate(`${input.analysisDate}-short-execution`, [
+        "短线只做确认后的那一段，不预判。",
+        "先轻仓试单，确认延续再处理加减仓。",
+        "拿不到确认信号就继续观望。",
+        "自动版本下，先做纪律，不做冲动。",
+      ]),
+    },
+    longTerm: {
+      label: "长线策略",
+      stance: longTermStance,
+      direction: longTermDirection,
+      rationale: pickByDate(`${input.analysisDate}-long-rationale`, [
+        "长线更看大级别是否重新一致，不在自动稿里提前给重仓结论。",
+        "当前长线思路偏向等压力区或趋势确认，不急着在中位下注。",
+        "长线计划以结构确认优先，先看大级别是否修复。",
+        "自动版本更适合给框架，不适合替代正式长线研究稿。",
+      ]),
+      triggerZone: pickByDate(`${input.analysisDate}-long-trigger`, [
+        "等大级别确认位站稳或失守后再执行。",
+        "反弹进压力区后再看是否顺势处理。",
+        "跌破关键位后的回抽确认区。",
+        "重新站稳中轴并延续后再考虑切换。",
+      ]),
+      stopLoss: pickByDate(`${input.analysisDate}-long-stop`, [
+        "长线失效位被破坏时离场。",
+        "确认位被反向收回后止损。",
+        "若趋势修复与原判断相反，则撤销原计划。",
+        "方向失效后不死扛。",
+      ]),
+      targets: [
+        pickByDate(`${input.analysisDate}-long-target-1`, ["第一目标：先看周内关键位", "第一目标：先看前高/前低一带", "第一目标：先看结构延续位", "第一目标：先看区间外侧"]),
+        pickByDate(`${input.analysisDate}-long-target-2`, ["第二目标：若大级别延续再看下一档", "第二目标：只在放量时继续上修/下修", "第二目标：若量价不配合就降低预期", "第二目标：先保护利润再谈扩展"]),
+      ],
+      invalidation: pickByDate(`${input.analysisDate}-long-invalidation`, [
+        "大级别确认失败后，长线计划取消。",
+        "若关键结构被反向修复，长线撤销。",
+        "没有趋势一致性时，长线不扩大仓位。",
+        "若宏观扰动放大且方向混乱，长线回到观望。",
+      ]),
+      executionLine: pickByDate(`${input.analysisDate}-long-execution`, [
+        "长线先看结构，不抢节奏。",
+        "等大级别确认后再放大仓位。",
+        "自动版本只给框架，正式出手仍要看确认。",
+        "先定义失效条件，再谈持仓周期。",
+      ]),
+    },
+  };
 
   return {
     ...fallback,
@@ -203,6 +287,7 @@ function buildAutoPayload(
       `自动版本已更新，但仍应先看关键位确认，不在中位追单。`,
       `若宏观事件临近或波动突然放大，优先等待下一根确认K线。`,
     ],
+    tradeSetups,
     status: input.status,
     source: input.source,
   };
