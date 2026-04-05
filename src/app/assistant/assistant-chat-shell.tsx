@@ -17,6 +17,17 @@ type AssistantChatShellProps = {
   userEmail?: string | null;
 };
 
+const FREE_CHAT_PLANS = new Set(["pro", "vip"]);
+
+function extractMembershipPlanFromMessage(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("vip")) return "vip";
+  if (normalized.includes("pro")) return "pro";
+  if (normalized.includes("free")) return "free";
+  return null;
+}
+
 const starterMessages: ChatMessage[] = [
   {
     id: "welcome",
@@ -63,6 +74,8 @@ export function AssistantChatShell({
   quota: initialQuota,
   userEmail,
 }: AssistantChatShellProps) {
+  const inferredPlan = extractMembershipPlanFromMessage(gateMessage);
+  const canUseFreeChat = inferredPlan ? FREE_CHAT_PLANS.has(inferredPlan) : false;
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages?.length ? initialMessages : starterMessages);
   const [input, setInput] = useState("");
@@ -99,10 +112,17 @@ export function AssistantChatShell({
     dispatchQuotaUpdated(initialQuota, isAuthenticated, isMember);
   }, [initialQuota, isAuthenticated, isMember]);
 
-  const canSend = useMemo(
-    () => isAuthenticated && isMember && canUseAssistant && input.trim().length > 0 && !isLoading,
-    [canUseAssistant, input, isAuthenticated, isLoading, isMember],
-  );
+  const canSend = useMemo(() => {
+    if (!(isAuthenticated && isMember && canUseAssistant) || isLoading) {
+      return false;
+    }
+
+    if (canUseFreeChat) {
+      return input.trim().length > 0;
+    }
+
+    return true;
+  }, [canUseAssistant, canUseFreeChat, input, isAuthenticated, isLoading, isMember]);
 
   async function handleSubmit(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
@@ -118,8 +138,9 @@ export function AssistantChatShell({
     }
 
     const manualInput = input.trim();
-    const content = manualInput || `请按固定模板分析 BTC ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
-    if (!content || isLoading) {
+    const presetContent = `请按固定模板分析 BTC ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
+    const content = canUseFreeChat ? manualInput : manualInput || presetContent;
+    if ((!content && canUseFreeChat) || isLoading) {
       return;
     }
 
@@ -267,11 +288,15 @@ export function AssistantChatShell({
           <div className="assistant-mode-card__header">
             <div>
               <span className="section__label">默认分析入口</span>
-              <strong>BTC 固定任务模式</strong>
+              <strong>{canUseFreeChat ? "Pro / VIP 自由输入模式" : "BTC 固定任务模式"}</strong>
             </div>
-            <span className="assistant-mode-card__tag">BTC First</span>
+            <span className="assistant-mode-card__tag">{canUseFreeChat ? "Pro / VIP" : "BTC First"}</span>
           </div>
-          <p>先选级别，再直接触发固定 BTC 分析。开放闲聊会被尽量收束回：结构判断、关键位确认、失效条件、交易计划。</p>
+          <p>
+            {canUseFreeChat
+              ? "你当前可自由输入问题，也可以继续用固定按钮快速发起 BTC 分析。"
+              : "普通体验用户默认先选级别，再直接触发固定 BTC 分析；不鼓励开放闲聊，重点收束到结构判断、关键位确认、失效条件、交易计划。"}
+          </p>
           <div className="assistant-levels">
             {levelOptions.map((level) => (
               <button
@@ -304,6 +329,11 @@ export function AssistantChatShell({
         </div>
 
         <form ref={formRef} className="assistant-form" onSubmit={handleSubmit}>
+          {!canUseFreeChat && isMember ? (
+            <div className="assistant-fixed-mode-tip">
+              当前账号默认使用固定分析按钮入口。若升级到 Pro / VIP，可开放自由输入与更深度追问。
+            </div>
+          ) : null}
           <label className="assistant-form__field">
             <span className="sr-only">输入你的问题</span>
             <textarea
@@ -318,11 +348,13 @@ export function AssistantChatShell({
                       : "已登录，但当前账号还未开通体验资格。若你已通过审核，请确认当前登录的是申请时填写的邮箱。"
                     : "未登录状态下可浏览，不可发送。先用申请时填写的登录邮箱登录后再提问。"
                   : quota.monthlyRemaining > 0
-                    ? `默认会发送：BTC ${selectedLevel} ${selectedTask} 固定分析。你也可以补充你的方向、关键位或持仓上下文。`
+                    ? canUseFreeChat
+                      ? "你是 Pro / VIP，可自由输入问题，也可以补充方向、关键位、持仓与交易计划。"
+                      : `默认会发送：BTC ${selectedLevel} ${selectedTask} 固定分析。普通体验版先走固定入口；你也可以补充方向、关键位或持仓上下文。`
                     : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
-              disabled={!isMember || quota.monthlyRemaining <= 0}
+              disabled={!isMember || quota.monthlyRemaining <= 0 || (!canUseFreeChat && isLoading)}
             />
           </label>
 
@@ -330,7 +362,9 @@ export function AssistantChatShell({
             <p>
               {isMember
                 ? quota.monthlyRemaining > 0
-                  ? `Enter 发送，Shift + Enter 换行。不填也能直接触发 BTC ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
+                  ? canUseFreeChat
+                    ? "Enter 发送，Shift + Enter 换行。你当前可自由输入，也可以继续使用固定 BTC 分析按钮。成功调用一次后会在服务端记录并扣减当月 AI 次数。"
+                    : `普通体验版默认走固定分析按钮，不填也能直接触发 BTC ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
                   : "当前资格有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
                 : isAuthenticated
                   ? isPending
@@ -348,7 +382,9 @@ export function AssistantChatShell({
                       : "审核通过后可发送"
                     : "登录后可发送"
                   : quota.monthlyRemaining > 0
-                    ? "发送"
+                    ? canUseFreeChat
+                      ? "发送自由问题"
+                      : "发送固定分析"
                     : "本月额度已用尽"}
             </button>
           </div>

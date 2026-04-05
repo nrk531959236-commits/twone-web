@@ -97,7 +97,7 @@ export function buildMembershipSummary(
       isMember: true,
       isPending: false,
       message: "已开通体验资格，可使用 AI 助手。",
-      detail: "当前账号具备有效会员权限，文本对话能力已放行。默认审批会按登录邮箱发放 Free 体验版与 2 次 AI 对话；后续仍可在同一模型上叠加等级、额度与到期管理。",
+      detail: `当前账号具备有效会员权限，当前计划：${row?.plan ?? "free"}。普通体验用户默认走固定分析按钮入口；仅 pro / vip 计划开放自由输入。默认审批会按登录邮箱发放 Free 体验版与 2 次 AI 对话；后续仍可在同一模型上叠加等级、额度与到期管理。`,
       expiresAt: row?.expires_at ?? null,
       plan: row?.plan ?? null,
     };

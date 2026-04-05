@@ -17,8 +17,8 @@ export function SiteHeader({ current }: SiteHeaderProps) {
       <div className="site-header__brand">
         <div className="site-header__logo">T</div>
         <div>
-          <p className="site-header__name">Twone</p>
-          <span className="site-header__tag">Private Members Platform</span>
+          <p className="site-header__name">Twone 社区</p>
+          <span className="site-header__tag">AI 交易助手会员平台</span>
         </div>
       </div>
 

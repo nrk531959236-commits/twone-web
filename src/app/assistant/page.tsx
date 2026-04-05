@@ -67,7 +67,7 @@ export default async function AssistantPage({
             <h1>BTC AI 助手 V1</h1>
           </div>
           <p className="section__intro">
-            这一版只做分析本体，不再扩登录、审核、后台等外围体验。网站里的 AI 已明确收口为 BTC 优先、冷静、偏进攻型的交易分析助手；主入口默认走固定任务模式，优先输出统一模板。若当前页没有实时行情源，会直接诚实标注缺失，并给出结构化 fallback，而不是假装有数据。
+            这一版只做分析本体，不再扩登录、审核、后台等外围体验。网站里的 AI 已明确收口为 BTC 优先、冷静、偏进攻型的交易分析助手；普通用户默认走固定任务模式，不开放自由闲聊，优先输出统一模板。仅更高等级会员才开放自由输入。若当前页没有实时行情源，会直接诚实标注缺失，并给出结构化 fallback，而不是假装有数据。
           </p>
         </div>
       </section>
@@ -83,7 +83,7 @@ export default async function AssistantPage({
           <div className="assistant-chat__header">
             <div>
               <p className="section__label">BTC Analysis</p>
-              <h2>固定分析入口</h2>
+              <h2>固定分析入口 / 会员分层输入</h2>
             </div>
             <div className="assistant-chat__badge">
               <span className={`status-dot${quota.canUseAssistant ? "" : " status-dot--muted"}`} />
@@ -129,7 +129,7 @@ export default async function AssistantPage({
             <p className="section__label">BTC Scope</p>
             <h2>当前分析边界</h2>
             <p>
-              当前主界面已经不把重点放在开放聊天，而是默认把用户导向 BTC 固定分析：选级别、发起分析、看确认位与否定位。如果你补充持仓、关键价位、预期方向，输出会更贴近实战；如果没补数据，系统会老实告诉你哪些字段暂时缺失。
+              当前主界面已经不把重点放在开放聊天，而是默认把用户导向 BTC 固定分析：选级别、发起分析、看确认位与否定位。普通体验用户主打固定入口；更高等级会员再开放自由输入。如果你补充持仓、关键价位、预期方向，输出会更贴近实战；如果没补数据，系统会老实告诉你哪些字段暂时缺失。
             </p>
             <div className="membership-list">
               <div className="membership-list__item">
@@ -151,6 +151,10 @@ export default async function AssistantPage({
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
                 <span>整体语气保持中文、简洁、交易导向，不做喊单式表达</span>
+              </div>
+              <div className="membership-list__item">
+                <span className="membership-list__icon">✦</span>
+                <span>普通用户默认使用固定按钮；Pro / VIP 才开放自由输入</span>
               </div>
             </div>
           </section>

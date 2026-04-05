@@ -1,239 +1,227 @@
-const benefits = [
-  {
-    title: "策略框架",
-    description:
-      "从市场结构、流动性、情绪到执行节奏，形成适合实战的 Web3 认知地图，而不是碎片化喊单。",
-  },
-  {
-    title: "高质量社群",
-    description:
-      "聚焦真正愿意长期进化的成员，减少噪音，提升讨论密度，让每次交流都有信息含量。",
-  },
-  {
-    title: "AI 辅助决策",
-    description:
-      "用 AI 做信息筛选、行情整理、观点归纳与复盘支持，提升研究效率，而不是替代判断。",
-  },
-];
-
-const memberships = [
-  "核心研报与专题内容优先查看",
-  "每周市场复盘与主题追踪",
-  "课程资料库与方法论更新",
-  "社群问答与阶段性闭门分享",
-  "AI 助手专属入口与研究模板",
-  "后续开放工具、活动与线下权益",
-];
-
-const courseCards = [
-  {
-    label: "Course 01",
-    title: "市场结构与趋势识别",
-    text: "理解周期、强弱切换、关键区间与确认逻辑，建立稳定的读图与决策基础。",
-  },
-  {
-    label: "Course 02",
-    title: "交易系统与风险管理",
-    text: "把进场、止损、加减仓、复盘串成一套可执行系统，减少情绪型操作。",
-  },
-  {
-    label: "Course 03",
-    title: "Web3 叙事与项目研究",
-    text: "从 narrative、资金流向、生态位置和团队执行力理解项目，不做情绪追高。",
-  },
-];
-
-const aiFeatures = [
-  "行情摘要 / Watchlist",
-  "研报提炼 / 信息聚合",
-  "交易复盘 / 结构化总结",
-  "策略提示 / Risk Check",
-];
-
 import { SiteHeader } from "@/components/site-header";
 import { AccessEntryLink } from "@/components/access-entry-link";
+import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote } from "@/lib/daily-ai-market";
+
+const coreBenefits = [
+  {
+    title: "固定分析入口",
+    description: "不把 AI 做成杂乱聊天框，而是直接收口到几个常用市场分析入口。",
+  },
+  {
+    title: "交易导向输出",
+    description: "围绕结构、关键位、确认位、否定位和执行计划，减少空话和噪音。",
+  },
+  {
+    title: "会员分层",
+    description: "普通体验用户默认走固定按钮，高级版会员再开放自由输入与更深度交互。",
+  },
+];
+
+const assistantEntrances = [
+  "BTC 15M 快速节奏",
+  "BTC 1H 结构判断",
+  "BTC 4H 主交易计划",
+  "BTC 1D 大级别方向",
+];
+
+const planRows = [
+  { label: "Free / 普通体验", value: "固定分析按钮入口" },
+  { label: "Pro / VIP", value: "开放自由输入 + 更深度研究交互" },
+  { label: "首页内容策略", value: "先展示 AI 核心能力，再补社群/课程信息" },
+];
 
 export default function Home() {
+  const dailyAnalysis = getDailyAiMarketAnalysis();
+  const workflow = getDailyAiMarketWorkflowNote();
+
   return (
     <main className="page-shell">
       <SiteHeader current="home" />
-      <section className="hero section">
-        <div className="hero__badge">Twone Web3.0 Community · Private Members Hub</div>
-        <div className="hero__grid">
+
+      <section className="hero section home-hero">
+        <div className="hero__badge">Twone 社区 · AI 交易助手优先</div>
+        <div className="hero__grid home-hero__grid">
           <div className="hero__content">
-            <p className="eyebrow">面向少数真正想长期做成的人</p>
+            <p className="eyebrow">更少噪音，更像真正能落地的炒币助手</p>
             <h1>
-              不只是社群，
+              <span>Twone</span> 首页先聚焦 AI 助手，
               <br />
-              而是一套围绕 <span>认知 × 执行 × 连接</span> 的会员平台。
+              把分析入口做简单、做直接。
             </h1>
             <p className="hero__description">
-              Twone 致力于打造一个偏高质量、偏长期主义、偏实战导向的 Web3 私人会员空间。
-              现在优先开放 Free 体验版做内测：申请通过后默认可获得免费体验版与 2 次 AI 对话，用更低门槛先体验整体节奏，再决定是否继续深入。
+              这一版首页不再堆太多社群介绍，而是把核心价值前置：固定分析入口、每日 AI 行情分析、会员分层权限。
+              普通用户先通过按钮进入常用分析，高级版会员再开放自由输入，把页面从“介绍站”收束成“交易入口”。
             </p>
             <div className="hero__actions">
-              <a href="/apply" className="button button--primary">
-                申请加入
-              </a>
-              <a href="#courses" className="button button--ghost">
-                浏览课程入口
-              </a>
-              <AccessEntryLink href="/assistant" mode="assistant" className="button button--ghost">
-                查看 AI 助手
+              <AccessEntryLink href="/assistant" mode="assistant" className="button button--primary">
+                进入 AI 助手
               </AccessEntryLink>
-            </div>
-            <div className="hero__stats">
-              <div>
-                <strong>01</strong>
-                <span>Private Community</span>
-              </div>
-              <div>
-                <strong>02</strong>
-                <span>Courses & Research</span>
-              </div>
-              <div>
-                <strong>03</strong>
-                <span>AI Copilot Access</span>
-              </div>
+              <a href="#daily-ai-market" className="button button--ghost">
+                看今晚 AI 行情分析
+              </a>
+              <a href="/apply" className="button button--ghost">
+                申请会员
+              </a>
             </div>
           </div>
 
-          <div className="hero__panel card-glow">
+          <div className="hero__panel card-glow home-hero__panel">
             <div className="panel__topline">
               <span className="status-dot" />
-              Member Access Preview
+              AI First Product Layout
             </div>
-            <div className="panel__title">你的 Web3 Private Operating System</div>
+            <div className="home-logo-block">
+              <div className="home-logo-block__mark">T</div>
+              <div>
+                <p className="home-logo-block__name">Twone 社区</p>
+                <span className="home-logo-block__tag">中文化 / 简洁 / 交易产品导向</span>
+              </div>
+            </div>
             <div className="panel__list">
-              <article>
-                <span>Insight Layer</span>
-                <strong>深度内容 / 专题 / 周期判断</strong>
-              </article>
-              <article>
-                <span>Execution Layer</span>
-                <strong>课程方法 / 风险框架 / 复盘体系</strong>
-              </article>
-              <article>
-                <span>Network Layer</span>
-                <strong>会员链接 / 协作机会 / 线下活动</strong>
-              </article>
-              <article>
-                <span>AI Layer</span>
-                <strong>申请通过默认送 Free Trial，含 2 次 AI 对话体验</strong>
-              </article>
+              {planRows.map((item) => (
+                <article key={item.label}>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </article>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section section--split">
+      <section className="section section--split compact-split">
         <div>
-          <p className="section__label">为什么是 Twone</p>
-          <h2>一个面向私人会员的高信噪比平台</h2>
+          <p className="section__label">核心能力</p>
+          <h2>首页只保留对转化最关键的三件事</h2>
         </div>
         <p className="section__intro">
-          我们不把首页做成发币项目站，也不追求夸张叙事。这个平台强调的是：内容有深度、关系有筛选、工具能落地、AI 真正能提高效率。现在先用 Free 体验版把门槛降下来，方便真实用户先上手测试。
+          第一是 AI 助手入口，第二是每日 AI 行情分析，第三是会员权限差异。课程、社群、内容体系仍然保留，但不再抢首页第一视觉。
         </p>
       </section>
 
-      <section className="section card-grid">
-        {benefits.map((item) => (
+      <section className="section card-grid compact-card-grid">
+        {coreBenefits.map((item, index) => (
           <article className="info-card" key={item.title}>
-            <div className="info-card__index">0{benefits.indexOf(item) + 1}</div>
+            <div className="info-card__index">0{index + 1}</div>
             <h3>{item.title}</h3>
             <p>{item.description}</p>
           </article>
         ))}
       </section>
 
-      <section className="section membership-block" id="benefits">
-        <div className="membership-block__content">
-          <p className="section__label">会员权益</p>
-          <h2>加入后，你将进入一个持续更新的会员体系</h2>
-          <p>
-            从课程、研究、社群到 AI 辅助工具，Twone 的设计目标是让每一位成员都能拥有更稳定的成长路径，而不是依赖单点信息刺激。当前申请通过后会先发放 Free 体验版，默认附带 2 次 AI 对话额度。
+      <section className="section ai-home-focus">
+        <div>
+          <p className="section__label">AI 助手入口</p>
+          <h2>默认不给普通用户开放闲聊，先走固定分析按钮</h2>
+          <p className="section__intro">
+            这样做的好处是减少滥问、减少无效 token 消耗，也更符合交易产品的使用路径：先点常用入口，再看结果；只有 Pro / VIP 会员才开放自由输入。
           </p>
         </div>
-        <div className="membership-list card-glow">
-          {memberships.map((item) => (
-            <div className="membership-list__item" key={item}>
-              <span className="membership-list__icon">✦</span>
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section" id="courses">
-        <div className="section-heading">
-          <div>
-            <p className="section__label">课程入口</p>
-            <h2>从底层逻辑到实战方法，逐步建立你的系统</h2>
-          </div>
-          <a href="/apply" className="text-link">
-            查看会员通道 →
-          </a>
-        </div>
-        <div className="course-grid">
-          {courseCards.map((course) => (
-            <article className="course-card" key={course.title}>
-              <span className="course-card__label">{course.label}</span>
-              <h3>{course.title}</h3>
-              <p>{course.text}</p>
-              <button type="button">进入模块</button>
+        <div className="assistant-entrance-grid">
+          {assistantEntrances.map((item) => (
+            <article key={item} className="assistant-entrance-card">
+              <span className="assistant-entrance-card__label">固定入口</span>
+              <strong>{item}</strong>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="section ai-block">
-        <div className="ai-block__left">
-          <p className="section__label">AI 助手入口</p>
-          <h2>让 AI 成为你的研究副驾驶，而不是噪音制造机</h2>
-          <p>
-            平台后续将集成面向会员的 AI 入口，用于行情整理、交易复盘、研究摘要、知识库检索与策略提醒，帮助你更快完成从信息到判断的转换。当前申请通过后，默认会先开通 Free 体验版，含 2 次 AI 对话，方便快速试用。
+      <section className="section daily-market-block card-glow" id="daily-ai-market">
+        <div className="section-heading daily-market-block__heading">
+          <div>
+            <p className="section__label">每日 AI 行情分析</p>
+            <h2>每天日本时间 21:15 左右更新一条首页市场结论</h2>
+          </div>
+          <div className="daily-market-meta">
+            <span>发布时间：{workflow.timezone} {workflow.preferredPublishTime}</span>
+            <span>当前模式：{workflow.currentMode}</span>
+          </div>
+        </div>
+
+        <div className="daily-market-card">
+          <div className="daily-market-card__top">
+            <div>
+              <p className="daily-market-card__title">{dailyAnalysis.title}</p>
+              <span className="daily-market-card__time">预设发布时间：{dailyAnalysis.publishAtJst}</span>
+            </div>
+            <div className="daily-market-bias">{dailyAnalysis.marketBias}</div>
+          </div>
+
+          <p className="daily-market-card__summary">{dailyAnalysis.summary}</p>
+
+          <div className="daily-market-columns">
+            <div>
+              <h3>关键位</h3>
+              <ul>
+                {dailyAnalysis.keyLevels.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3>今晚重点</h3>
+              <ul>
+                {dailyAnalysis.focus.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3>风险提示</h3>
+              <ul>
+                {dailyAnalysis.riskTips.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="daily-market-card__footnote">
+            当前先走最小可用方案：首页直接读取本地数据结构 / API 占位内容。后续只需接一个后台发布动作或定时脚本，在每晚 21:15 前写入最新内容，首页就能自动展示当天分析。
           </p>
         </div>
-        <div className="ai-block__right card-glow">
-          <div className="ai-block__chip">AI Copilot Preview</div>
-          <ul>
-            {aiFeatures.map((feature) => (
-              <li key={feature}>{feature}</li>
-            ))}
-          </ul>
-          <AccessEntryLink href="/assistant" mode="assistant" className="button button--secondary">
-            进入 AI 助手原型
-          </AccessEntryLink>
+      </section>
+
+      <section className="section membership-block" id="benefits">
+        <div className="membership-block__content">
+          <p className="section__label">会员分层</p>
+          <h2>先把权限逻辑讲清楚，再让用户进入 AI</h2>
+          <p>
+            Free / 普通体验版默认看固定按钮和固定分析流程，不鼓励直接闲聊。Pro / VIP 再开放自由输入、个性化问题和更深度的研究交互。这样首页承诺与产品能力会更一致。
+          </p>
+        </div>
+        <div className="membership-list card-glow">
+          <div className="membership-list__item">
+            <span className="membership-list__icon">✦</span>
+            <span>普通体验：固定分析入口 + 首页每日 AI 行情分析</span>
+          </div>
+          <div className="membership-list__item">
+            <span className="membership-list__icon">✦</span>
+            <span>高级会员：开放自由输入、追问、持仓上下文补充</span>
+          </div>
+          <div className="membership-list__item">
+            <span className="membership-list__icon">✦</span>
+            <span>整体语气继续保持中文、简洁、偏交易执行，不做花哨叙事</span>
+          </div>
         </div>
       </section>
 
       <section className="section cta-block card-glow" id="cta">
-        <p className="section__label">Call To Action</p>
-        <h2>如果你想进入一个更克制、更有质量的 Web3 成长环境，现在可以先留下入口。</h2>
+        <p className="section__label">现在进入</p>
+        <h2>首页已经收口成一个更像产品、而不是宣传页的版本</h2>
         <p>
-          当前页面为首页原型，后续可继续扩展会员登录、支付、内容系统、活动报名、AI 对话界面与 Vercel 部署配置。现阶段优先把 Free Trial 路径跑通：申请通过即可拿到免费体验版，默认 2 次 AI 对话。
+          如果要继续推进，下一步最值得做的是：把每日 AI 行情分析接到后台发布，以及把 Pro / VIP 自由输入权限和会员计划真正联动起来。
         </p>
         <div className="hero__actions">
-          <a href="/apply" className="button button--primary">
-            前往会员申请
-          </a>
-          <AccessEntryLink href="/assistant" mode="assistant" className="button button--ghost">
-            查看 AI 助手页
+          <AccessEntryLink href="/assistant" mode="assistant" className="button button--primary">
+            打开 AI 助手
           </AccessEntryLink>
+          <a href="/apply" className="button button--ghost">
+            去申请会员
+          </a>
         </div>
       </section>
-
-      <footer className="footer section">
-        <div>
-          <strong>Twone Web3.0 Community</strong>
-          <p>Private Members Platform for serious builders, traders and thinkers.</p>
-        </div>
-        <div className="footer__meta">
-          <span>Landing Page Prototype</span>
-          <span>Next.js App Router</span>
-          <span>© 2026 Twone</span>
-        </div>
-      </footer>
     </main>
   );
 }
