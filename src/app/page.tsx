@@ -65,10 +65,50 @@ function formatCountdown(targetIso: string) {
   return `${hours} 小时 ${minutes} 分钟`;
 }
 
+function formatJstTimeLabel(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
+function getDailyStatusLabel({
+  todayPublished,
+  todayPublishedAt,
+  nextUpdateCountdown,
+}: {
+  todayPublished: boolean;
+  todayPublishedAt?: string | null;
+  nextUpdateCountdown: string;
+}) {
+  if (todayPublished) {
+    const publishedTime = formatJstTimeLabel(todayPublishedAt);
+    return publishedTime ? `今日已发布 · 数据库已于 ${publishedTime} 标记 published` : "今日已发布 · 数据库状态为 published";
+  }
+
+  return `今日未发布 · 等待 21:15 正常发布，若错过会在 22:15 后补跑；当前倒计时 ${nextUpdateCountdown}`;
+}
+
 export default async function Home() {
   const dailyAnalysis = await getDailyAiMarketAnalysis();
   const workflow = await getDailyAiMarketWorkflowNote();
   const nextUpdateCountdown = formatCountdown(dailyAnalysis.publishAtJst);
+  const dailyStatusLabel = getDailyStatusLabel({
+    todayPublished: workflow.todayPublished,
+    todayPublishedAt: workflow.todayPublishedAt,
+    nextUpdateCountdown,
+  });
   const tradeSetups = [dailyAnalysis.tradeSetups.shortTerm, dailyAnalysis.tradeSetups.longTerm];
   const biasTheme = marketBiasTheme[dailyAnalysis.marketBias];
 
@@ -106,8 +146,11 @@ export default async function Home() {
             </h1>
           </div>
           <div className="home-daily-meta">
-            <span>{workflow.preferredPublishTime} 固定更新</span>
-            <span>下次更新：{nextUpdateCountdown}</span>
+            <span>
+              {workflow.preferredPublishTime} 固定更新
+              {workflow.fallbackPublishTime ? ` / ${workflow.fallbackPublishTime} 补跑兜底` : ""}
+            </span>
+            <span>{dailyStatusLabel}</span>
           </div>
         </div>
 

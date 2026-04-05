@@ -124,6 +124,9 @@ export function AssistantChatShell({
     return true;
   }, [canUseAssistant, canUseFreeChat, input, isAuthenticated, isLoading, isMember]);
 
+  const fixedModePrompt = `请按固定模板分析 BTC ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
+  const inputDisabled = !isMember || quota.monthlyRemaining <= 0 || isLoading;
+
   async function handleSubmit(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
 
@@ -138,8 +141,7 @@ export function AssistantChatShell({
     }
 
     const manualInput = input.trim();
-    const presetContent = `请按固定模板分析 BTC ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
-    const content = canUseFreeChat ? manualInput : manualInput || presetContent;
+    const content = canUseFreeChat ? manualInput : fixedModePrompt;
     if ((!content && canUseFreeChat) || isLoading) {
       return;
     }
@@ -196,13 +198,25 @@ export function AssistantChatShell({
   }
 
   function applySuggestion(value: string) {
-    setInput(`请按固定模板分析 ${value}，重点写确认位、否定位和我的判断。`);
+    const matchedLevel = levelOptions.find((level) => value.includes(level));
+    const nextTask = value.replace(/^BTC\s+\S+\s+/, "");
+
+    if (matchedLevel) {
+      setSelectedLevel(matchedLevel);
+    }
+
+    setSelectedTask(nextTask || "主交易计划");
+    setInput(`补充上下文：${value}，重点写确认位、否定位和我的判断。`);
     setError(null);
     formRef.current?.querySelector("textarea")?.focus();
   }
 
   function applyPresetTask(task: string) {
-    setSelectedTask(task.replace(/^BTC\s+\S+\s+/, ""));
+    const matchedLevel = levelOptions.find((level) => task.includes(level));
+    if (matchedLevel) {
+      setSelectedLevel(matchedLevel);
+    }
+    setSelectedTask(task.replace(/^BTC\s+\S+\s+/, "") || "主交易计划");
     setError(null);
     setInput("");
   }
@@ -230,6 +244,44 @@ export function AssistantChatShell({
       </div>
 
       <div className="assistant-input card-glow">
+        <section className="assistant-composer-overview">
+          <article className="assistant-overview-card assistant-overview-card--primary">
+            <div className="assistant-overview-card__top">
+              <div>
+                <span className="section__label">当前发送方式</span>
+                <strong>默认走 BTC 固定分析入口</strong>
+              </div>
+              <span className="assistant-mode-card__tag">{canUseFreeChat ? "固定入口 + 自由输入" : "固定入口优先"}</span>
+            </div>
+            <p>
+              旧的“随便发一句就试试看”逻辑已经收掉。现在普通 / 免费用户点击发送时，会直接按上面选定的级别与任务触发固定 BTC 分析；输入框只作为补充仓位、关键位、预期方向的上下文。Pro / VIP 才额外开放真正的自由输入与连续追问。
+            </p>
+            <div className="assistant-overview-metrics">
+              <article>
+                <span>当前级别</span>
+                <strong>{selectedLevel}</strong>
+              </article>
+              <article>
+                <span>当前任务</span>
+                <strong>{selectedTask}</strong>
+              </article>
+              <article>
+                <span>发送口径</span>
+                <strong>{canUseFreeChat ? "可自由输入" : "固定模板"}</strong>
+              </article>
+            </div>
+          </article>
+
+          <article className="assistant-overview-card assistant-overview-card--secondary">
+            <span className="section__label">权限表达</span>
+            <ul className="assistant-overview-list">
+              <li>未登录：可浏览，不可发。</li>
+              <li>已登录待审核：继续只读，等审核完成。</li>
+              <li>Free / 普通可用用户：默认固定 BTC 分析入口。</li>
+              <li>Pro / VIP：在固定入口上额外开放自由输入。</li>
+            </ul>
+          </article>
+        </section>
         {!isMember ? (
           <div className="form-status assistant-gate-banner" role="status">
             <div className="assistant-gate-banner__content">
@@ -324,6 +376,10 @@ export function AssistantChatShell({
               </button>
             ))}
           </div>
+          <div className="assistant-prompt-preview">
+            <span className="section__label">本次固定发送内容</span>
+            <p>{fixedModePrompt}</p>
+          </div>
         </section>
 
         <section className="assistant-mode-card assistant-mode-card--pro">
@@ -361,11 +417,11 @@ export function AssistantChatShell({
                   : quota.monthlyRemaining > 0
                     ? canUseFreeChat
                       ? "你当前额外开放自由输入模式，可直接提问，也可以继续使用上方 BTC 固定分析主入口。"
-                      : `默认会发送：BTC ${selectedLevel} ${selectedTask} 固定分析。当前主入口就是固定分析模式，也是普通 / 免费用户默认可用入口；你也可以补充方向、关键位或持仓上下文。`
+                      : `这里不再承担旧的自由发送逻辑。点击发送时会直接触发：BTC ${selectedLevel} ${selectedTask} 固定分析。你也可以在这里补充方向、关键位或持仓上下文。`
                     : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
-              disabled={!isMember || quota.monthlyRemaining <= 0 || (!canUseFreeChat && isLoading)}
+              disabled={inputDisabled}
             />
           </label>
 
@@ -395,7 +451,7 @@ export function AssistantChatShell({
                   : quota.monthlyRemaining > 0
                     ? canUseFreeChat
                       ? "发送问题"
-                      : "发送固定分析"
+                      : "发送 BTC 固定分析"
                     : "本月额度已用尽"}
             </button>
           </div>

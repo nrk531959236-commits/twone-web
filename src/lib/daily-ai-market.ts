@@ -98,10 +98,14 @@ export type DailyAiMarketRecord = {
 export type DailyAiMarketWorkflowNote = {
   timezone: string;
   preferredPublishTime: string;
+  fallbackPublishTime?: string;
   currentMode: "manual-seed" | "supabase";
   nextStep: string;
   dataSource: "seed" | "supabase";
   latestStatus: DailyAiMarketStatus | "seed";
+  todayPublished: boolean;
+  todayPublishedAt?: string | null;
+  todayAnalysisDate?: string | null;
 };
 
 export const fallbackDailyAnalysisSeed: DailyAiMarketAnalysis = {
@@ -242,9 +246,13 @@ export const fallbackDailyAnalysisSeed: DailyAiMarketAnalysis = {
 const fallbackWorkflowNote: DailyAiMarketWorkflowNote = {
   timezone: "Asia/Tokyo",
   preferredPublishTime: "21:15",
+  fallbackPublishTime: "22:15",
   currentMode: "manual-seed",
   dataSource: "seed",
   latestStatus: "seed",
+  todayPublished: false,
+  todayPublishedAt: null,
+  todayAnalysisDate: null,
   nextStep:
     "当前已提供可被 cron 触发的自动发布接口。若尚未建定时器，首页会继续回退到本地固定模板；一旦定时任务开始调用该入口，首页将自动切到最新 published 数据。",
 };
@@ -255,6 +263,19 @@ export function getFallbackDailyAiMarketAnalysis(): DailyAiMarketAnalysis {
 
 function isSupabaseConfigured() {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function pad(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function getJstNow(date = new Date()) {
+  return new Date(date.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+}
+
+function getTodayDateJst(date = new Date()) {
+  const jst = getJstNow(date);
+  return `${jst.getFullYear()}-${pad(jst.getMonth() + 1)}-${pad(jst.getDate())}`;
 }
 
 function normalizeStoredPayload(payload: unknown): DailyAiMarketAnalysis | null {
@@ -309,8 +330,52 @@ export async function getDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis>
   return latest?.payload ?? getFallbackDailyAiMarketAnalysis();
 }
 
+export async function getTodayPublishedDailyAiMarketRecord(): Promise<DailyAiMarketRecord | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const today = getTodayDateJst();
+  const { data, error } = await supabase
+    .from("daily_ai_market_analyses")
+    .select("id, slug, analysis_date, publish_at_jst, status, source, payload, created_at, updated_at, published_at")
+    .eq("status", "published")
+    .eq("analysis_date", today)
+    .order("published_at", { ascending: false })
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<DailyAiMarketRecord>();
+
+  if (error) {
+    const message = String(error.message ?? "").toLowerCase();
+    if (message.includes("does not exist") || message.includes("relation") || message.includes("schema cache")) {
+      return null;
+    }
+
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const payload = normalizeStoredPayload(data.payload);
+  if (!payload) {
+    return null;
+  }
+
+  return {
+    ...data,
+    payload,
+  };
+}
+
 export async function getDailyAiMarketWorkflowNote(): Promise<DailyAiMarketWorkflowNote> {
-  const latest = await getLatestPublishedDailyAiMarketRecord();
+  const [latest, todayPublishedRecord] = await Promise.all([
+    getLatestPublishedDailyAiMarketRecord(),
+    getTodayPublishedDailyAiMarketRecord(),
+  ]);
 
   if (!latest) {
     return fallbackWorkflowNote;
@@ -319,10 +384,14 @@ export async function getDailyAiMarketWorkflowNote(): Promise<DailyAiMarketWorkf
   return {
     timezone: "Asia/Tokyo",
     preferredPublishTime: "21:15",
+    fallbackPublishTime: "22:15",
     currentMode: "supabase",
     dataSource: "supabase",
     latestStatus: latest.status,
+    todayPublished: Boolean(todayPublishedRecord),
+    todayPublishedAt: todayPublishedRecord?.published_at ?? todayPublishedRecord?.publish_at_jst ?? null,
+    todayAnalysisDate: todayPublishedRecord?.analysis_date ?? null,
     nextStep:
-      "当前首页已优先读取 Supabase 中最新 published 分析。要变成真正每日自动更新，只差把生成脚本接进 cron / 定时任务，在每天 21:15 JST 前自动写入并发布。",
+      "当前首页已优先读取 Supabase 中最新 published 分析。自动发布默认在 21:15 JST 跑一次，若错过或失败，会在 22:15 JST 再补跑一次同日发布。",
   };
 }

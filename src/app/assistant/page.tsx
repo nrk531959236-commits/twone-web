@@ -33,6 +33,21 @@ const capabilityCards = [
   "成功调用后服务端记录一次 AI 使用",
 ];
 
+const entryFlowCards = [
+  {
+    title: "默认入口",
+    detail: "所有可用用户先走 BTC 固定分析，避免页面一上来就回到旧的随意聊天入口。",
+  },
+  {
+    title: "权限分层",
+    detail: "Free / 普通用户可直接使用固定分析；Pro / VIP 额外开放自由输入和连续追问。",
+  },
+  {
+    title: "服务端兜底",
+    detail: "真正能不能发，不靠前端文案猜，而由 /api/assistant 按登录、资格、额度三层校验。",
+  },
+];
+
 export default async function AssistantPage({
   searchParams,
 }: {
@@ -111,6 +126,23 @@ export default async function AssistantPage({
         </div>
 
         <aside className="assistant-sidebar">
+          <section className="section card-glow sidebar-card assistant-sidebar-highlight">
+            <p className="section__label">入口梳理</p>
+            <h2>
+              <span className="section-title-with-icon">
+                <AssistantIcon className="section-title-icon" />
+                固定入口与权限现在怎么走
+              </span>
+            </h2>
+            <div className="assistant-sidebar-flow">
+              {entryFlowCards.map((item) => (
+                <article key={item.title} className="assistant-sidebar-flow__item">
+                  <strong>{item.title}</strong>
+                  <p>{item.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
           <AuthStatus
              initialUser={
                user

@@ -47,12 +47,14 @@ function parseSearchParams(request: NextRequest): DailyAiMarketAutoGenerateInput
   const publishAtJst = request.nextUrl.searchParams.get("publishAtJst")?.trim() || undefined;
   const status = request.nextUrl.searchParams.get("status")?.trim();
   const source = request.nextUrl.searchParams.get("source")?.trim();
+  const forceRepublish = request.nextUrl.searchParams.get("forceRepublish")?.trim();
 
   return {
     analysisDate,
     publishAtJst,
     status: status === "scheduled" || status === "published" ? status : undefined,
     source: source === "admin" || source === "manual-seed" || source === "auto" ? source : undefined,
+    forceRepublish: forceRepublish === "1" || forceRepublish === "true" ? true : undefined,
   };
 }
 
@@ -68,6 +70,7 @@ function parseBody(body: unknown): DailyAiMarketAutoGenerateInput {
     publishAtJst: typeof candidate.publishAtJst === "string" ? candidate.publishAtJst.trim() : undefined,
     status: candidate.status === "scheduled" || candidate.status === "published" ? candidate.status : undefined,
     source: candidate.source === "admin" || candidate.source === "manual-seed" || candidate.source === "auto" ? candidate.source : undefined,
+    forceRepublish: typeof candidate.forceRepublish === "boolean" ? candidate.forceRepublish : undefined,
   };
 }
 
@@ -77,6 +80,7 @@ function mergeInput(base: DailyAiMarketAutoGenerateInput, override: DailyAiMarke
     publishAtJst: override.publishAtJst ?? base.publishAtJst,
     status: override.status ?? base.status,
     source: override.source ?? base.source,
+    forceRepublish: override.forceRepublish ?? base.forceRepublish,
   };
 }
 

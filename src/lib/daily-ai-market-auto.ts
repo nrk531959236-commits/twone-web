@@ -6,6 +6,7 @@ export type DailyAiMarketAutoGenerateInput = {
   publishAtJst?: string;
   source?: "auto" | "admin" | "manual-seed";
   status?: "scheduled" | "published";
+  forceRepublish?: boolean;
 };
 
 export type DailyAiMarketAutoPublishResult = {
@@ -26,11 +27,30 @@ function buildPublishAtJst(date: string, time = "21:15") {
   return `${date}T${time}:00+09:00`;
 }
 
+function getJstNow(date = new Date()) {
+  return new Date(date.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+}
+
+function hasReachedJstTime(time: string, now = new Date()) {
+  const jst = getJstNow(now);
+  const [hourText, minuteText] = time.split(":");
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+    return false;
+  }
+
+  return jst.getHours() > hour || (jst.getHours() === hour && jst.getMinutes() >= minute);
+}
+
 function createSlug(date: string) {
   return `daily-ai-market-${date}`;
 }
 
-function buildAutoPayload(input: Required<DailyAiMarketAutoGenerateInput>): DailyAiMarketAnalysis {
+function buildAutoPayload(
+  input: Pick<Required<DailyAiMarketAutoGenerateInput>, "analysisDate" | "publishAtJst" | "source" | "status">,
+): DailyAiMarketAnalysis {
   const fallback = fallbackDailyAnalysisSeed;
 
   return {
@@ -69,13 +89,19 @@ export async function upsertDailyAiMarketAutoPublish(input: DailyAiMarketAutoGen
 
   const { data: existing, error: existingError } = await supabase
     .from("daily_ai_market_analyses")
-    .select("id")
+    .select("id, status, published_at")
     .eq("analysis_date", generated.analysisDate)
-    .maybeSingle<{ id: string }>();
+    .maybeSingle<{ id: string; status: "scheduled" | "published" | "draft"; published_at: string | null }>();
 
   if (existingError) {
     throw existingError;
   }
+
+  const fallbackWindowReached = hasReachedJstTime("22:15");
+  const shouldForceRepublish = input.forceRepublish ?? (generated.status === "published" && fallbackWindowReached && existing?.status !== "published");
+
+  const nextStatus = shouldForceRepublish ? "published" : generated.status;
+  const nextPublishedAt = nextStatus === "published" ? now : null;
 
   const { data, error } = await supabase
     .from("daily_ai_market_analyses")
@@ -84,10 +110,13 @@ export async function upsertDailyAiMarketAutoPublish(input: DailyAiMarketAutoGen
         slug: generated.slug,
         analysis_date: generated.analysisDate,
         publish_at_jst: generated.publishAtJst,
-        status: generated.status,
+        status: nextStatus,
         source: generated.source,
-        payload: generated.payload,
-        published_at: generated.status === "published" ? now : null,
+        payload: {
+          ...generated.payload,
+          status: nextStatus,
+        },
+        published_at: nextPublishedAt,
         updated_at: now,
       },
       {
