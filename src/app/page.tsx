@@ -56,9 +56,9 @@ function formatCountdown(targetIso: string) {
   return `${hours} 小时 ${minutes} 分钟`;
 }
 
-export default function Home() {
-  const dailyAnalysis = getDailyAiMarketAnalysis();
-  const workflow = getDailyAiMarketWorkflowNote();
+export default async function Home() {
+  const dailyAnalysis = await getDailyAiMarketAnalysis();
+  const workflow = await getDailyAiMarketWorkflowNote();
   const nextUpdateCountdown = formatCountdown(dailyAnalysis.publishAtJst);
   const tradeSetups = [dailyAnalysis.tradeSetups.shortTerm, dailyAnalysis.tradeSetups.longTerm];
   const biasTheme = marketBiasTheme[dailyAnalysis.marketBias];

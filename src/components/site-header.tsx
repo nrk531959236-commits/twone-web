@@ -2,13 +2,30 @@ import Link from "next/link";
 import { AccessEntryLink } from "@/components/access-entry-link";
 
 type SiteHeaderProps = {
-  current?: "home" | "apply" | "assistant" | "admin";
+  current?: "home" | "apply" | "assistant" | "courses" | "admin";
 };
 
-const navItems = [
+type NavItem =
+  | {
+      href: string;
+      label: string;
+      key: "home" | "apply" | "assistant";
+      note?: string;
+      disabled?: false;
+    }
+  | {
+      href: string;
+      label: string;
+      key: "courses";
+      note?: string;
+      disabled: true;
+    };
+
+const navItems: readonly NavItem[] = [
   { href: "/", label: "首页", key: "home" },
   { href: "/apply", label: "会员申请", key: "apply" },
-  { href: "/assistant", label: "AI 助手", key: "assistant" },
+  { href: "/assistant", label: "AI 助手", key: "assistant", note: "开通会员即可使用" },
+  { href: "/courses", label: "课程学习（更新中）", key: "courses", note: "已规划，暂未开放", disabled: true },
 ] as const;
 
 export function SiteHeader({ current }: SiteHeaderProps) {
@@ -26,16 +43,37 @@ export function SiteHeader({ current }: SiteHeaderProps) {
         {navItems.map((item) => {
           const isActive = current === item.key;
           const isAssistant = item.key === "assistant";
+          const isDisabled = item.disabled === true;
 
           return (
-            <div key={item.href} className={`site-header__nav-item ${isAssistant ? "site-header__nav-item--assistant" : ""}`}>
-              <Link
-                href={item.href}
-                className={`site-header__link ${isActive ? "site-header__link--active" : ""} ${isAssistant ? "site-header__link--assistant" : ""}`}
-              >
-                {item.label}
-              </Link>
-              {isAssistant ? <span className="site-header__assistant-note">开通会员即可使用</span> : null}
+            <div
+              key={item.href}
+              className={`site-header__nav-item ${isAssistant ? "site-header__nav-item--assistant" : ""} ${isDisabled ? "site-header__nav-item--planned" : ""}`}
+            >
+              {isDisabled ? (
+                <span
+                  className={`site-header__link site-header__link--planned ${isActive ? "site-header__link--active" : ""}`}
+                  aria-disabled="true"
+                  title="课程学习功能正在更新中，暂未开放"
+                >
+                  {item.label}
+                </span>
+              ) : (
+                <Link
+                  href={item.href}
+                  className={`site-header__link ${isActive ? "site-header__link--active" : ""} ${isAssistant ? "site-header__link--assistant" : ""}`}
+                >
+                  {item.label}
+                </Link>
+              )}
+
+              {item.note ? (
+                <span
+                  className={`site-header__assistant-note ${isDisabled ? "site-header__assistant-note--planned" : ""}`}
+                >
+                  {item.note}
+                </span>
+              ) : null}
             </div>
           );
         })}

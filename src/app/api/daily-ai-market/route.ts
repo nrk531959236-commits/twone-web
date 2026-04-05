@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
-import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote } from "@/lib/daily-ai-market";
+import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote, getLatestPublishedDailyAiMarketRecord } from "@/lib/daily-ai-market";
 
 export async function GET() {
   try {
+    const [item, workflow, latestRecord] = await Promise.all([
+      getDailyAiMarketAnalysis(),
+      getDailyAiMarketWorkflowNote(),
+      getLatestPublishedDailyAiMarketRecord(),
+    ]);
+
     return NextResponse.json({
-      item: getDailyAiMarketAnalysis(),
-      workflow: getDailyAiMarketWorkflowNote(),
+      item,
+      workflow,
+      latestRecord,
     });
   } catch (error) {
     console.error("/api/daily-ai-market error", error);

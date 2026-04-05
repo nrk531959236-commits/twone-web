@@ -115,6 +115,53 @@ supabase-first-password-setup-v1.sql
 - `membership_password_setup_tokens`
   - 保存一次性首次设密 token 的哈希、目标 `user_id`、状态、过期时间、使用时间
 
+## 每日 AI 行情真链路 v1
+
+这版已把“首页只读本地 seed”推进到“优先读取正式数据源”的最小可用链路：
+
+- 新增 Supabase 表：`daily_ai_market_analyses`
+- 首页 `src/app/page.tsx`
+  - 现在优先读取 Supabase 中最新一条 `published`
+  - 若表未建立或暂无已发布数据，自动回退到本地 seed
+- API `GET /api/daily-ai-market`
+  - 返回 `item + workflow + latestRecord`
+- 后台新增页面：`/admin/daily-ai-market`
+  - 可手动填写 / 修改每日分析模板字段
+  - 保存后直接写入 Supabase
+  - `status=published` 时首页立即读取最新发布内容
+
+### 需要先执行的 SQL
+
+在 Supabase SQL Editor 中执行：
+
+```bash
+supabase-daily-ai-market-v1.sql
+```
+
+它会创建：
+
+- `daily_ai_market_analyses`
+  - `analysis_date`：每日唯一日期
+  - `publish_at_jst`：计划 / 实际发布时间
+  - `status`：`draft | scheduled | published`
+  - `source`：`manual-seed | admin | auto`
+  - `payload`：完整首页模板 JSON
+
+### 当前 v1 到了哪一步
+
+已经完成：
+
+1. 正式可写入数据源（Supabase 表结构）
+2. 网站首页读取最新已发布内容
+3. 一个可手动触发的发布入口（后台页面）
+4. 保持和首页现有模板字段兼容
+
+还差最后一小步，才算“真正每天自动执行”：
+
+- 把同一套写入动作接到 cron / 定时任务 / 外部工作流，在每天固定时间自动生成并调用发布。
+
+也就是说，现在“读正式数据源 + 手动发布入口”已经打通；离全自动，只差调度器把这一步每天定时触发。
+
 ## 后续可扩展方向
 
 - 接入会员申请表单

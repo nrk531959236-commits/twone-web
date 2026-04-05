@@ -429,6 +429,9 @@ export default async function AdminPage({
           <a href="#memberships" className="site-header__link site-header__link--active">
             会员管理
           </a>
+          <a href="/admin/daily-ai-market" className="site-header__link site-header__link--active">
+            每日 AI 行情发布台
+          </a>
         </div>
       </section>
 

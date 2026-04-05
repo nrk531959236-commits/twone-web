@@ -1,7 +1,18 @@
+import { createSupabaseAdminClient } from "@/lib/admin";
+
+export type DailyAiMarketBias = "偏多" | "中性偏多" | "震荡" | "中性偏空" | "偏空";
+export type DailyAiMarketStatus = "draft" | "scheduled" | "published";
+export type DailyAiMarketSource = "manual-seed" | "admin" | "auto";
+export type IndicatorTone = "bullish" | "bearish" | "neutral";
+export type TradeStance = "短线偏多" | "短线偏空" | "短线震荡" | "短线观望" | "长线偏多" | "长线偏空" | "长线震荡" | "长线观望";
+export type TradeDirection = "区间低吸做多" | "回落承接做多" | "反弹承压做空" | "突破追多" | "跌破追空" | "观望等待";
+export type MacroEventName = "FOMC" | "CPI" | "非农";
+export type MacroEventStatus = "待公布" | "已排期";
+
 export type DailyAiMarketAnalysis = {
   title: string;
   publishAtJst: string;
-  marketBias: "偏多" | "中性偏多" | "震荡" | "中性偏空" | "偏空";
+  marketBias: DailyAiMarketBias;
   conviction: string;
   headline: string;
   summary: string;
@@ -12,7 +23,7 @@ export type DailyAiMarketAnalysis = {
   rsi: string;
   indicatorPanels: Array<{
     timeframe: "4H" | "D" | "W";
-    bias: "bullish" | "bearish" | "neutral";
+    bias: IndicatorTone;
     vwap: {
       value: string;
       val: string;
@@ -22,12 +33,12 @@ export type DailyAiMarketAnalysis = {
     macd: {
       direction: string;
       divergence: string;
-      bias: "bullish" | "bearish" | "neutral";
+      bias: IndicatorTone;
     };
     rsi: {
       value: number;
       divergence: string;
-      bias: "bullish" | "bearish" | "neutral";
+      bias: IndicatorTone;
     };
   }>;
   keyLevels: string[];
@@ -36,8 +47,8 @@ export type DailyAiMarketAnalysis = {
   tradeSetups: {
     shortTerm: {
       label: string;
-      stance: "短线偏多" | "短线偏空" | "短线震荡" | "短线观望";
-      direction: "区间低吸做多" | "回落承接做多" | "反弹承压做空" | "突破追多" | "跌破追空" | "观望等待";
+      stance: Extract<TradeStance, "短线偏多" | "短线偏空" | "短线震荡" | "短线观望">;
+      direction: TradeDirection;
       rationale: string;
       triggerZone: string;
       stopLoss: string;
@@ -47,8 +58,8 @@ export type DailyAiMarketAnalysis = {
     };
     longTerm: {
       label: string;
-      stance: "长线偏多" | "长线偏空" | "长线震荡" | "长线观望";
-      direction: "区间低吸做多" | "回落承接做多" | "反弹承压做空" | "突破追多" | "跌破追空" | "观望等待";
+      stance: Extract<TradeStance, "长线偏多" | "长线偏空" | "长线震荡" | "长线观望">;
+      direction: TradeDirection;
       rationale: string;
       triggerZone: string;
       stopLoss: string;
@@ -58,16 +69,38 @@ export type DailyAiMarketAnalysis = {
     };
   };
   macroEvents: Array<{
-    name: "FOMC" | "CPI" | "非农";
+    name: MacroEventName;
     nextTimeJst: string;
-    status: "待公布" | "已排期";
+    status: MacroEventStatus;
     current?: string;
     forecast?: string;
     previous?: string;
     note: string;
   }>;
-  status: "scheduled" | "published";
-  source: "manual-seed" | "admin" | "auto";
+  status: Exclude<DailyAiMarketStatus, "draft">;
+  source: DailyAiMarketSource;
+};
+
+export type DailyAiMarketRecord = {
+  id: string;
+  slug: string;
+  analysis_date: string;
+  publish_at_jst: string;
+  status: DailyAiMarketStatus;
+  source: DailyAiMarketSource;
+  payload: DailyAiMarketAnalysis;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type DailyAiMarketWorkflowNote = {
+  timezone: string;
+  preferredPublishTime: string;
+  currentMode: "manual-seed" | "supabase";
+  nextStep: string;
+  dataSource: "seed" | "supabase";
+  latestStatus: DailyAiMarketStatus | "seed";
 };
 
 const fallbackDailyAnalysis: DailyAiMarketAnalysis = {
@@ -205,16 +238,90 @@ const fallbackDailyAnalysis: DailyAiMarketAnalysis = {
   source: "manual-seed",
 };
 
-export function getDailyAiMarketAnalysis(): DailyAiMarketAnalysis {
+const fallbackWorkflowNote: DailyAiMarketWorkflowNote = {
+  timezone: "Asia/Tokyo",
+  preferredPublishTime: "21:15",
+  currentMode: "manual-seed",
+  dataSource: "seed",
+  latestStatus: "seed",
+  nextStep:
+    "后续可接后台发布或定时脚本，在 21:15 JST 前写入数据库/接口，再由首页自动读取最新一条。当前首页中的开单建议和宏观事件时间卡也都来自同一份本地 seed 数据。",
+};
+
+export function getFallbackDailyAiMarketAnalysis(): DailyAiMarketAnalysis {
   return fallbackDailyAnalysis;
 }
 
-export function getDailyAiMarketWorkflowNote() {
+function isSupabaseConfigured() {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function normalizeStoredPayload(payload: unknown): DailyAiMarketAnalysis | null {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  return payload as DailyAiMarketAnalysis;
+}
+
+export async function getLatestPublishedDailyAiMarketRecord(): Promise<DailyAiMarketRecord | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("daily_ai_market_analyses")
+    .select("id, slug, analysis_date, publish_at_jst, status, source, payload, created_at, updated_at, published_at")
+    .eq("status", "published")
+    .order("publish_at_jst", { ascending: false })
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<DailyAiMarketRecord>();
+
+  if (error) {
+    const message = String(error.message ?? "").toLowerCase();
+    if (message.includes("does not exist") || message.includes("relation") || message.includes("schema cache")) {
+      return null;
+    }
+
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const payload = normalizeStoredPayload(data.payload);
+  if (!payload) {
+    return null;
+  }
+
+  return {
+    ...data,
+    payload,
+  };
+}
+
+export async function getDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis> {
+  const latest = await getLatestPublishedDailyAiMarketRecord();
+  return latest?.payload ?? fallbackDailyAnalysis;
+}
+
+export async function getDailyAiMarketWorkflowNote(): Promise<DailyAiMarketWorkflowNote> {
+  const latest = await getLatestPublishedDailyAiMarketRecord();
+
+  if (!latest) {
+    return fallbackWorkflowNote;
+  }
+
   return {
     timezone: "Asia/Tokyo",
     preferredPublishTime: "21:15",
-    currentMode: "manual-seed",
+    currentMode: "supabase",
+    dataSource: "supabase",
+    latestStatus: latest.status,
     nextStep:
-      "后续可接后台发布或定时脚本，在 21:15 JST 前写入数据库/接口，再由首页自动读取最新一条。当前首页中的开单建议和宏观事件时间卡也都来自同一份本地 seed 数据。",
+      "当前首页已优先读取 Supabase 中最新 published 分析。要变成真正每日自动更新，只差把生成脚本接进 cron / 定时任务，在每天 21:15 JST 前自动写入并发布。",
   };
 }
