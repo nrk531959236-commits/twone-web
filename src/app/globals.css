@@ -2880,10 +2880,8 @@ button {
   inset: 0;
   z-index: 9999;
   display: grid;
-  align-items: flex-start;
-  justify-items: center;
+  place-items: center;
   padding: 24px;
-  overflow-y: auto;
   isolation: isolate;
 }
 
@@ -2901,12 +2899,20 @@ button {
   z-index: 1;
   isolation: isolate;
   width: min(1280px, calc(100vw - 32px));
-  margin: 0 auto;
+  height: min(88vh, 920px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   padding: 26px;
   border-radius: 28px;
   border: 1px solid rgba(124, 140, 255, 0.24);
   background: linear-gradient(180deg, rgba(9, 17, 29, 0.995), rgba(6, 11, 20, 0.995));
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.58);
+}
+
+.trade-review-modal__body {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
 }
 
 .trade-review-modal__header {
@@ -3154,6 +3160,7 @@ button {
 
   .trade-review-modal__panel {
     width: calc(100vw - 24px);
+    height: min(92vh, 920px);
     padding: 20px;
   }
 

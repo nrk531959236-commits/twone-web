@@ -94,89 +94,91 @@ export function TradeReviewCalendarModal({ tradeReviewCalendar }: Props) {
               </button>
             </div>
 
-            <div className="trade-review-modal__stats">
-              <article>
-                <span>月份</span>
-                <strong>{calendar.monthLabel}</strong>
-              </article>
-              <article>
-                <span>胜率亮化</span>
-                <strong>{tradeReviewCalendar.winRate}</strong>
-              </article>
-              <article>
-                <span>盈利格</span>
-                <strong>{stats.wins}</strong>
-              </article>
-              <article>
-                <span>亏损格</span>
-                <strong>{stats.losses}</strong>
-              </article>
-              <article>
-                <span>持仓中</span>
-                <strong>{stats.holding}</strong>
-              </article>
-              <article>
-                <span>观望</span>
-                <strong>{stats.watching}</strong>
-              </article>
-            </div>
+            <div className="trade-review-modal__body">
+              <div className="trade-review-modal__stats">
+                <article>
+                  <span>月份</span>
+                  <strong>{calendar.monthLabel}</strong>
+                </article>
+                <article>
+                  <span>胜率亮化</span>
+                  <strong>{tradeReviewCalendar.winRate}</strong>
+                </article>
+                <article>
+                  <span>盈利格</span>
+                  <strong>{stats.wins}</strong>
+                </article>
+                <article>
+                  <span>亏损格</span>
+                  <strong>{stats.losses}</strong>
+                </article>
+                <article>
+                  <span>持仓中</span>
+                  <strong>{stats.holding}</strong>
+                </article>
+                <article>
+                  <span>观望</span>
+                  <strong>{stats.watching}</strong>
+                </article>
+              </div>
 
-            <div className="trade-review-modal__legend">
-              <span className="trade-review-legend trade-review-legend--tp_hit">绿色 = 盈利</span>
-              <span className="trade-review-legend trade-review-legend--sl_hit">红色 = 亏损</span>
-              <span className="trade-review-legend trade-review-legend--holding">黄色 = 持仓中</span>
-              <span className="trade-review-legend trade-review-legend--watching">灰色 = 观望</span>
-            </div>
+              <div className="trade-review-modal__legend">
+                <span className="trade-review-legend trade-review-legend--tp_hit">绿色 = 盈利</span>
+                <span className="trade-review-legend trade-review-legend--sl_hit">红色 = 亏损</span>
+                <span className="trade-review-legend trade-review-legend--holding">黄色 = 持仓中</span>
+                <span className="trade-review-legend trade-review-legend--watching">灰色 = 观望</span>
+              </div>
 
-            <div className="trade-review-month-grid">
-              {weekLabels.map((label) => (
-                <span key={label} className="trade-review-month-grid__weekday">
-                  {label}
-                </span>
-              ))}
+              <div className="trade-review-month-grid">
+                {weekLabels.map((label) => (
+                  <span key={label} className="trade-review-month-grid__weekday">
+                    {label}
+                  </span>
+                ))}
 
-              {calendar.cells.map((cell) =>
-                cell.dateNumber ? (
-                  <article
-                    key={cell.key}
-                    className={`trade-review-month-cell ${cell.entry ? `trade-review-month-cell--${cell.entry.status}` : "trade-review-month-cell--empty"}`}
-                  >
-                    <div className="trade-review-month-cell__top">
-                      <span className="trade-review-month-cell__date">{cell.dateNumber}</span>
-                      {cell.entry ? (
-                        <span className={`trade-review-month-cell__direction trade-review-month-cell__direction--${cell.entry.direction}`}>
-                          {cell.entry.direction === "long" ? "Long" : "Short"}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    {cell.entry ? (
-                      <>
-                        <div className="trade-review-month-cell__body">
-                          <strong>{cell.entry.entry}</strong>
-                          <p>{cell.entry.setupLabel}</p>
-                        </div>
-
-                        <div className="trade-review-month-cell__meta">
-                          <span>TP {cell.entry.takeProfit}</span>
-                          <span>SL {cell.entry.stopLoss}</span>
-                        </div>
-
-                        <div className="trade-review-month-cell__footer">
-                          <span className={`trade-review-month-cell__status trade-review-month-cell__status--${cell.entry.status}`}>
-                            {statusLabel[cell.entry.status]}
+                {calendar.cells.map((cell) =>
+                  cell.dateNumber ? (
+                    <article
+                      key={cell.key}
+                      className={`trade-review-month-cell ${cell.entry ? `trade-review-month-cell--${cell.entry.status}` : "trade-review-month-cell--empty"}`}
+                    >
+                      <div className="trade-review-month-cell__top">
+                        <span className="trade-review-month-cell__date">{cell.dateNumber}</span>
+                        {cell.entry ? (
+                          <span className={`trade-review-month-cell__direction trade-review-month-cell__direction--${cell.entry.direction}`}>
+                            {cell.entry.direction === "long" ? "Long" : "Short"}
                           </span>
-                          <strong>{cell.entry.pnlLabel}</strong>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="trade-review-month-cell__placeholder">无数据</div>
-                    )}
-                  </article>
-                ) : (
-                  <div key={cell.key} className="trade-review-month-cell trade-review-month-cell--blank" aria-hidden="true" />
-                ),
-              )}
+                        ) : null}
+                      </div>
+
+                      {cell.entry ? (
+                        <>
+                          <div className="trade-review-month-cell__body">
+                            <strong>{cell.entry.entry}</strong>
+                            <p>{cell.entry.setupLabel}</p>
+                          </div>
+
+                          <div className="trade-review-month-cell__meta">
+                            <span>TP {cell.entry.takeProfit}</span>
+                            <span>SL {cell.entry.stopLoss}</span>
+                          </div>
+
+                          <div className="trade-review-month-cell__footer">
+                            <span className={`trade-review-month-cell__status trade-review-month-cell__status--${cell.entry.status}`}>
+                              {statusLabel[cell.entry.status]}
+                            </span>
+                            <strong>{cell.entry.pnlLabel}</strong>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="trade-review-month-cell__placeholder">无数据</div>
+                      )}
+                    </article>
+                  ) : (
+                    <div key={cell.key} className="trade-review-month-cell trade-review-month-cell--blank" aria-hidden="true" />
+                  ),
+                )}
+              </div>
             </div>
           </div>
         </div>
