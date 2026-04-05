@@ -22,6 +22,12 @@ const macroEventMetricLabels = {
   previous: "前值",
 } as const;
 
+const indicatorToneLabel = {
+  bullish: "偏多",
+  bearish: "偏空",
+  neutral: "中性",
+} as const;
+
 function formatCountdown(targetIso: string) {
   const now = new Date();
   const target = new Date(targetIso);
@@ -131,17 +137,57 @@ export default function Home() {
           </article>
 
           <aside className="home-daily-side">
-            <article className="home-side-card">
-              <p className="home-chip">每日分析定位</p>
-              <h3>这是每天统一更新的主判断</h3>
-              <p>适合先快速掌握今天主方向、关键位、风险事件和整体执行框架。</p>
-            </article>
+            {dailyAnalysis.indicatorPanels.map((panel) => (
+              <article
+                key={panel.timeframe}
+                className={`home-side-card home-side-card--indicator home-side-card--${panel.bias}`}
+              >
+                <div className="home-indicator-card__head">
+                  <p className="home-chip">{panel.timeframe}</p>
+                  <span className={`home-indicator-tone home-indicator-tone--${panel.bias}`}>
+                    {indicatorToneLabel[panel.bias]}
+                  </span>
+                </div>
 
-            <article className="home-side-card">
-              <p className="home-chip">更新时间</p>
-              <h3>{dailyAnalysis.publishAtJst}</h3>
-              <p>{workflow.timezone} / 美股开盘前更新，不是盘中即时请求。</p>
-            </article>
+                <div className="home-indicator-stack">
+                  <div className="home-indicator-row">
+                    <span className="home-indicator-label">VWAP</span>
+                    <strong>{panel.vwap.value}</strong>
+                  </div>
+                  <div className="home-indicator-subrow">
+                    <span>VAL {panel.vwap.val}</span>
+                    <span>VAH {panel.vwap.vah}</span>
+                  </div>
+                  <p className="home-indicator-note">{panel.vwap.stance}</p>
+                </div>
+
+                <div className="home-indicator-stack">
+                  <div className="home-indicator-row">
+                    <span className="home-indicator-label">MACD</span>
+                    <strong>{panel.macd.direction}</strong>
+                  </div>
+                  <div className="home-indicator-subrow">
+                    <span>背离</span>
+                    <span className={`home-indicator-signal home-indicator-signal--${panel.macd.bias}`}>
+                      {panel.macd.divergence}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="home-indicator-stack">
+                  <div className="home-indicator-row">
+                    <span className="home-indicator-label">RSI</span>
+                    <strong>{panel.rsi.value}</strong>
+                  </div>
+                  <div className="home-indicator-subrow">
+                    <span>背离</span>
+                    <span className={`home-indicator-signal home-indicator-signal--${panel.rsi.bias}`}>
+                      {panel.rsi.divergence}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
           </aside>
         </div>
       </section>

@@ -10,6 +10,26 @@ export type DailyAiMarketAnalysis = {
   vwap: string;
   macd: string;
   rsi: string;
+  indicatorPanels: Array<{
+    timeframe: "4H" | "D" | "W";
+    bias: "bullish" | "bearish" | "neutral";
+    vwap: {
+      value: string;
+      val: string;
+      vah: string;
+      stance: string;
+    };
+    macd: {
+      direction: string;
+      divergence: string;
+      bias: "bullish" | "bearish" | "neutral";
+    };
+    rsi: {
+      value: number;
+      divergence: string;
+      bias: "bullish" | "bearish" | "neutral";
+    };
+  }>;
   keyLevels: string[];
   focus: string[];
   riskTips: string[];
@@ -63,6 +83,68 @@ const fallbackDailyAnalysis: DailyAiMarketAnalysis = {
   vwap: "日内若始终压在 VWAP 下方，优先按反弹卖点看；只有重新站回 VWAP 并连续承接，短线多头才有继续扩展空间。",
   macd: "15M MACD 有低位收敛迹象，适合观察短反弹；但 1H / 4H 动能还没重新扩张，说明大方向暂时不支持无脑追多。",
   rsi: "15M RSI 从低位修复只代表跌势放缓，不代表趋势反转；若 1H RSI 反抽后仍上不去强势区，长线空头框架优先级更高。",
+  indicatorPanels: [
+    {
+      timeframe: "4H",
+      bias: "bearish",
+      vwap: {
+        value: "67,410",
+        val: "66,980",
+        vah: "67,860",
+        stance: "价位仍压 VWAP 下",
+      },
+      macd: {
+        direction: "死叉后缩口",
+        divergence: "无明显背离",
+        bias: "bearish",
+      },
+      rsi: {
+        value: 43,
+        divergence: "无背离",
+        bias: "bearish",
+      },
+    },
+    {
+      timeframe: "D",
+      bias: "neutral",
+      vwap: {
+        value: "68,020",
+        val: "67,160",
+        vah: "69,080",
+        stance: "贴近 VWAP 中轴",
+      },
+      macd: {
+        direction: "零轴下方走平",
+        divergence: "轻微底背离",
+        bias: "neutral",
+      },
+      rsi: {
+        value: 48,
+        divergence: "轻微底背离",
+        bias: "neutral",
+      },
+    },
+    {
+      timeframe: "W",
+      bias: "bullish",
+      vwap: {
+        value: "65,880",
+        val: "63,940",
+        vah: "68,740",
+        stance: "仍守 VWAP 上",
+      },
+      macd: {
+        direction: "多头柱体放缓",
+        divergence: "无背离",
+        bias: "bullish",
+      },
+      rsi: {
+        value: 56,
+        divergence: "无背离",
+        bias: "bullish",
+      },
+    },
+  ],
   keyLevels: ["上方确认：67,850 上方放量站稳", "核心承接：67,120 - 67,280 回踩不破", "下方否定：66,780 跌破后 15M 无法收回"],
   focus: ["美股开盘前后是否给出顺势放量", "BTC 回踩承接是否伴随主流币同步企稳", "若冲高不放量，优先防一次假突破回落"],
   riskTips: ["没有确认前，不在箱体中位重仓追单", "若美盘前宏观预期扰动放大，先等 15M 收线再执行", "这不是喊单，先定义失效条件，再谈仓位和目标"],
