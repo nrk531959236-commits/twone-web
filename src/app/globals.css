@@ -2847,35 +2847,114 @@ button {
   align-items: stretch;
 }
 
-.home-trade-review-meta,
-.home-trade-review-summary,
-.home-trade-review-calendar,
-.home-trade-review-levels,
-.home-trade-review-badges {
+.home-trade-review-trigger-wrap {
   display: grid;
-  gap: 16px;
 }
 
-.home-trade-review-meta {
-  align-content: start;
+.home-trade-review-trigger {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  padding: 22px;
+  text-align: left;
+  color: var(--text);
+  border-radius: 24px;
+  border: 1px solid rgba(77, 226, 197, 0.2);
+  background: linear-gradient(135deg, rgba(77, 226, 197, 0.08), rgba(124, 140, 255, 0.08));
+  box-shadow: 0 20px 56px rgba(9, 18, 30, 0.16);
+  cursor: pointer;
 }
 
-.home-trade-review-summary {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.home-trade-review-trigger strong {
+  font-size: 24px;
+  line-height: 1.2;
 }
 
-.home-trade-review-summary article,
-.home-trade-review-levels article {
+.home-trade-review-trigger p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.trade-review-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.trade-review-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 8, 15, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.trade-review-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(1280px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 26px;
+  border-radius: 28px;
+  border: 1px solid rgba(124, 140, 255, 0.2);
+  background: linear-gradient(180deg, rgba(9, 17, 29, 0.98), rgba(6, 11, 20, 0.98));
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+}
+
+.trade-review-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.trade-review-modal__header h2 {
+  margin-top: 10px;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.02;
+}
+
+.trade-review-modal__header p:last-child {
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 60rem;
+}
+
+.trade-review-modal__close {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.trade-review-modal__stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.trade-review-modal__stats article,
+.trade-review-day__grid article {
   min-width: 0;
   padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.home-trade-review-summary span,
-.home-trade-review-levels span,
-.home-trade-review-footer span {
+.trade-review-modal__stats span,
+.trade-review-day__grid span,
+.trade-review-day__footer span,
+.trade-review-day__date {
   display: block;
   color: var(--muted);
   font-size: 12px;
@@ -2883,240 +2962,101 @@ button {
   text-transform: uppercase;
 }
 
-.home-trade-review-summary strong,
-.home-trade-review-levels strong,
-.home-trade-review-footer strong {
+.trade-review-modal__stats strong,
+.trade-review-day__grid strong,
+.trade-review-day__footer strong {
   display: block;
   margin-top: 10px;
   font-size: 18px;
   line-height: 1.5;
 }
 
-.home-trade-review-hero {
-  display: grid;
-  gap: 12px;
+.trade-review-modal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 20px;
-  padding: 22px;
-  border-radius: 24px;
-  border: 1px solid rgba(124, 140, 255, 0.18);
-  background: linear-gradient(135deg, rgba(124, 140, 255, 0.12), rgba(77, 226, 197, 0.08));
 }
 
-.home-trade-review-hero h3 {
-  font-size: clamp(22px, 3vw, 30px);
-  line-height: 1.18;
+.trade-review-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
 }
 
-.home-trade-review-calendar {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 18px;
+.trade-review-legend--tp_hit {
+  color: #b8fff0;
+  background: rgba(77, 226, 197, 0.14);
 }
 
-.home-trade-review-calendar--heatmap {
+.trade-review-legend--sl_hit {
+  color: #ffd3d3;
+  background: rgba(255, 130, 130, 0.14);
+}
+
+.trade-review-legend--holding {
+  color: #ffe7a8;
+  background: rgba(255, 190, 92, 0.14);
+}
+
+.trade-review-legend--watching {
+  color: #dfe5ff;
+  background: rgba(124, 140, 255, 0.14);
+}
+
+.trade-review-modal__calendar {
+  display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+  margin-top: 22px;
 }
 
-.home-trade-review-card {
+.trade-review-day {
   display: grid;
-  align-content: start;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
-  padding: 20px;
+  min-height: 310px;
+  padding: 18px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
 }
 
-.home-trade-review-card--heat {
-  gap: 14px;
-  min-height: 280px;
-  padding: 18px;
-}
-
-.home-trade-review-card__headline {
-  display: grid;
-  gap: 8px;
-}
-
-.home-trade-review-card__headline strong {
-  font-size: 26px;
-  line-height: 1;
-}
-
-.home-trade-review-card__top--compact {
-  gap: 12px;
-}
-
-.home-trade-review-badges--inline {
-  gap: 10px;
-}
-
-.home-trade-review-levels--compact {
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.home-trade-review-levels--compact article {
-  padding: 12px 14px;
-}
-
-.home-trade-review-levels--compact strong {
-  font-size: 16px;
-}
-
-.home-trade-review-footer--compact {
-  display: grid;
-  gap: 10px;
-}
-
-.home-trade-review-footer--compact p {
-  margin-top: 0;
-  font-size: 13px;
-  line-height: 1.65;
-}
-
-.home-trade-review-card--tp_hit {
+.trade-review-day--tp_hit {
   border-color: rgba(77, 226, 197, 0.28);
-  background: linear-gradient(180deg, rgba(18, 67, 58, 0.52), rgba(9, 21, 22, 0.96));
-  box-shadow: 0 20px 56px rgba(77, 226, 197, 0.12);
+  background: linear-gradient(180deg, rgba(18, 67, 58, 0.6), rgba(9, 21, 22, 0.96));
+  box-shadow: 0 0 32px rgba(77, 226, 197, 0.08);
 }
 
-.home-trade-review-card--sl_hit {
-  border-color: rgba(255, 130, 130, 0.26);
-  background: linear-gradient(180deg, rgba(70, 28, 34, 0.52), rgba(18, 17, 24, 0.96));
+.trade-review-day--sl_hit {
+  border-color: rgba(255, 130, 130, 0.28);
+  background: linear-gradient(180deg, rgba(70, 28, 34, 0.58), rgba(18, 17, 24, 0.96));
 }
 
-.home-trade-review-card--holding {
-  border-color: rgba(255, 190, 92, 0.28);
-  background: linear-gradient(180deg, rgba(70, 47, 12, 0.52), rgba(17, 18, 26, 0.96));
-  box-shadow: 0 20px 56px rgba(255, 190, 92, 0.1);
+.trade-review-day--holding {
+  border-color: rgba(255, 190, 92, 0.3);
+  background: linear-gradient(180deg, rgba(74, 52, 15, 0.6), rgba(17, 18, 26, 0.96));
+  box-shadow: 0 0 24px rgba(255, 190, 92, 0.08);
 }
 
-.home-trade-review-card--watching {
+.trade-review-day--watching {
   border-color: rgba(124, 140, 255, 0.2);
-  background: linear-gradient(180deg, rgba(31, 39, 76, 0.44), rgba(11, 17, 30, 0.96));
+  background: linear-gradient(180deg, rgba(31, 39, 76, 0.48), rgba(11, 17, 30, 0.96));
 }
 
-.home-trade-review-card--tp_hit.home-trade-review-card--heat {
-  box-shadow:
-    0 20px 56px rgba(77, 226, 197, 0.12),
-    inset 0 0 0 1px rgba(135, 255, 223, 0.08),
-    0 0 32px rgba(77, 226, 197, 0.08);
-}
-
-.home-trade-review-card--holding.home-trade-review-card--heat {
-  box-shadow:
-    0 20px 56px rgba(255, 190, 92, 0.1),
-    inset 0 0 0 1px rgba(255, 230, 168, 0.08),
-    0 0 24px rgba(255, 190, 92, 0.08);
-}
-
-.home-trade-review-card--sl_hit.home-trade-review-card--heat {
-  box-shadow: inset 0 0 0 1px rgba(255, 164, 164, 0.05);
-}
-
-.home-trade-review-card--watching.home-trade-review-card--heat {
-  opacity: 0.9;
-}
-
-.home-trade-review-card--low.home-trade-review-card--heat {
-  filter: saturate(0.86) brightness(0.94);
-}
-
-.home-trade-review-card--medium.home-trade-review-card--heat {
-  filter: saturate(0.96) brightness(0.99);
-}
-
-.home-trade-review-card--high.home-trade-review-card--heat {
-  filter: saturate(1.08) brightness(1.04);
-}
-
-.home-trade-review-card--heat .home-chip {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.home-trade-review-card--heat .home-trade-review-card__headline h3 {
-  font-size: 18px;
-  line-height: 1.2;
-}
-
-.home-trade-review-card--heat .home-trade-review-card__headline strong {
-  font-size: 24px;
-}
-
-.home-trade-review-card--heat .home-trade-review-footer strong {
-  font-size: 16px;
-}
-
-.home-trade-review-card--heat .home-trade-review-footer p {
-  color: rgba(237, 244, 255, 0.72);
-}
-
-.home-trade-review-card--heat .home-trade-review-status--tp_hit {
-  background: rgba(77, 226, 197, 0.18);
-}
-
-.home-trade-review-card--heat .home-trade-review-status--holding {
-  background: rgba(255, 190, 92, 0.18);
-}
-
-.home-trade-review-card--heat .home-trade-review-status--sl_hit {
-  background: rgba(255, 130, 130, 0.18);
-}
-
-.home-trade-review-card--heat .home-trade-review-levels article {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.home-trade-review-card--heat .home-trade-review-levels span,
-.home-trade-review-card--heat .home-trade-review-footer span {
-  font-size: 11px;
-}
-
-.home-trade-review-card--heat .home-trade-review-levels strong {
-  line-height: 1.45;
-}
-
-.home-trade-review-card--heat:hover {
-  transform: translateY(-2px);
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-}
-
-.home-trade-review-card--heat:hover.home-trade-review-card--tp_hit {
-  border-color: rgba(135, 255, 223, 0.34);
-}
-
-.home-trade-review-card--heat:hover.home-trade-review-card--holding {
-  border-color: rgba(255, 220, 132, 0.34);
-}
-
-.home-trade-review-card--heat:hover.home-trade-review-card--sl_hit {
-  border-color: rgba(255, 164, 164, 0.3);
-}
-
-.home-trade-review-card--heat:hover.home-trade-review-card--watching {
-  border-color: rgba(160, 176, 255, 0.28);
-}
-
-.home-trade-review-card--high {
-  filter: saturate(1.06) brightness(1.03);
-}
-
-.home-trade-review-card__top,
-.home-trade-review-footer {
+.trade-review-day__top,
+.trade-review-day__footer {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 18px;
+  gap: 12px;
 }
 
-.home-trade-review-badges {
-  justify-items: end;
-}
-
-.home-trade-review-direction,
-.home-trade-review-status {
+.trade-review-day__direction,
+.trade-review-day__status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3127,98 +3067,77 @@ button {
   text-transform: uppercase;
 }
 
-.home-trade-review-direction--long {
+.trade-review-day__direction--long {
   color: #b8fff0;
-  border: 1px solid rgba(77, 226, 197, 0.22);
-  background: rgba(77, 226, 197, 0.12);
-}
-
-.home-trade-review-direction--short {
-  color: #ffd3d3;
-  border: 1px solid rgba(255, 130, 130, 0.22);
-  background: rgba(255, 130, 130, 0.12);
-}
-
-.home-trade-review-status--tp_hit {
-  color: #b8fff0;
-  border: 1px solid rgba(77, 226, 197, 0.24);
   background: rgba(77, 226, 197, 0.14);
 }
 
-.home-trade-review-status--sl_hit {
+.trade-review-day__direction--short {
   color: #ffd3d3;
-  border: 1px solid rgba(255, 130, 130, 0.24);
   background: rgba(255, 130, 130, 0.14);
 }
 
-.home-trade-review-status--holding {
-  color: #ffe7a8;
-  border: 1px solid rgba(255, 190, 92, 0.24);
-  background: rgba(255, 190, 92, 0.14);
-}
-
-.home-trade-review-status--watching {
-  color: #dfe5ff;
-  border: 1px solid rgba(124, 140, 255, 0.2);
-  background: rgba(124, 140, 255, 0.12);
-}
-
-.home-trade-review-levels {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.home-trade-review-footer {
-  align-items: stretch;
-}
-
-.home-trade-review-footer p {
-  margin-top: 8px;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.home-trade-review-pnl-block {
-  min-width: 148px;
-  padding: 16px 18px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.025);
-}
-
-.home-trade-review-pnl-block strong {
-  font-size: 24px;
-}
-
-.home-trade-review-pnl-block span {
-  color: var(--muted);
-}
-
-.home-trade-review-section {
-  scroll-margin-top: 96px;
-}
-
-.home-trade-review-empty {
-  grid-column: 1 / -1;
+.trade-review-day__core {
   display: grid;
-  gap: 12px;
-  padding: 22px;
-  border-radius: 24px;
-  border: 1px dashed rgba(124, 140, 255, 0.24);
-  background: linear-gradient(135deg, rgba(124, 140, 255, 0.08), rgba(255, 255, 255, 0.02));
+  gap: 8px;
 }
 
-.home-trade-review-empty h3 {
-  font-size: 22px;
+.trade-review-day__core h3 {
+  font-size: 18px;
   line-height: 1.25;
 }
 
-.home-trade-review-empty p:last-child {
-  color: var(--muted);
-  line-height: 1.75;
+.trade-review-day__core strong {
+  font-size: 24px;
 }
 
-.home-trade-review-empty .home-chip {
-  width: fit-content;
+.trade-review-day__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.trade-review-day__status--tp_hit {
+  color: #b8fff0;
+  background: rgba(77, 226, 197, 0.18);
+}
+
+.trade-review-day__status--sl_hit {
+  color: #ffd3d3;
+  background: rgba(255, 130, 130, 0.18);
+}
+
+.trade-review-day__status--holding {
+  color: #ffe7a8;
+  background: rgba(255, 190, 92, 0.18);
+}
+
+.trade-review-day__status--watching {
+  color: #dfe5ff;
+  background: rgba(124, 140, 255, 0.18);
+}
+
+@media (max-width: 960px) {
+  .trade-review-modal {
+    padding: 12px;
+  }
+
+  .trade-review-modal__panel {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    padding: 20px;
+  }
+
+  .trade-review-modal__header,
+  .trade-review-day__top,
+  .trade-review-day__footer {
+    flex-direction: column;
+  }
+
+  .trade-review-modal__stats,
+  .trade-review-modal__calendar {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-trade-card,
