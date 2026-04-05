@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
+import { AssistantIcon } from "@/components/section-icons";
 import { getAssistantQuotaSummary } from "@/lib/assistant-quota";
 import { getAssistantConversation } from "@/lib/assistant-history";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -64,7 +65,12 @@ export default async function AssistantPage({
         <div className="section-heading assistant-heading">
           <div>
             <p className="eyebrow">把 AI 收口成固定 BTC 分析入口，而不是继续开放闲聊</p>
-            <h1>BTC AI 助手 V1</h1>
+            <h1>
+              <span className="page-heading-with-icon">
+                <AssistantIcon className="page-heading-icon" />
+                BTC AI 助手 V1
+              </span>
+            </h1>
           </div>
           <p className="section__intro">
             这一版把 BTC 固定分析明确设为默认主入口：普通 / 免费用户也能正常使用，不需要先开 Pro / VIP。Pro / VIP 不是“才有助手可用”，而是在固定分析主入口之外，额外开放自由输入与连续追问。若当前页没有实时行情源，会直接诚实标注缺失，并给出结构化 fallback，而不是假装有数据。
@@ -127,7 +133,12 @@ export default async function AssistantPage({
 
           <section className="section card-glow sidebar-card">
             <p className="section__label">BTC Scope</p>
-            <h2>当前分析边界</h2>
+            <h2>
+              <span className="section-title-with-icon">
+                <AssistantIcon className="section-title-icon" />
+                当前分析边界
+              </span>
+            </h2>
             <p>
               当前主界面已经明确分层：所有可用用户先走 BTC 固定分析主入口，选级别、发起分析、看确认位与否定位；Pro / VIP 只是在这个默认主入口基础上额外开放自由输入。如果你补充持仓、关键价位、预期方向，输出会更贴近实战；如果没补数据，系统会老实告诉你哪些字段暂时缺失。
             </p>
@@ -172,7 +183,12 @@ export default async function AssistantPage({
 
           <section className="section sidebar-card assistant-notes-card">
             <p className="section__label">Current Scope</p>
-            <h2>这一版 BTC 脑子已经能做什么</h2>
+            <h2>
+              <span className="section-title-with-icon">
+                <AssistantIcon className="section-title-icon" />
+                这一版 BTC 脑子已经能做什么
+              </span>
+            </h2>
             <div className="assistant-notes-list">
               {capabilityCards.map((item) => (
                 <article key={item} className="assistant-note-item">

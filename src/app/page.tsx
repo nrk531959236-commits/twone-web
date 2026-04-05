@@ -1,4 +1,13 @@
 import { SiteHeader } from "@/components/site-header";
+import {
+  AssistantIcon,
+  BiasIcon,
+  DailyAnalysisIcon,
+  IndicatorsIcon,
+  KeyLevelsIcon,
+  MacroEventIcon,
+  TradeSetupIcon,
+} from "@/components/section-icons";
 import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote } from "@/lib/daily-ai-market";
 
 const contactChannels = [
@@ -69,15 +78,32 @@ export default async function Home() {
 
       <section className="section home-minimal-section home-daily-section" id="daily-ai-market">
         <div className="home-content-pillars">
-          <span>每日 AI 行情分析</span>
-          <span>开单建议</span>
-          <span>事件表</span>
-          <span>Discord / Telegram</span>
+          <span>
+            <DailyAnalysisIcon className="home-inline-icon" />
+            每日 AI 行情分析
+          </span>
+          <span>
+            <TradeSetupIcon className="home-inline-icon" />
+            开单建议
+          </span>
+          <span>
+            <MacroEventIcon className="home-inline-icon" />
+            事件表
+          </span>
+          <span>
+            <AssistantIcon className="home-inline-icon" />
+            Discord / Telegram
+          </span>
         </div>
         <div className="home-section-heading">
           <div>
             <p className="section__label">A · 首页核心</p>
-            <h1>每日 AI 行情分析</h1>
+            <h1>
+              <span className="home-heading-with-icon">
+                <DailyAnalysisIcon className="home-section-icon" />
+                每日 AI 行情分析
+              </span>
+            </h1>
           </div>
           <div className="home-daily-meta">
             <span>{workflow.preferredPublishTime} 固定更新</span>
@@ -94,7 +120,10 @@ export default async function Home() {
               </div>
               <div className={`home-bias-box home-bias-box--${biasTheme}`}>
                 <div className="home-bias-box__head">
-                  <span className="home-highlight-label">今日偏向</span>
+                  <span className="home-highlight-label">
+                    <BiasIcon className="home-label-icon" />
+                    今日偏向
+                  </span>
                   <strong>{dailyAnalysis.marketBias}</strong>
                 </div>
                 <em>{dailyAnalysis.conviction}</em>
@@ -103,12 +132,18 @@ export default async function Home() {
 
             <div className="home-analysis-highlights home-analysis-highlights--stacked">
               <article className="home-analysis-highlight home-analysis-highlight--bias">
-                <span className="home-highlight-label">主结论</span>
+                <span className="home-highlight-label">
+                  <DailyAnalysisIcon className="home-label-icon" />
+                  主结论
+                </span>
                 <strong>{dailyAnalysis.headline}</strong>
                 <p>{dailyAnalysis.summary}</p>
               </article>
               <article className="home-analysis-highlight home-analysis-highlight--levels">
-                <span className="home-highlight-label">关键位置</span>
+                <span className="home-highlight-label">
+                  <KeyLevelsIcon className="home-label-icon" />
+                  关键位置
+                </span>
                 <div className="home-key-levels home-key-levels--compact">
                   <article>
                     <span>上方确认</span>
@@ -142,7 +177,12 @@ export default async function Home() {
               <div className="home-side-card__compact-head">
                 <div>
                   <p className="home-chip">多级别指标提示</p>
-                  <h3>4H / D / W 指标提示</h3>
+                  <h3>
+                    <span className="home-card-title-with-icon">
+                      <IndicatorsIcon className="home-card-icon" />
+                      4H / D / W 指标提示
+                    </span>
+                  </h3>
                 </div>
                 <span className="home-side-mini-tag">快速校验</span>
               </div>
@@ -214,7 +254,12 @@ export default async function Home() {
         <div className="home-section-heading home-section-heading--split">
           <div>
             <p className="section__label">C · 开单建议</p>
-            <h2>短线 / 长线分开执行</h2>
+            <h2>
+              <span className="home-heading-with-icon">
+                <TradeSetupIcon className="home-section-icon" />
+                短线 / 长线分开执行
+              </span>
+            </h2>
           </div>
           <p className="section__intro">
             恢复首页开单建议，但不做成喊单区。只保留触发区、止损、目标、失效条件和执行备注，避免信息发散。
@@ -272,7 +317,12 @@ export default async function Home() {
         <div className="home-section-heading home-section-heading--split">
           <div>
             <p className="section__label">D · 宏观事件</p>
-            <h2>FOMC / CPI / 非农</h2>
+            <h2>
+              <span className="home-heading-with-icon">
+                <MacroEventIcon className="home-section-icon" />
+                FOMC / CPI / 非农
+              </span>
+            </h2>
           </div>
           <p className="section__intro">恢复首页事件表，放在开单建议后面，用来解释今晚波动驱动，不再额外堆宣传模块。</p>
         </div>
@@ -311,7 +361,12 @@ export default async function Home() {
         <div className="home-section-heading home-section-heading--split">
           <div>
             <p className="section__label">E · 联系方式</p>
-            <h2>Discord / Telegram</h2>
+            <h2>
+              <span className="home-heading-with-icon">
+                <AssistantIcon className="home-section-icon" />
+                Discord / Telegram
+              </span>
+            </h2>
           </div>
           <p className="section__intro">首页最后只留联系入口，方便用户加入社区或直接咨询会员开通。</p>
         </div>
@@ -320,7 +375,12 @@ export default async function Home() {
           {contactChannels.map((item) => (
             <a key={item.name} href={item.href} className="home-contact-card">
               <p className="home-chip">{item.name}</p>
-              <h3>{item.name}</h3>
+              <h3>
+                <span className="home-card-title-with-icon">
+                  <AssistantIcon className="home-card-icon" />
+                  {item.name}
+                </span>
+              </h3>
               <p>{item.detail}</p>
               <span>{item.cta} →</span>
             </a>

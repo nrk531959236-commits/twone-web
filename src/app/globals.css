@@ -920,6 +920,98 @@ button {
   max-width: 12em;
 }
 
+.page-heading-with-icon,
+.section-title-with-icon,
+.home-heading-with-icon,
+.home-card-title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.62em;
+  max-width: 100%;
+}
+
+.page-heading-icon,
+.home-section-icon {
+  flex-shrink: 0;
+  width: 1.26em;
+  height: 1.26em;
+  color: rgba(223, 232, 255, 0.9);
+  opacity: 0.9;
+}
+
+.section-title-icon,
+.home-card-icon {
+  flex-shrink: 0;
+  width: 1.12em;
+  height: 1.12em;
+  color: rgba(201, 215, 238, 0.84);
+  opacity: 0.86;
+}
+
+.home-inline-icon,
+.home-label-icon {
+  flex-shrink: 0;
+  width: 1.05em;
+  height: 1.05em;
+  color: currentColor;
+}
+
+.home-inline-icon {
+  opacity: 0.74;
+}
+
+.home-label-icon {
+  opacity: 0.82;
+}
+
+.home-card-title-with-icon .home-card-icon,
+.section-title-with-icon .section-title-icon,
+.page-heading-with-icon .page-heading-icon,
+.home-heading-with-icon .home-section-icon {
+  stroke-width: 1.65;
+}
+
+.page-heading-with-icon,
+.home-heading-with-icon {
+  line-height: inherit;
+}
+
+.section-title-with-icon {
+  line-height: 1.3;
+}
+
+.home-heading-with-icon {
+  flex-wrap: wrap;
+}
+
+.home-highlight-label svg,
+.home-content-pillars span svg,
+.home-chip svg,
+.hero__badge svg,
+.section__label svg,
+.home-scroll-guide__icon svg {
+  display: block;
+}
+
+.home-scroll-guide__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 640px) {
+  .page-heading-icon,
+  .home-section-icon {
+    width: 1.18em;
+    height: 1.18em;
+  }
+
+  .section-title-icon,
+  .home-card-icon {
+    width: 1.02em;
+    height: 1.02em;
+  }
+}
+
 .hero__content span {
   color: #c3b1ff;
 }
@@ -2049,6 +2141,7 @@ button {
 .home-content-pillars span {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255, 190, 92, 0.18);
@@ -2126,6 +2219,7 @@ button {
 .home-highlight-label {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
   width: fit-content;
   padding: 6px 10px;
   border-radius: 999px;
