@@ -4,25 +4,40 @@ import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote } from "@/lib/da
 
 const insightCards = [
   {
-    title: "先看今日结论",
-    description: "首页第一屏直接给出 AI 今日行情分析，不先让用户读品牌介绍，也不先给空聊天框。",
+    title: "先看结论",
+    description: "第一屏先给方向、关键位和执行判断，不把用户扔进品牌介绍或空白聊天框。",
   },
   {
-    title: "再进更深分析",
-    description: "上方高亮按钮直接导向 AI 助手，进去后继续看更细的结构拆解、节奏判断和计划推演。",
+    title: "再看计划",
+    description: "把开单建议与宏观事件拆开，短线、波段与事件风险各看各的，减少信息打架。",
   },
   {
-    title: "交易导向而非宣传导向",
-    description: "围绕主结论、关键位、风险提示和执行路径组织页面，减少传统 landing page 的叙事噪音。",
+    title: "最后再深入",
+    description: "想继续拆级别结构和推演计划，再进入 AI 助手，而不是首页一次把所有能力堆满。",
   },
 ];
 
 const assistantEntrances = ["BTC 15M 快速节奏", "BTC 1H 结构判断", "BTC 4H 主交易计划", "BTC 1D 大级别方向"];
 
 const executionNotes = [
-  "普通体验用户先走固定分析入口，不优先开放闲聊。",
-  "Pro / VIP 再开放自由输入、连续追问与更深度研究。",
-  "首页主视觉改成 AI 今日行情分析，AI 助手按钮只负责承接更详细分析。",
+  "普通 / 免费用户默认可用 BTC 固定分析主入口。",
+  "Pro / VIP 在固定分析之外，额外开放自由输入与连续追问。",
+  "首页只保留交易判断、执行计划和进入助手的承接入口，不再把无关信息堆在首屏。",
+];
+
+const cleanHighlights = [
+  {
+    label: "主次更清楚",
+    text: "首屏只留“今日判断 + 关键位 + 进入更细分析”，用户不需要先读一堆解释。",
+  },
+  {
+    label: "信息更分层",
+    text: "方向判断、执行计划、事件节奏分别成块，避免重点信息互相抢注意力。",
+  },
+  {
+    label: "留白更充足",
+    text: "收紧说明文字、减少重复卡片，让页面呼吸感更强，看起来不再满屏都在说话。",
+  },
 ];
 
 function formatCountdown(targetIso: string) {
@@ -177,6 +192,25 @@ export default function Home() {
           </div>
 
           <div className="hero-insight-grid">
+            <article className="hero-focus-panel">
+              <div className="hero-focus-panel__header">
+                <div>
+                  <p className="trade-setup-card__chip">首页阅读顺序</p>
+                  <h2>先判断，再执行，再深入分析</h2>
+                </div>
+                <p className="hero-focus-panel__note">把首页压缩成交易决策面板，而不是功能展览区。</p>
+              </div>
+
+              <div className="hero-focus-panel__grid">
+                {cleanHighlights.map((item) => (
+                  <article key={item.label} className="hero-focus-point">
+                    <span>{item.label}</span>
+                    <strong>{item.text}</strong>
+                  </article>
+                ))}
+              </div>
+            </article>
+
             <article className="trade-setup-card trade-setup-card--highlight card-glow">
               <div className="trade-setup-card__header trade-setup-card__header--split">
                 <div>
@@ -274,17 +308,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section section--split compact-split">
+      <section className="section section--split compact-split home-strategy-strip">
         <div>
           <p className="section__label">页面策略</p>
           <h2>首页先完成交易判断，再引导用户进入更深分析</h2>
         </div>
         <p className="section__intro">
-          这一版把页面重心改成“先给 AI 今日行情分析，再给 AI 助手入口”。用户不需要先理解一堆品牌故事，也不会先面对空白输入框，而是先拿到可执行的市场框架。
+          这一版把首页收敛成更干净的三段式路径：先看 AI 今日行情分析，再看执行建议与风险节奏，最后再进入 AI 助手继续深挖。这样主次更稳，重点更集中。
         </p>
       </section>
 
-      <section className="section card-grid compact-card-grid">
+      <section className="section card-grid compact-card-grid home-strategy-grid">
         {insightCards.map((item, index) => (
           <article className="info-card" key={item.title}>
             <div className="info-card__index">0{index + 1}</div>
@@ -294,7 +328,7 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="section ai-home-focus">
+      <section className="section ai-home-focus ai-home-focus--compact">
         <div>
           <p className="section__label">AI 助手入口</p>
           <h2>高亮按钮负责承接“更详细分析”</h2>
@@ -312,12 +346,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section membership-block" id="benefits">
+      <section className="section membership-block membership-block--compact" id="benefits">
         <div className="membership-block__content">
           <p className="section__label">产品路径</p>
           <h2>先固定分析，再分层开放能力</h2>
           <p>
-            当前首页明确不走“什么都能问”的泛 AI 叙事。普通体验版先用固定交易分析入口；更高等级会员再获得自由输入、连续追问和更深度研究能力。这样首页承诺、按钮文案和后续体验是统一的。
+            当前首页明确不走“什么都能问”的泛 AI 叙事。普通 / 免费用户先用固定交易分析主入口；Pro / VIP 再额外获得自由输入、连续追问和更深度研究能力。这样首页承诺、按钮文案和后续体验保持一致。
           </p>
         </div>
         <div className="membership-list card-glow">
@@ -332,9 +366,9 @@ export default function Home() {
 
       <section className="section cta-block card-glow" id="cta">
         <p className="section__label">继续深入</p>
-        <h2>看完首页第一屏结论后，再进 AI 助手做更细致推演</h2>
+        <h2>看完首页结论后，再进 AI 助手做更细致推演</h2>
         <p>
-          当前 daily-ai-market 模块已经被直接抬到首页主视觉。后续只要接后台发布或定时任务，每晚更新一条新的 AI 行情分析，首页第一屏就会自动变成当天版本。
+          当前 daily-ai-market 模块已经被直接抬到首页主视觉。后续只要接后台发布或定时任务，每晚更新一条新的 AI 行情分析，首页主视觉就会自动切到当天版本，用户一进来先看到判断，再决定是否深入。
         </p>
         <div className="hero__actions">
           <AccessEntryLink href="/assistant" mode="assistant" className="button button--primary">

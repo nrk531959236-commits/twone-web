@@ -284,18 +284,16 @@ export function AssistantChatShell({
           ) : null}
         </div>
 
-        <div className="assistant-mode-card">
+        <section className="assistant-mode-card assistant-mode-card--default">
           <div className="assistant-mode-card__header">
             <div>
-              <span className="section__label">默认分析入口</span>
-              <strong>{canUseFreeChat ? "Pro / VIP 自由输入模式" : "BTC 固定任务模式"}</strong>
+              <span className="section__label">默认主入口</span>
+              <strong>BTC 固定分析模式</strong>
             </div>
-            <span className="assistant-mode-card__tag">{canUseFreeChat ? "Pro / VIP" : "BTC First"}</span>
+            <span className="assistant-mode-card__tag">所有可用用户</span>
           </div>
           <p>
-            {canUseFreeChat
-              ? "你当前可自由输入问题，也可以继续用固定按钮快速发起 BTC 分析。"
-              : "普通体验用户默认先选级别，再直接触发固定 BTC 分析；不鼓励开放闲聊，重点收束到结构判断、关键位确认、失效条件、交易计划。"}
+            这是当前 AI 助手对所有可用用户开放的默认主入口。直接选级别并发送，重点输出结构、关键位、确认位、否定位和交易计划；普通 / 免费用户也能正常使用，不需要先升级到 Pro / VIP。
           </p>
           <div className="assistant-levels">
             {levelOptions.map((level) => (
@@ -326,12 +324,25 @@ export function AssistantChatShell({
               </button>
             ))}
           </div>
-        </div>
+        </section>
+
+        <section className="assistant-mode-card assistant-mode-card--pro">
+          <div className="assistant-mode-card__header">
+            <div>
+              <span className="section__label">额外开放</span>
+              <strong>自由输入模式</strong>
+            </div>
+            <span className="assistant-mode-card__tag">仅 Pro / VIP</span>
+          </div>
+          <p>
+            Pro / VIP 额外开放自由输入，可直接提问、连续追问，或补充方向、持仓、关键位与交易计划；但 BTC 固定分析模式仍然保留，并且仍是默认主入口。
+          </p>
+        </section>
 
         <form ref={formRef} className="assistant-form" onSubmit={handleSubmit}>
           {!canUseFreeChat && isMember ? (
             <div className="assistant-fixed-mode-tip">
-              当前账号默认使用固定分析按钮入口。若升级到 Pro / VIP，可开放自由输入与更深度追问。
+              你当前直接使用上方 BTC 固定分析主入口即可；这是普通 / 免费用户默认可用的主入口，自由输入模式仅对 Pro / VIP 额外开放。
             </div>
           ) : null}
           <label className="assistant-form__field">
@@ -349,8 +360,8 @@ export function AssistantChatShell({
                     : "未登录状态下可浏览，不可发送。先用申请时填写的登录邮箱登录后再提问。"
                   : quota.monthlyRemaining > 0
                     ? canUseFreeChat
-                      ? "你是 Pro / VIP，可自由输入问题，也可以补充方向、关键位、持仓与交易计划。"
-                      : `默认会发送：BTC ${selectedLevel} ${selectedTask} 固定分析。普通体验版先走固定入口；你也可以补充方向、关键位或持仓上下文。`
+                      ? "你当前额外开放自由输入模式，可直接提问，也可以继续使用上方 BTC 固定分析主入口。"
+                      : `默认会发送：BTC ${selectedLevel} ${selectedTask} 固定分析。当前主入口就是固定分析模式，也是普通 / 免费用户默认可用入口；你也可以补充方向、关键位或持仓上下文。`
                     : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
@@ -363,8 +374,8 @@ export function AssistantChatShell({
               {isMember
                 ? quota.monthlyRemaining > 0
                   ? canUseFreeChat
-                    ? "Enter 发送，Shift + Enter 换行。你当前可自由输入，也可以继续使用固定 BTC 分析按钮。成功调用一次后会在服务端记录并扣减当月 AI 次数。"
-                    : `普通体验版默认走固定分析按钮，不填也能直接触发 BTC ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
+                    ? "Enter 发送，Shift + Enter 换行。你当前额外开放自由输入模式，同时仍可继续使用固定 BTC 分析主入口。成功调用一次后会在服务端记录并扣减当月 AI 次数。"
+                    : `普通 / 免费用户默认使用固定分析主入口，不填也能直接触发 BTC ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
                   : "当前资格有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
                 : isAuthenticated
                   ? isPending
@@ -383,7 +394,7 @@ export function AssistantChatShell({
                     : "登录后可发送"
                   : quota.monthlyRemaining > 0
                     ? canUseFreeChat
-                      ? "发送自由问题"
+                      ? "发送问题"
                       : "发送固定分析"
                     : "本月额度已用尽"}
             </button>
