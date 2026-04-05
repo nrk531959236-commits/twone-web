@@ -40,12 +40,14 @@ const starterMessages: ChatMessage[] = [
   },
 ];
 
+const assetOptions = ["BTC", "ETH", "SOL", "BNB", "黄金"] as const;
+
 const taskSuggestions = [
-  "BTC 15M 快速节奏",
-  "BTC 1H 结构判断",
-  "BTC 4H 主交易计划",
-  "BTC 1D 大级别方向",
-];
+  "15M 快速节奏",
+  "1H 结构判断",
+  "4H 主交易计划",
+  "1D 大级别方向",
+] as const;
 
 const levelOptions = ["15M", "1H", "4H", "1D"] as const;
 
@@ -87,6 +89,7 @@ export function AssistantChatShell({
   const [error, setError] = useState<string | null>(null);
   const urlLevel = searchParams.get("level");
   const initialLevel = levelOptions.find((level) => level === urlLevel) ?? "4H";
+  const [selectedAsset, setSelectedAsset] = useState<(typeof assetOptions)[number]>("BTC");
   const [selectedLevel, setSelectedLevel] = useState<(typeof levelOptions)[number]>(initialLevel);
   const [selectedTask, setSelectedTask] = useState(searchParams.get("task")?.trim() || "主交易计划");
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -128,7 +131,7 @@ export function AssistantChatShell({
     return true;
   }, [canUseAssistant, canUseFreeChat, input, isAuthenticated, isLoading, isMember]);
 
-  const fixedModePrompt = `请按固定模板分析 BTC ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
+  const fixedModePrompt = `请按固定模板分析 ${selectedAsset} ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
   const inputDisabled = !isMember || quota.monthlyRemaining <= 0 || isLoading;
 
   async function handleSubmit(event?: FormEvent<HTMLFormElement>) {
@@ -203,14 +206,14 @@ export function AssistantChatShell({
 
   function applySuggestion(value: string) {
     const matchedLevel = levelOptions.find((level) => value.includes(level));
-    const nextTask = value.replace(/^BTC\s+\S+\s+/, "");
+    const nextTask = value.replace(/^\S+\s+/, "");
 
     if (matchedLevel) {
       setSelectedLevel(matchedLevel);
     }
 
     setSelectedTask(nextTask || "主交易计划");
-    setInput(`补充上下文：${value}，重点写确认位、否定位和我的判断。`);
+    setInput(`补充上下文：${selectedAsset} ${value}，重点写确认位、否定位和我的判断。`);
     setError(null);
     formRef.current?.querySelector("textarea")?.focus();
   }
@@ -220,7 +223,7 @@ export function AssistantChatShell({
     if (matchedLevel) {
       setSelectedLevel(matchedLevel);
     }
-    setSelectedTask(task.replace(/^BTC\s+\S+\s+/, "") || "主交易计划");
+    setSelectedTask(task.replace(/^\S+\s+/, "") || "主交易计划");
     setError(null);
     setInput("");
   }
@@ -262,6 +265,10 @@ export function AssistantChatShell({
             </p>
             <div className="assistant-overview-metrics">
               <article>
+                <span>当前品种</span>
+                <strong>{selectedAsset}</strong>
+              </article>
+              <article>
                 <span>当前级别</span>
                 <strong>{selectedLevel}</strong>
               </article>
@@ -281,7 +288,7 @@ export function AssistantChatShell({
             <ul className="assistant-overview-list">
               <li>未登录：可浏览，不可发。</li>
               <li>已登录待审核：继续只读，等审核完成。</li>
-              <li>Free / 普通可用用户：默认固定 BTC 分析入口。</li>
+              <li>Free / 普通可用用户：默认固定分析入口。</li>
               <li>Pro / VIP：在固定入口上额外开放自由输入。</li>
             </ul>
           </article>
@@ -344,13 +351,26 @@ export function AssistantChatShell({
           <div className="assistant-mode-card__header">
             <div>
               <span className="section__label">默认主入口</span>
-              <strong>BTC 固定分析模式</strong>
+              <strong>固定分析模式</strong>
             </div>
             <span className="assistant-mode-card__tag">所有可用用户</span>
           </div>
           <p>
-            这是当前 AI 助手对所有可用用户开放的默认主入口。直接选级别并发送，重点输出结构、关键位、确认位、否定位和交易计划；普通 / 免费用户也能正常使用，不需要先升级到 Pro / VIP。
+            这是当前 AI 助手对所有可用用户开放的默认主入口。先选品种，再选级别并发送，重点输出结构、关键位、确认位、否定位和交易计划；普通 / 免费用户也能正常使用，不需要先升级到 Pro / VIP。
           </p>
+          <div className="assistant-levels">
+            {assetOptions.map((asset) => (
+              <button
+                key={asset}
+                type="button"
+                className={`suggestion-chip${selectedAsset === asset ? " suggestion-chip--active" : ""}`}
+                onClick={() => setSelectedAsset(asset)}
+                disabled={isLoading}
+              >
+                {asset}
+              </button>
+            ))}
+          </div>
           <div className="assistant-levels">
             {levelOptions.map((level) => (
               <button
@@ -421,7 +441,7 @@ export function AssistantChatShell({
                   : quota.monthlyRemaining > 0
                     ? canUseFreeChat
                       ? "你当前额外开放自由输入模式，可直接提问，也可以继续使用上方 BTC 固定分析主入口。"
-                      : `这里不再承担旧的自由发送逻辑。点击发送时会直接触发：BTC ${selectedLevel} ${selectedTask} 固定分析。你也可以在这里补充方向、关键位或持仓上下文。`
+                      : `这里不再承担旧的自由发送逻辑。点击发送时会直接触发：${selectedAsset} ${selectedLevel} ${selectedTask} 固定分析。你也可以在这里补充方向、关键位或持仓上下文。`
                     : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
@@ -435,7 +455,7 @@ export function AssistantChatShell({
                 ? quota.monthlyRemaining > 0
                   ? canUseFreeChat
                     ? "Enter 发送，Shift + Enter 换行。你当前额外开放自由输入模式，同时仍可继续使用固定 BTC 分析主入口。成功调用一次后会在服务端记录并扣减当月 AI 次数。"
-                    : `普通 / 免费用户默认使用固定分析主入口，不填也能直接触发 BTC ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
+                    : `普通 / 免费用户默认使用固定分析主入口，不填也能直接触发 ${selectedAsset} ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
                   : "当前资格有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
                 : isAuthenticated
                   ? isPending
@@ -455,7 +475,7 @@ export function AssistantChatShell({
                   : quota.monthlyRemaining > 0
                     ? canUseFreeChat
                       ? "发送问题"
-                      : "发送 BTC 固定分析"
+                      : `发送 ${selectedAsset} 固定分析`
                     : "本月额度已用尽"}
             </button>
           </div>
