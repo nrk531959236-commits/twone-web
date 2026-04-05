@@ -1974,7 +1974,7 @@ button {
 }
 
 .home-minimal-section {
-  padding: 34px;
+  padding: 28px;
 }
 
 .home-section-heading,
@@ -1991,7 +1991,7 @@ button {
 .home-events-grid,
 .home-event-stats {
   display: grid;
-  gap: 24px;
+  gap: 18px;
 }
 
 .home-section-heading {
@@ -2073,7 +2073,7 @@ button {
 .home-instant-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
-  gap: 24px;
+  gap: 20px;
   align-items: stretch;
 }
 
@@ -2086,7 +2086,7 @@ button {
 .home-trade-card,
 .home-event-card {
   min-width: 0;
-  padding: 28px;
+  padding: 22px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
@@ -2128,8 +2128,8 @@ button {
 
 .home-side-card--indicator {
   display: grid;
-  gap: 18px;
-  padding: 24px 22px;
+  gap: 14px;
+  padding: 20px 18px;
 }
 
 .home-side-card--indicator.home-side-card--bullish {
@@ -2193,8 +2193,8 @@ button {
 
 .home-indicator-stack {
   display: grid;
-  gap: 12px;
-  padding: 16px 18px;
+  gap: 10px;
+  padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(10, 12, 24, 0.28);
@@ -2231,8 +2231,8 @@ button {
 
 .home-bias-box {
   display: grid;
-  gap: 12px;
-  padding: 22px;
+  gap: 10px;
+  padding: 18px;
   border-radius: 20px;
   background: linear-gradient(180deg, rgba(124, 140, 255, 0.16), rgba(255, 255, 255, 0.03));
   border: 1px solid rgba(124, 140, 255, 0.22);
@@ -2254,7 +2254,7 @@ button {
 .home-contact-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 14px;
 }
 
 .home-analysis-highlights {
@@ -2265,7 +2265,7 @@ button {
 .home-key-levels article,
 .home-pro-input,
 .home-daily-column-card {
-  padding: 20px 22px;
+  padding: 16px 18px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.025);
@@ -2273,7 +2273,7 @@ button {
 
 .home-analysis-highlight {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .home-analysis-highlight strong {
@@ -2403,7 +2403,7 @@ button {
 .home-event-card {
   display: grid;
   align-content: start;
-  gap: 22px;
+  gap: 18px;
 }
 
 .home-trade-card--highlight {
@@ -2449,13 +2449,13 @@ button {
 .home-event-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 
 .home-trade-points article,
 .home-event-stats article {
   min-width: 0;
-  padding: 18px 18px;
+  padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.025);
@@ -2485,7 +2485,7 @@ button {
 
 .home-trade-columns div {
   min-width: 0;
-  padding: 20px 22px;
+  padding: 16px 18px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.025);
@@ -2547,7 +2547,7 @@ button {
   }
 
   .home-minimal-section {
-    padding: 28px 22px;
+    padding: 24px 20px;
   }
 
   .home-daily-main,
@@ -2559,7 +2559,7 @@ button {
   .home-trade-card,
   .home-event-card,
   .home-side-card--indicator {
-    padding: 22px;
+    padding: 18px;
   }
 
   .site-header__nav,

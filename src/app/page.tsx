@@ -137,6 +137,12 @@ export default function Home() {
           </article>
 
           <aside className="home-daily-side">
+            <article className="home-side-card">
+              <p className="home-chip">多级别指标提示</p>
+              <h3>4H / D / W 指标提示</h3>
+              <p>聚合 VWAP、VAL / VAH、MACD 与 RSI 背离信号，用来快速看多空强弱，不代替主结论。</p>
+            </article>
+
             {dailyAnalysis.indicatorPanels.map((panel) => (
               <article
                 key={panel.timeframe}
