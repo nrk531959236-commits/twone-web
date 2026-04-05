@@ -3007,112 +3007,137 @@ button {
   background: rgba(124, 140, 255, 0.14);
 }
 
-.trade-review-modal__calendar {
+.trade-review-month-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
   margin-top: 22px;
 }
 
-.trade-review-day {
+.trade-review-month-grid__weekday {
   display: grid;
-  gap: 14px;
+  place-items: center;
+  min-height: 40px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trade-review-month-cell {
+  display: grid;
+  align-content: start;
+  gap: 10px;
   min-width: 0;
-  min-height: 310px;
-  padding: 18px;
-  border-radius: 24px;
+  min-height: 170px;
+  padding: 12px;
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
 }
 
-.trade-review-day--tp_hit {
+.trade-review-month-cell--tp_hit {
   border-color: rgba(77, 226, 197, 0.28);
-  background: linear-gradient(180deg, rgba(18, 67, 58, 0.6), rgba(9, 21, 22, 0.96));
-  box-shadow: 0 0 32px rgba(77, 226, 197, 0.08);
+  background: linear-gradient(180deg, rgba(18, 67, 58, 0.62), rgba(9, 21, 22, 0.98));
 }
 
-.trade-review-day--sl_hit {
+.trade-review-month-cell--sl_hit {
   border-color: rgba(255, 130, 130, 0.28);
-  background: linear-gradient(180deg, rgba(70, 28, 34, 0.58), rgba(18, 17, 24, 0.96));
+  background: linear-gradient(180deg, rgba(70, 28, 34, 0.62), rgba(18, 17, 24, 0.98));
 }
 
-.trade-review-day--holding {
+.trade-review-month-cell--holding {
   border-color: rgba(255, 190, 92, 0.3);
-  background: linear-gradient(180deg, rgba(74, 52, 15, 0.6), rgba(17, 18, 26, 0.96));
-  box-shadow: 0 0 24px rgba(255, 190, 92, 0.08);
+  background: linear-gradient(180deg, rgba(74, 52, 15, 0.62), rgba(17, 18, 26, 0.98));
 }
 
-.trade-review-day--watching {
+.trade-review-month-cell--watching,
+.trade-review-month-cell--empty {
   border-color: rgba(124, 140, 255, 0.2);
   background: linear-gradient(180deg, rgba(31, 39, 76, 0.48), rgba(11, 17, 30, 0.96));
 }
 
-.trade-review-day__top,
-.trade-review-day__footer {
+.trade-review-month-cell--blank {
+  min-height: 170px;
+  border: 1px dashed rgba(255, 255, 255, 0.04);
+  background: transparent;
+}
+
+.trade-review-month-cell__top,
+.trade-review-month-cell__footer {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
-.trade-review-day__direction,
-.trade-review-day__status {
+.trade-review-month-cell__date {
+  color: #eff5ff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.trade-review-month-cell__direction,
+.trade-review-month-cell__status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 5px 8px;
   border-radius: 999px;
-  font-size: 12px;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.trade-review-day__direction--long {
+.trade-review-month-cell__direction--long {
   color: #b8fff0;
   background: rgba(77, 226, 197, 0.14);
 }
 
-.trade-review-day__direction--short {
+.trade-review-month-cell__direction--short {
   color: #ffd3d3;
   background: rgba(255, 130, 130, 0.14);
 }
 
-.trade-review-day__core {
+.trade-review-month-cell__body {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
-.trade-review-day__core h3 {
-  font-size: 18px;
-  line-height: 1.25;
+.trade-review-month-cell__body strong {
+  font-size: 15px;
+  line-height: 1.35;
 }
 
-.trade-review-day__core strong {
-  font-size: 24px;
+.trade-review-month-cell__body p,
+.trade-review-month-cell__meta span,
+.trade-review-month-cell__placeholder {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
-.trade-review-day__grid {
+.trade-review-month-cell__meta {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 4px;
 }
 
-.trade-review-day__status--tp_hit {
+.trade-review-month-cell__status--tp_hit {
   color: #b8fff0;
   background: rgba(77, 226, 197, 0.18);
 }
 
-.trade-review-day__status--sl_hit {
+.trade-review-month-cell__status--sl_hit {
   color: #ffd3d3;
   background: rgba(255, 130, 130, 0.18);
 }
 
-.trade-review-day__status--holding {
+.trade-review-month-cell__status--holding {
   color: #ffe7a8;
   background: rgba(255, 190, 92, 0.18);
 }
 
-.trade-review-day__status--watching {
+.trade-review-month-cell__status--watching {
   color: #dfe5ff;
   background: rgba(124, 140, 255, 0.18);
 }
@@ -3129,14 +3154,21 @@ button {
   }
 
   .trade-review-modal__header,
-  .trade-review-day__top,
-  .trade-review-day__footer {
+  .trade-review-month-cell__top,
+  .trade-review-month-cell__footer {
     flex-direction: column;
   }
 
-  .trade-review-modal__stats,
-  .trade-review-modal__calendar {
+  .trade-review-modal__stats {
     grid-template-columns: 1fr;
+  }
+
+  .trade-review-month-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trade-review-month-grid__weekday {
+    display: none;
   }
 }
 
