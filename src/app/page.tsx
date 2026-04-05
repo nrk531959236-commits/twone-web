@@ -82,7 +82,6 @@ export default function Home() {
               <div>
                 <p className="home-chip">每日结论</p>
                 <h2>{dailyAnalysis.headline}</h2>
-                <p className="home-daily-main__summary">{dailyAnalysis.summary}</p>
               </div>
               <div className="home-bias-box">
                 <span className="home-highlight-label">今日偏向</span>
@@ -91,15 +90,15 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="home-analysis-highlights">
+            <div className="home-analysis-highlights home-analysis-highlights--stacked">
               <article className="home-analysis-highlight home-analysis-highlight--bias">
                 <span className="home-highlight-label">主结论</span>
                 <strong>{dailyAnalysis.headline}</strong>
                 <p>{dailyAnalysis.summary}</p>
               </article>
               <article className="home-analysis-highlight home-analysis-highlight--levels">
-                <span className="home-highlight-label">关键位</span>
-                <div className="home-key-levels">
+                <span className="home-highlight-label">关键位置</span>
+                <div className="home-key-levels home-key-levels--compact">
                   <article>
                     <span>上方确认</span>
                     <strong>{dailyAnalysis.keyLevels[0]}</strong>
@@ -115,85 +114,77 @@ export default function Home() {
                 </div>
               </article>
             </div>
-
-            <div className="home-daily-columns">
-              <div className="home-daily-column-card home-daily-column-card--focus">
-                <p className="home-chip home-chip--highlight">重点信号</p>
-                <ul>
-                  {dailyAnalysis.focus.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="home-daily-column-card home-daily-column-card--risk">
-                <p className="home-chip">风险提示</p>
-                <ul>
-                  {dailyAnalysis.riskTips.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
           </article>
 
           <aside className="home-daily-side">
-            <article className="home-side-card">
-              <p className="home-chip">多级别指标提示</p>
-              <h3>4H / D / W 指标提示</h3>
-              <p>聚合 VWAP、VAL / VAH、MACD 与 RSI 背离信号，用来快速看多空强弱，不代替主结论。</p>
+            <article className="home-side-card home-side-card--intro">
+              <div className="home-side-card__compact-head">
+                <div>
+                  <p className="home-chip">多级别指标提示</p>
+                  <h3>4H / D / W 指标提示</h3>
+                </div>
+                <span className="home-side-mini-tag">快速校验</span>
+              </div>
+              <p>把 VWAP、VAL / VAH、MACD 与 RSI 浓缩成同一阅读节奏，用来确认强弱与节奏，不抢主结论的位置。</p>
             </article>
 
-            {dailyAnalysis.indicatorPanels.map((panel) => (
-              <article
-                key={panel.timeframe}
-                className={`home-side-card home-side-card--indicator home-side-card--${panel.bias}`}
-              >
-                <div className="home-indicator-card__head">
-                  <p className="home-chip">{panel.timeframe}</p>
-                  <span className={`home-indicator-tone home-indicator-tone--${panel.bias}`}>
-                    {indicatorToneLabel[panel.bias]}
-                  </span>
-                </div>
+            <div className="home-indicator-list">
+              {dailyAnalysis.indicatorPanels.map((panel) => (
+                <article
+                  key={panel.timeframe}
+                  className={`home-side-card home-side-card--indicator home-side-card--${panel.bias}`}
+                >
+                  <div className="home-indicator-card__head">
+                    <div className="home-indicator-title">
+                      <p className="home-chip">{panel.timeframe}</p>
+                      <span className={`home-indicator-tone home-indicator-tone--${panel.bias}`}>
+                        {indicatorToneLabel[panel.bias]}
+                      </span>
+                    </div>
+                    <p className="home-indicator-note">{panel.vwap.stance}</p>
+                  </div>
 
-                <div className="home-indicator-stack">
-                  <div className="home-indicator-row">
-                    <span className="home-indicator-label">VWAP</span>
-                    <strong>{panel.vwap.value}</strong>
-                  </div>
-                  <div className="home-indicator-subrow">
-                    <span>VAL {panel.vwap.val}</span>
-                    <span>VAH {panel.vwap.vah}</span>
-                  </div>
-                  <p className="home-indicator-note">{panel.vwap.stance}</p>
-                </div>
+                  <div className="home-indicator-metrics">
+                    <div className="home-indicator-stack">
+                      <div className="home-indicator-row">
+                        <span className="home-indicator-label">VWAP</span>
+                        <strong>{panel.vwap.value}</strong>
+                      </div>
+                      <div className="home-indicator-subrow">
+                        <span>VAL {panel.vwap.val}</span>
+                        <span>VAH {panel.vwap.vah}</span>
+                      </div>
+                    </div>
 
-                <div className="home-indicator-stack">
-                  <div className="home-indicator-row">
-                    <span className="home-indicator-label">MACD</span>
-                    <strong>{panel.macd.direction}</strong>
-                  </div>
-                  <div className="home-indicator-subrow">
-                    <span>背离</span>
-                    <span className={`home-indicator-signal home-indicator-signal--${panel.macd.bias}`}>
-                      {panel.macd.divergence}
-                    </span>
-                  </div>
-                </div>
+                    <div className="home-indicator-stack">
+                      <div className="home-indicator-row">
+                        <span className="home-indicator-label">MACD</span>
+                        <strong>{panel.macd.direction}</strong>
+                      </div>
+                      <div className="home-indicator-subrow">
+                        <span>背离</span>
+                        <span className={`home-indicator-signal home-indicator-signal--${panel.macd.bias}`}>
+                          {panel.macd.divergence}
+                        </span>
+                      </div>
+                    </div>
 
-                <div className="home-indicator-stack">
-                  <div className="home-indicator-row">
-                    <span className="home-indicator-label">RSI</span>
-                    <strong>{panel.rsi.value}</strong>
+                    <div className="home-indicator-stack">
+                      <div className="home-indicator-row">
+                        <span className="home-indicator-label">RSI</span>
+                        <strong>{panel.rsi.value}</strong>
+                      </div>
+                      <div className="home-indicator-subrow">
+                        <span>背离</span>
+                        <span className={`home-indicator-signal home-indicator-signal--${panel.rsi.bias}`}>
+                          {panel.rsi.divergence}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="home-indicator-subrow">
-                    <span>背离</span>
-                    <span className={`home-indicator-signal home-indicator-signal--${panel.rsi.bias}`}>
-                      {panel.rsi.divergence}
-                    </span>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
           </aside>
         </div>
       </section>
