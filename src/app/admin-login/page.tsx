@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
           <p className="section__label">Admin Sign In</p>
           <h2>输入管理员邮箱和密码</h2>
           <p className="section__intro admin-login-panel__intro">
-            适合管理员自用。若你还没有为该邮箱设置密码，需要先去 Supabase 后台为这个管理员账号创建或重置密码。
+            适合管理员自用。若你还没有为该邮箱设置密码，不用再去 Supabase 后台手工处理，直接在下方填邮箱后发送设密邮件即可。
           </p>
           <AdminLoginForm />
         </div>
@@ -69,6 +69,10 @@ export default function AdminLoginPage() {
             <div className="membership-list__item">
               <span className="membership-list__icon">✦</span>
               <span>登录成功 ≠ 一定有后台权限；最终仍会检查 ADMIN_EMAILS。</span>
+            </div>
+            <div className="membership-list__item">
+              <span className="membership-list__icon">✦</span>
+              <span>如果管理员邮箱还没有密码，直接在本页输入邮箱并点击“没密码？发设密邮件”，完成邮件里的设置后再回来登录。</span>
             </div>
             <div className="membership-list__item">
               <span className="membership-list__icon">✦</span>

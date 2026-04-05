@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getAuthCallbackUrl } from "@/lib/auth";
 import { getReadableAuthErrorMessage } from "@/lib/auth-error";
 
 type FormState = {
@@ -56,6 +58,33 @@ export function AdminLoginForm() {
     router.refresh();
   }
 
+  async function handleSendResetEmail() {
+    const email = form.email.trim();
+
+    if (!email) {
+      setError("先输入管理员邮箱，再发送设密邮件。");
+      setMessage(null);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    setMessage(null);
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getAuthCallbackUrl("/auth/reset-password?next=%2Fadmin-login"),
+    });
+
+    if (resetError) {
+      setError(getReadableAuthErrorMessage(resetError.message));
+      setIsSubmitting(false);
+      return;
+    }
+
+    setMessage(`设密邮件已发送到 ${email}。请打开邮件完成密码设置，完成后回到 /admin-login 用新密码登录。`);
+    setIsSubmitting(false);
+  }
+
   return (
     <form className="auth-form admin-login-form" onSubmit={handleSubmit}>
       <label className="assistant-form__field">
@@ -82,12 +111,18 @@ export function AdminLoginForm() {
 
       <div className="auth-card__actions">
         <button type="submit" className="button button--primary" disabled={isSubmitting}>
-          {isSubmitting ? "登录中..." : "进入后台"}
+          {isSubmitting ? "处理中..." : "进入后台"}
         </button>
+        <button type="button" className="button button--ghost" disabled={isSubmitting} onClick={handleSendResetEmail}>
+          没密码？发设密邮件
+        </button>
+        <Link href="/auth/reset-password?next=/admin-login" className="button button--ghost">
+          去重置页
+        </Link>
       </div>
 
       <p className="auth-card__hint">
-        说明：这里只负责完成 Supabase 登录；真正进入后台时，服务端还会按 ADMIN_EMAILS 白名单再次校验。
+        说明：这里只负责完成 Supabase 登录；真正进入后台时，服务端还会按 ADMIN_EMAILS 白名单再次校验。若这个管理员邮箱还没设过密码，直接填邮箱后点“没密码？发设密邮件”即可，不必再去 Supabase 后台手工操作。
       </p>
 
       {message ? <div className="form-status form-status--success">{message}</div> : null}

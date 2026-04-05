@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { getAuthCallbackUrl } from "@/lib/auth";
 import { getReadableAuthErrorMessage } from "@/lib/auth-error";
+import { PASSWORD_SETUP_MIN_LENGTH } from "@/lib/password-setup";
 
 type ResetMode = "request" | "update";
 
@@ -22,15 +23,40 @@ function detectModeFromHash() {
   return "request" satisfies ResetMode;
 }
 
+function detectNextPath() {
+  if (typeof window === "undefined") {
+    return "/assistant?entry=login";
+  }
+
+  const next = new URLSearchParams(window.location.search).get("next");
+  return next === "/admin-login" ? "/admin-login" : "/assistant?entry=login";
+}
+
 export default function ResetPasswordPage() {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
-  const [mode] = useState<ResetMode>(detectModeFromHash);
+  const [mode, setMode] = useState<ResetMode>(detectModeFromHash);
+  const [next, setNext] = useState("/assistant?entry=login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const entryLabel = next === "/admin-login" ? "管理员后台登录页" : "AI 助手登录页";
+
+  useEffect(() => {
+    function syncFromLocation() {
+      setMode(detectModeFromHash());
+      setNext(detectNextPath());
+    }
+
+    syncFromLocation();
+    window.addEventListener("hashchange", syncFromLocation);
+
+    return () => {
+      window.removeEventListener("hashchange", syncFromLocation);
+    };
+  }, []);
 
   async function handleRequestReset(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,7 +64,11 @@ export default function ResetPasswordPage() {
     const normalizedEmail = email.trim();
 
     if (!normalizedEmail) {
-      setError("先输入你的登录邮箱。\n如果你是老用户，也请填之前申请或使用过的邮箱。");
+      setError(
+        next === "/admin-login"
+          ? "先输入管理员邮箱。"
+          : "先输入你的登录邮箱。\n如果你是老用户，也请填之前申请或使用过的邮箱。",
+      );
       setMessage(null);
       return;
     }
@@ -47,7 +77,7 @@ export default function ResetPasswordPage() {
     setError(null);
     setMessage(null);
 
-    const redirectTo = getAuthCallbackUrl("/auth/reset-password");
+    const redirectTo = getAuthCallbackUrl(`/auth/reset-password?next=${encodeURIComponent(next)}`);
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
       redirectTo,
     });
@@ -59,7 +89,7 @@ export default function ResetPasswordPage() {
     }
 
     setMessage(
-      `设置密码邮件已发送到 ${normalizedEmail}。\n请打开邮件里的链接完成设置；设置完成后，就可以回到 AI 助手页直接用邮箱 + 密码登录。`,
+      `设置密码邮件已发送到 ${normalizedEmail}。\n请打开邮件里的链接完成设置；设置完成后，回到${entryLabel}直接用邮箱 + 密码登录即可。`,
     );
     setIsSubmitting(false);
   }
@@ -73,8 +103,8 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("新密码至少 6 位，方便测试也别太短。");
+    if (password.length < PASSWORD_SETUP_MIN_LENGTH) {
+      setError(`新密码至少 ${PASSWORD_SETUP_MIN_LENGTH} 位。`);
       setMessage(null);
       return;
     }
@@ -99,7 +129,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setMessage("密码已设置完成。现在可以直接回 AI 助手页，用邮箱 + 密码登录。\n如果你当前已登录，也可以直接继续使用。");
+    setMessage(`密码已设置完成。现在可以直接回${entryLabel}，用邮箱 + 密码登录。\n如果你当前已登录，也可以直接继续使用。`);
     setIsSubmitting(false);
   }
 
@@ -109,13 +139,15 @@ export default function ResetPasswordPage() {
         <div className="hero__badge">Password Setup / Recovery</div>
         <div className="section-heading assistant-heading">
           <div>
-            <p className="eyebrow">给普通测试用户一个顺手的补密码入口</p>
-            <h1>{mode === "update" ? "设置你的新密码" : "设置密码 / 忘记密码"}</h1>
+            <p className="eyebrow">补密码 / 重置密码统一入口，管理员和普通用户都能用</p>
+            <h1>{mode === "update" ? "设置你的新密码" : next === "/admin-login" ? "管理员设置密码 / 忘记密码" : "设置密码 / 忘记密码"}</h1>
           </div>
           <p className="section__intro">
             {mode === "update"
-              ? "你已经通过邮件验证，可以直接设置新密码。设置完成后，后续登录优先使用邮箱 + 密码；magic link 仍保留为备用。"
-              : "如果你以前一直用邮箱登录链接，或者忘了密码，可以在这里补密码。填入你的邮箱后，系统会发送一封设置密码邮件给你。若你是刚通过审核的新测试员，也可以优先向管理员索取“网页内首次设密链接”，这样不依赖邮件。"}
+              ? `你已经通过邮件验证，可以直接设置新密码。设置完成后，回到${entryLabel}用邮箱 + 密码登录即可。`
+              : next === "/admin-login"
+                ? "如果管理员邮箱目前还没有可用密码，或你忘了管理员密码，可以在这里直接发重置邮件。邮件里的 recovery 链接会自动回到 /admin-login，设置完成后就能直接进后台。"
+                : "如果你以前一直用邮箱登录链接，或者忘了密码，可以在这里补密码。填入你的邮箱后，系统会发送一封设置密码邮件给你。若你是刚通过审核的新测试员，也可以优先向管理员索取“网页内首次设密链接”，这样不依赖邮件。"}
           </p>
         </div>
       </section>
@@ -129,7 +161,7 @@ export default function ResetPasswordPage() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="至少 6 位"
+                placeholder={`至少 ${PASSWORD_SETUP_MIN_LENGTH} 位`}
                 autoComplete="new-password"
               />
             </label>
@@ -149,7 +181,7 @@ export default function ResetPasswordPage() {
               <button type="submit" className="button button--primary" disabled={isSubmitting}>
                 {isSubmitting ? "保存中..." : "保存新密码"}
               </button>
-              <Link href="/assistant?entry=login" className="button button--ghost">
+              <Link href={next} className="button button--ghost">
                 返回登录页
               </Link>
             </div>
@@ -157,7 +189,7 @@ export default function ResetPasswordPage() {
         ) : (
           <form className="auth-form" onSubmit={handleRequestReset}>
             <label className="assistant-form__field">
-              <span>登录邮箱</span>
+              <span>{next === "/admin-login" ? "管理员邮箱" : "登录邮箱"}</span>
               <input
                 type="email"
                 value={email}
@@ -169,9 +201,9 @@ export default function ResetPasswordPage() {
 
             <div className="auth-card__actions">
               <button type="submit" className="button button--primary" disabled={isSubmitting}>
-                {isSubmitting ? "发送中..." : "发送设置密码邮件"}
+                {isSubmitting ? "发送中..." : next === "/admin-login" ? "发送管理员设密邮件" : "发送设置密码邮件"}
               </button>
-              <Link href="/assistant?entry=login" className="button button--ghost">
+              <Link href={next} className="button button--ghost">
                 返回登录页
               </Link>
             </div>
@@ -181,11 +213,11 @@ export default function ResetPasswordPage() {
         <div className="auth-reset-help">
           <div className="auth-reset-help__item">
             <strong>适合谁用</strong>
-            <p>老用户以前只用 magic link 登录，想补一个固定密码；或者你单纯忘了密码。</p>
+            <p>{next === "/admin-login" ? "管理员邮箱还没设过密码，或者管理员单纯忘了密码时，用这里最快。" : "老用户以前只用 magic link 登录，想补一个固定密码；或者你单纯忘了密码。"}</p>
           </div>
           <div className="auth-reset-help__item">
             <strong>设置后怎么登录</strong>
-            <p>以后直接去 AI 助手页，输入邮箱 + 密码登录即可；收邮件链接不再是主路径。新测试员优先建议走管理员生成的一次性网页内设密链接。</p>
+            <p>{next === "/admin-login" ? "设置完成后直接回 /admin-login，用管理员邮箱 + 新密码登录；真正能否进入后台，仍以 ADMIN_EMAILS 白名单为准。" : "以后直接去 AI 助手页，输入邮箱 + 密码登录即可；收邮件链接不再是主路径。新测试员优先建议走管理员生成的一次性网页内设密链接。"}</p>
           </div>
         </div>
 
