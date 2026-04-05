@@ -124,14 +124,11 @@ export function AssistantChatShell({
       return false;
     }
 
-    if (canUseFreeChat) {
-      return input.trim().length > 0;
-    }
-
     return true;
-  }, [canUseAssistant, canUseFreeChat, input, isAuthenticated, isLoading, isMember]);
+  }, [canUseAssistant, isAuthenticated, isLoading, isMember]);
 
   const fixedModePrompt = `请按固定模板分析 ${selectedAsset} ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
+  const finalPrompt = [fixedModePrompt, input.trim()].filter(Boolean).join("\n\n补充上下文：");
   const inputDisabled = !isMember || quota.monthlyRemaining <= 0 || isLoading;
 
   async function handleSubmit(event?: FormEvent<HTMLFormElement>) {
@@ -147,9 +144,8 @@ export function AssistantChatShell({
       return;
     }
 
-    const manualInput = input.trim();
-    const content = canUseFreeChat ? manualInput : fixedModePrompt;
-    if ((!content && canUseFreeChat) || isLoading) {
+    const content = finalPrompt;
+    if (!content || isLoading) {
       return;
     }
 
@@ -278,7 +274,7 @@ export function AssistantChatShell({
               </article>
               <article>
                 <span>发送口径</span>
-                <strong>{canUseFreeChat ? "可自由输入" : "固定模板"}</strong>
+                <strong>{canUseFreeChat ? "固定模板 + 可补充上下文" : "固定模板"}</strong>
               </article>
             </div>
           </article>
@@ -289,7 +285,7 @@ export function AssistantChatShell({
               <li>未登录：可浏览，不可发。</li>
               <li>已登录待审核：继续只读，等审核完成。</li>
               <li>Free / 普通可用用户：默认固定分析入口。</li>
-              <li>Pro / VIP：在固定入口上额外开放自由输入。</li>
+              <li>Pro / VIP：在固定入口上额外开放连续追问，但主发送仍走固定分析。</li>
             </ul>
           </article>
         </section>
@@ -415,14 +411,14 @@ export function AssistantChatShell({
             <span className="assistant-mode-card__tag">仅 Pro / VIP</span>
           </div>
           <p>
-            Pro / VIP 额外开放自由输入，可直接提问、连续追问，或补充方向、持仓、关键位与交易计划；但 BTC 固定分析模式仍然保留，并且仍是默认主入口。
+            Pro / VIP 额外开放连续追问与更灵活的补充上下文，但主发送仍走当前选中的固定分析入口，不再回到旧的纯自由发送逻辑。
           </p>
         </section>
 
         <form ref={formRef} className="assistant-form" onSubmit={handleSubmit}>
-          {!canUseFreeChat && isMember ? (
+          {isMember ? (
             <div className="assistant-fixed-mode-tip">
-              你当前直接使用上方 BTC 固定分析主入口即可；这是普通 / 免费用户默认可用的主入口，自由输入模式仅对 Pro / VIP 额外开放。
+              当前发送会始终按你上面选中的品种、级别和任务触发固定分析；输入框只作为补充上下文，不再承担旧的自由发送逻辑。
             </div>
           ) : null}
           <label className="assistant-form__field">
@@ -439,9 +435,7 @@ export function AssistantChatShell({
                       : "已登录，但当前账号还未开通体验资格。若你已通过审核，请确认当前登录的是申请时填写的邮箱。"
                     : "未登录状态下可浏览，不可发送。先用申请时填写的登录邮箱登录后再提问。"
                   : quota.monthlyRemaining > 0
-                    ? canUseFreeChat
-                      ? "你当前额外开放自由输入模式，可直接提问，也可以继续使用上方 BTC 固定分析主入口。"
-                      : `这里不再承担旧的自由发送逻辑。点击发送时会直接触发：${selectedAsset} ${selectedLevel} ${selectedTask} 固定分析。你也可以在这里补充方向、关键位或持仓上下文。`
+                    ? `点击发送时会触发：${selectedAsset} ${selectedLevel} ${selectedTask} 固定分析。你也可以在这里补充方向、关键位或持仓上下文。`
                     : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
@@ -453,9 +447,7 @@ export function AssistantChatShell({
             <p>
               {isMember
                 ? quota.monthlyRemaining > 0
-                  ? canUseFreeChat
-                    ? "Enter 发送，Shift + Enter 换行。你当前额外开放自由输入模式，同时仍可继续使用固定 BTC 分析主入口。成功调用一次后会在服务端记录并扣减当月 AI 次数。"
-                    : `普通 / 免费用户默认使用固定分析主入口，不填也能直接触发 ${selectedAsset} ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
+                  ? `Enter 发送，Shift + Enter 换行。当前按钮会直接发送 ${selectedAsset} ${selectedLevel} ${selectedTask} 固定分析，并附带你的补充上下文。成功调用一次后会在服务端记录并扣减当月 AI 次数。`
                   : "当前资格有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
                 : isAuthenticated
                   ? isPending
@@ -473,9 +465,7 @@ export function AssistantChatShell({
                       : "审核通过后可发送"
                     : "登录后可发送"
                   : quota.monthlyRemaining > 0
-                    ? canUseFreeChat
-                      ? "发送问题"
-                      : `发送 ${selectedAsset} 固定分析`
+                    ? `发送 ${selectedAsset} 固定分析`
                     : "本月额度已用尽"}
             </button>
           </div>
