@@ -407,6 +407,42 @@ button {
   margin-bottom: 16px;
 }
 
+.assistant-mode-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(124, 140, 255, 0.22);
+  background: rgba(124, 140, 255, 0.06);
+}
+
+.assistant-mode-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assistant-mode-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(77, 226, 197, 0.12);
+  border: 1px solid rgba(77, 226, 197, 0.22);
+  color: #baf5eb;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.assistant-levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .suggestion-chip {
   padding: 10px 14px;
   border-radius: 999px;
@@ -419,6 +455,12 @@ button {
 .suggestion-chip:hover:not(:disabled) {
   border-color: rgba(124, 140, 255, 0.35);
   background: rgba(124, 140, 255, 0.12);
+}
+
+.suggestion-chip--active {
+  border-color: rgba(77, 226, 197, 0.35);
+  background: rgba(77, 226, 197, 0.14);
+  color: #dffff8;
 }
 
 .assistant-form {

@@ -20,16 +20,16 @@ function isMissingAuthSessionError(error: unknown) {
 }
 
 export const metadata: Metadata = {
-  title: "AI 助手 | Twone Web3.0 Community",
+  title: "BTC AI 助手 | Twone Web3.0 Community",
   description:
-    "Twone 会员 AI 助手 V1：支持公开浏览、登录 + membership 双重校验、月度 AI 配额限制、未开通会员拦截，并预留后续等级扩展结构。",
+    "Twone BTC AI 助手 V1：BTC 优先、固定分析模板、登录 + membership 双重校验、月度 AI 配额限制。",
 };
 
 const capabilityCards = [
-  "文本问题输入、发送与对话记录展示",
-  "已接入真实 AI 回复接口",
+  "BTC 优先固定分析入口",
+  "固定输出模板：结构 / OB / POC / OI / VWAP / CVD / Delta / MACD / RSI / 确认位 / 否定位",
+  "缺实时数据时自动切到诚实的结构化 fallback",
   "成功调用后服务端记录一次 AI 使用",
-  "Supabase Auth 登录态 + memberships + 月度额度校验",
 ];
 
 export default async function AssistantPage({
@@ -63,13 +63,11 @@ export default async function AssistantPage({
         <div className="hero__badge">AI Copilot · Members Only V1</div>
         <div className="section-heading assistant-heading">
           <div>
-            <p className="eyebrow">把 AI 变成研究副驾驶，而不是又一个聊天窗口</p>
-            <h1>AI 助手 V1</h1>
+            <p className="eyebrow">把 AI 收口成固定 BTC 分析入口，而不是继续开放闲聊</p>
+            <h1>BTC AI 助手 V1</h1>
           </div>
           <p className="section__intro">
-            这一版把最轻量可行的体验权限补齐：未登录可浏览、不可发送；已登录但未通过审核仍不可用；
-            只有有效体验资格或会员资格且本月额度未耗尽才放行。现在普通用户优先支持邮箱 + 密码登录，magic link 保留为备用；当前默认会按登录邮箱发放 Free 体验版与 2 次 AI 对话，已接入真实 AI 后端接口，并在服务端同时校验 Supabase Auth 会话、
-            memberships 状态与 assistant_usage 月度使用次数，并在用户首次用已获批邮箱登录时自动兑现资格。
+            这一版只做分析本体，不再扩登录、审核、后台等外围体验。网站里的 AI 已明确收口为 BTC 优先、冷静、偏进攻型的交易分析助手；主入口默认走固定任务模式，优先输出统一模板。若当前页没有实时行情源，会直接诚实标注缺失，并给出结构化 fallback，而不是假装有数据。
           </p>
         </div>
       </section>
@@ -84,12 +82,12 @@ export default async function AssistantPage({
         <div className="section assistant-chat" id="assistant-chat">
           <div className="assistant-chat__header">
             <div>
-              <p className="section__label">Conversation</p>
-              <h2>文本对话</h2>
+              <p className="section__label">BTC Analysis</p>
+              <h2>固定分析入口</h2>
             </div>
             <div className="assistant-chat__badge">
               <span className={`status-dot${quota.canUseAssistant ? "" : " status-dot--muted"}`} />
-              {quota.canUseAssistant ? "AI Runtime Online" : "Quota Locked"}
+              {quota.canUseAssistant ? "BTC Brain Online" : "Quota Locked"}
             </div>
           </div>
 
@@ -128,40 +126,38 @@ export default async function AssistantPage({
           />
 
           <section className="section card-glow sidebar-card">
-            <p className="section__label">Membership Gate</p>
-            <h2>会员权限提示</h2>
+            <p className="section__label">BTC Scope</p>
+            <h2>当前分析边界</h2>
             <p>
-              当前先开放文本对话体验。未登录用户可以查看页面和默认欢迎内容，但发送入口会锁定；
-              已登录且申请仍在审核中的用户，会明确看到“你的申请正在审核中”与下一步说明；未申请用户会被明确引导去申请或使用已有账号登录；
-              审核通过后默认按登录邮箱发放 Free 体验版与 2 次 AI 对话，用户未来首次用该邮箱登录后会自动生效；现在默认登录方式为邮箱 + 密码，老用户也可从页面直接进入“设置密码 / 忘记密码”；若本月次数耗尽，也会被前后端同时拦截。
+              当前主界面已经不把重点放在开放聊天，而是默认把用户导向 BTC 固定分析：选级别、发起分析、看确认位与否定位。如果你补充持仓、关键价位、预期方向，输出会更贴近实战；如果没补数据，系统会老实告诉你哪些字段暂时缺失。
             </p>
             <div className="membership-list">
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>未登录：可浏览 AI 助手页面，不可发送消息；已获批用户优先用邮箱 + 密码登录</span>
+                <span>默认先分析 BTC，再决定是否扩到 ETH / 山寨 / watchlist</span>
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>已登录且申请审核中：页面会明确提示“你的申请正在审核中”，当前可浏览不可发送，无需重复提交</span>
+                <span>输出模板固定：级别、现价/24h高低/24h涨跌、结构、OB、POC、OI、VWAP、CVD/Delta、MACD、RSI、确认位、否定位、我的判断</span>
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>已登录但未申请或未获批：/assistant 与 /api/assistant 仍会拒绝发送；若已通过审核，请确认当前邮箱就是申请时填写的登录邮箱；老用户可先补密码再试</span>
+                <span>没有实时数据时不伪造价格和指标，只给结构化 fallback</span>
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>已开通 Free 体验版但额度耗尽：页面会显示剩余 0 次，服务端返回 429</span>
+                <span>确认位和否定位是强制输出字段，不给模糊判断</span>
               </div>
               <div className="membership-list__item">
                 <span className="membership-list__icon">✦</span>
-                <span>已开通 Free 体验版且额度充足：可正常发起文本对话与获取 AI 回复</span>
+                <span>整体语气保持中文、简洁、交易导向，不做喊单式表达</span>
               </div>
             </div>
           </section>
 
           <section className="section sidebar-card" id="quota-panel">
             <p className="section__label">Usage</p>
-            <h2>使用额度展示</h2>
+            <h2>分析调用额度</h2>
             <AssistantQuotaPanel
               initialQuota={toAssistantQuotaView(quota)}
               initialCanUseAssistant={quota.canUseAssistant}
@@ -172,7 +168,7 @@ export default async function AssistantPage({
 
           <section className="section sidebar-card assistant-notes-card">
             <p className="section__label">Current Scope</p>
-            <h2>这一版已经能做什么</h2>
+            <h2>这一版 BTC 脑子已经能做什么</h2>
             <div className="assistant-notes-list">
               {capabilityCards.map((item) => (
                 <article key={item} className="assistant-note-item">

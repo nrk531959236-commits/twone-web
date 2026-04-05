@@ -21,19 +21,21 @@ const starterMessages: ChatMessage[] = [
   {
     id: "welcome",
     role: "assistant",
-    title: "Twone AI Assistant",
+    title: "Twone BTC Assistant",
     content:
-      "欢迎回来。当前默认审批通过会发放 Free 体验版与 2 次 AI 对话。你可以直接问 BTC / ETH / 山寨结构、复盘某笔交易，或者让我帮你整理研究思路。我会先给出结构化判断，再提示风险点。",
+      "默认入口已切到 BTC 固定分析。直接选级别并发送，我会按固定模板输出：级别、现价/24h高低/24h涨跌、结构、OB、POC、OI、VWAP、CVD/Delta、MACD、RSI、确认位、否定位、我的判断。若当前没有实时数据，我会明确说明缺口，并给出结构化 fallback。",
     createdAt: new Date().toISOString(),
   },
 ];
 
-const suggestions = [
-  "帮我看 BTC 4H 当前结构",
-  "把这笔亏损交易按问题拆开复盘",
-  "给我一个今天适合盯的 watchlist 框架",
-  "如果 ETH 失守关键位，风控应该怎么收缩？",
+const taskSuggestions = [
+  "BTC 15M 快速节奏",
+  "BTC 1H 结构判断",
+  "BTC 4H 主交易计划",
+  "BTC 1D 大级别方向",
 ];
+
+const levelOptions = ["15M", "1H", "4H", "1D"] as const;
 
 function dispatchQuotaUpdated(quota: AssistantQuotaView, isAuthenticated: boolean, isMember: boolean) {
   if (typeof window === "undefined") {
@@ -68,6 +70,8 @@ export function AssistantChatShell({
   const [isLoading, setIsLoading] = useState(false);
   const [isQuotaRefreshing, setIsQuotaRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<(typeof levelOptions)[number]>("4H");
+  const [selectedTask, setSelectedTask] = useState("主交易计划");
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const canUseAssistant = isAuthenticated && isMember && quota.monthlyRemaining > 0 && initialCanUseAssistant;
@@ -113,7 +117,8 @@ export function AssistantChatShell({
       return;
     }
 
-    const content = input.trim();
+    const manualInput = input.trim();
+    const content = manualInput || `请按固定模板分析 BTC ${selectedLevel} ${selectedTask}，如果没有实时数据就诚实标注缺失，并给我结构化 fallback。`;
     if (!content || isLoading) {
       return;
     }
@@ -170,9 +175,15 @@ export function AssistantChatShell({
   }
 
   function applySuggestion(value: string) {
-    setInput(value);
+    setInput(`请按固定模板分析 ${value}，重点写确认位、否定位和我的判断。`);
     setError(null);
     formRef.current?.querySelector("textarea")?.focus();
+  }
+
+  function applyPresetTask(task: string) {
+    setSelectedTask(task.replace(/^BTC\s+\S+\s+/, ""));
+    setError(null);
+    setInput("");
   }
 
   return (
@@ -252,26 +263,44 @@ export function AssistantChatShell({
           ) : null}
         </div>
 
-        <div className="upload-placeholder">
-          <div className="upload-placeholder__icon">📊</div>
-          <div>
-            <strong>图表上传将在下一版接入</strong>
-            <p>当前先把文本对话流程跑通。默认 Free 体验版为 2 次文本对话，后续这里可接截图上传、TradingView 图片分析与批注返回。</p>
+        <div className="assistant-mode-card">
+          <div className="assistant-mode-card__header">
+            <div>
+              <span className="section__label">默认分析入口</span>
+              <strong>BTC 固定任务模式</strong>
+            </div>
+            <span className="assistant-mode-card__tag">BTC First</span>
           </div>
-        </div>
-
-        <div className="assistant-suggestions">
-          {suggestions.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className="suggestion-chip"
-              onClick={() => applySuggestion(item)}
-              disabled={isLoading}
-            >
-              {item}
-            </button>
-          ))}
+          <p>先选级别，再直接触发固定 BTC 分析。开放闲聊会被尽量收束回：结构判断、关键位确认、失效条件、交易计划。</p>
+          <div className="assistant-levels">
+            {levelOptions.map((level) => (
+              <button
+                key={level}
+                type="button"
+                className={`suggestion-chip${selectedLevel === level ? " suggestion-chip--active" : ""}`}
+                onClick={() => setSelectedLevel(level)}
+                disabled={isLoading}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+          <div className="assistant-suggestions">
+            {taskSuggestions.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className="suggestion-chip"
+                onClick={() => {
+                  applyPresetTask(item);
+                  applySuggestion(item);
+                }}
+                disabled={isLoading}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </div>
 
         <form ref={formRef} className="assistant-form" onSubmit={handleSubmit}>
@@ -289,7 +318,7 @@ export function AssistantChatShell({
                       : "已登录，但当前账号还未开通体验资格。若你已通过审核，请确认当前登录的是申请时填写的邮箱。"
                     : "未登录状态下可浏览，不可发送。先用申请时填写的登录邮箱登录后再提问。"
                   : quota.monthlyRemaining > 0
-                    ? "输入你的问题，例如：分析 BTC 4H 结构 / 帮我复盘这笔交易 / 给我一个今天的 watchlist 框架"
+                    ? `默认会发送：BTC ${selectedLevel} ${selectedTask} 固定分析。你也可以补充你的方向、关键位或持仓上下文。`
                     : "本月 Free 体验版 AI 对话额度已用尽，请等待下月重置后再试。"
               }
               rows={4}
@@ -301,7 +330,7 @@ export function AssistantChatShell({
             <p>
               {isMember
                 ? quota.monthlyRemaining > 0
-                  ? "Enter 发送，Shift + Enter 换行。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。"
+                  ? `Enter 发送，Shift + Enter 换行。不填也能直接触发 BTC ${selectedLevel} ${selectedTask} 固定分析。成功调用一次后会在服务端记录并扣减当月 AI 次数。默认 Free 体验版为 2 次。`
                   : "当前资格有效，但本月 AI 配额已经用完。/api/assistant 会在服务端直接拒绝。"
                 : isAuthenticated
                   ? isPending

@@ -5,6 +5,7 @@ import { consumeAssistantQuota, getAssistantQuotaSummary } from "@/lib/assistant
 import { appendAssistantConversationMessages, ensureAssistantSession } from "@/lib/assistant-history";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { toAssistantQuotaView } from "@/lib/assistant/view";
+import { BTC_ANALYSIS_SYSTEM_PROMPT, buildBtcAnalysisFallback } from "@/lib/assistant/btc-analysis";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,16 +17,7 @@ type AssistantRequestBody = {
   sessionId?: string | null;
 };
 
-const systemPrompt = [
-  "你是 Twone 的 AI 交易助理，服务于 Web3 交易与会员社区。",
-  "默认使用中文回答，语气冷静、直接、偏进攻型，但不要夸张喊单。",
-  "你的回答应优先服务于以下场景：币圈行情判断、交易计划、风险提示、复盘拆解、watchlist 梳理、会员研究支持。",
-  "回答尽量结构化、可执行。若信息不足，先基于用户给的信息给出一个实用框架，再明确说明还缺什么。",
-  "不要编造实时价格、仓位、新闻或链上数据。如果用户询问实时行情但你没有数据，就明确说当前页面未接实时行情源，并给出分析框架或需要补充的信息。",
-  "涉及交易建议时，必须同时提示关键风险、确认位和否定位，避免绝对化表述。",
-  "如果用户让你复盘交易，优先从入场逻辑、仓位管理、止损纪律、执行偏差、可复用结论这几个维度拆解。",
-  "输出以自然中文段落或简洁分点为主，不要使用 JSON。",
-].join("\n");
+const systemPrompt = BTC_ANALYSIS_SYSTEM_PROMPT;
 
 function normalizeHistory(history: ChatMessage[] = []) {
   return history
@@ -81,33 +73,36 @@ export async function POST(request: Request) {
       );
     }
 
-    const completion = await openai.responses.create({
-      model: "gpt-4.1-mini",
-      input: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        ...normalizeHistory(history).map((item) => ({
-          role: item.role,
-          content: item.content,
-        })),
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-      temperature: 0.7,
-      max_output_tokens: 800,
-    });
+    let content = "";
 
-    const content = completion.output_text?.trim();
+    try {
+      const completion = await openai.responses.create({
+        model: "gpt-4.1-mini",
+        input: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          ...normalizeHistory(history).map((item) => ({
+            role: item.role,
+            content: item.content,
+          })),
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+        temperature: 0.4,
+        max_output_tokens: 900,
+      });
+
+      content = completion.output_text?.trim() || "";
+    } catch (modelError) {
+      console.error("openai.responses.create failed, using fallback", modelError);
+    }
 
     if (!content) {
-      return NextResponse.json(
-        { error: "模型未返回有效内容，请稍后再试。" },
-        { status: 502 },
-      );
+      content = buildBtcAnalysisFallback({ userMessage: message });
     }
 
     const supabase = await createSupabaseServerClient();
