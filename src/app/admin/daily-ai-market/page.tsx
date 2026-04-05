@@ -103,8 +103,8 @@ export default async function AdminDailyAiMarketPage({
             <p className="eyebrow">把首页数据源从 seed 切到正式可写入内容</p>
             <h1>Supabase 每日分析发布入口</h1>
             <p className="hero__description">
-              这一版先做最小可用真链路：管理员在这里手动生成 / 修改当日分析，提交后写入 <code>daily_ai_market_analyses</code>，首页与
-              <code>/api/daily-ai-market</code> 自动读取最新 <code>published</code> 版本。
+              这一版先做最小可用真链路：管理员可在这里手动生成 / 修改当日分析，也可由定时器调用 <code>/api/daily-ai-market/auto-publish</code>
+              自动写入 <code>daily_ai_market_analyses</code>，首页与 <code>/api/daily-ai-market</code> 自动读取最新 <code>published</code> 版本。
             </p>
             <div className="hero__stats">
               <div>
@@ -138,7 +138,7 @@ export default async function AdminDailyAiMarketPage({
               </article>
               <article>
                 <span>下一步</span>
-                <strong>把同一写入动作接到 cron / 定时任务，就能每天自动跑。</strong>
+                <strong>现在可直接调用 /api/daily-ai-market/auto-publish；再补一个 cron 调度，就能每天自动跑。</strong>
               </article>
             </div>
           </aside>

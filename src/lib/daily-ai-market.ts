@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/admin";
+import { generateDailyAiMarketAutoPayload } from "@/lib/daily-ai-market-auto";
 
 export type DailyAiMarketBias = "偏多" | "中性偏多" | "震荡" | "中性偏空" | "偏空";
 export type DailyAiMarketStatus = "draft" | "scheduled" | "published";
@@ -103,7 +104,7 @@ export type DailyAiMarketWorkflowNote = {
   latestStatus: DailyAiMarketStatus | "seed";
 };
 
-const fallbackDailyAnalysis: DailyAiMarketAnalysis = {
+export const fallbackDailyAnalysisSeed: DailyAiMarketAnalysis = {
   title: "今日 AI 行情分析",
   publishAtJst: "2026-04-05T21:15:00+09:00",
   marketBias: "中性偏空",
@@ -245,11 +246,11 @@ const fallbackWorkflowNote: DailyAiMarketWorkflowNote = {
   dataSource: "seed",
   latestStatus: "seed",
   nextStep:
-    "后续可接后台发布或定时脚本，在 21:15 JST 前写入数据库/接口，再由首页自动读取最新一条。当前首页中的开单建议和宏观事件时间卡也都来自同一份本地 seed 数据。",
+    "当前已提供可被 cron 触发的自动发布接口。若尚未建定时器，首页会继续回退到本地固定模板；一旦定时任务开始调用该入口，首页将自动切到最新 published 数据。",
 };
 
 export function getFallbackDailyAiMarketAnalysis(): DailyAiMarketAnalysis {
-  return fallbackDailyAnalysis;
+  return generateDailyAiMarketAutoPayload().payload;
 }
 
 function isSupabaseConfigured() {
@@ -305,7 +306,7 @@ export async function getLatestPublishedDailyAiMarketRecord(): Promise<DailyAiMa
 
 export async function getDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis> {
   const latest = await getLatestPublishedDailyAiMarketRecord();
-  return latest?.payload ?? fallbackDailyAnalysis;
+  return latest?.payload ?? getFallbackDailyAiMarketAnalysis();
 }
 
 export async function getDailyAiMarketWorkflowNote(): Promise<DailyAiMarketWorkflowNote> {

@@ -156,11 +156,211 @@ supabase-daily-ai-market-v1.sql
 3. 一个可手动触发的发布入口（后台页面）
 4. 保持和首页现有模板字段兼容
 
-还差最后一小步，才算“真正每天自动执行”：
+v2 在此基础上继续补了“自动生成 + 自动发布”入口：
 
-- 把同一套写入动作接到 cron / 定时任务 / 外部工作流，在每天固定时间自动生成并调用发布。
+- 新增服务层：`src/lib/daily-ai-market-auto.ts`
+  - 用固定模板自动生成当日 payload
+  - 直接 upsert 到 `daily_ai_market_analyses`
+  - 默认以 `source=auto`、`status=published` 写入
+- 新增触发路由：`POST /api/daily-ai-market/auto-publish`
+  - 适合被 Vercel Cron、OpenClaw cron 或任意外部调度器调用
+  - 使用 `Authorization: Bearer $DAILY_AI_MARKET_CRON_TOKEN` 鉴权
+  - 也支持 `?token=...` 方式，便于先手工测试
 
-也就是说，现在“读正式数据源 + 手动发布入口”已经打通；离全自动，只差调度器把这一步每天定时触发。
+### 手工触发 v2 自动发布
+
+先在环境变量中配置：
+
+```bash
+DAILY_AI_MARKET_CRON_TOKEN=your-secret-token
+```
+
+本地或线上可这样调用：
+
+```bash
+curl -X POST http://localhost:3000/api/daily-ai-market/auto-publish \
+  -H "Authorization: Bearer $DAILY_AI_MARKET_CRON_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+也可指定日期：
+
+```bash
+curl -X POST https://your-domain/api/daily-ai-market/auto-publish \
+  -H "Authorization: Bearer $DAILY_AI_MARKET_CRON_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"analysisDate":"2026-04-05"}'
+```
+
+### 离“每天 21:15 自动跑”还差什么
+
+现在已经具备：
+
+1. 正式数据源（Supabase）
+2. 手动后台发布入口
+3. 自动生成固定模板 payload
+4. 可被外部定时器调用的自动发布 API
+
+还差最后一个调度层：
+
+- **Vercel Cron**：项目里已经补了 `vercel.json`，使用 UTC cron `15 12 * * *`，即 `21:15 JST`
+- **或 OpenClaw cron**：更推荐，直接由 OpenClaw 每天 21:15 发起一次 HTTP 调用
+- 若后面要从“固定模板”升级成“真数据生成”，再把 `daily-ai-market-auto.ts` 里的 payload 生成逻辑替换成实时数据拼装即可，路由和写库入口不需要重做
+
+也就是说，现在“自动发布入口”已经有了；离真正每天 21:15 自动执行，只差把这个入口挂到一个真正会每天触发的 cron 上。
+
+## 面向 OpenClaw cron 的最小接法（推荐）
+
+### 1) 先确认站点环境变量
+
+线上部署环境里至少要有：
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+DAILY_AI_MARKET_CRON_TOKEN=一个足够长的随机字符串
+```
+
+说明：
+
+- `DAILY_AI_MARKET_CRON_TOKEN` 是 cron 调接口时用的共享密钥
+- 不要把它写进前端公开变量
+- OpenClaw cron 只需要知道这个 token，不需要 Supabase key
+
+### 2) 触发接口
+
+推荐调用：
+
+```bash
+POST /api/daily-ai-market/auto-publish
+Authorization: Bearer $DAILY_AI_MARKET_CRON_TOKEN
+Content-Type: application/json
+```
+
+最小 body：
+
+```json
+{}
+```
+
+接口特性：
+
+- 支持 `POST` + JSON body
+- 也支持 `GET`，适合某些只方便发 URL 的 cron 场景
+- 支持 `Authorization: Bearer ...`
+- 也支持 `?token=...`，仅建议本地手测或临时排障时使用
+- 可选参数：
+  - `analysisDate=YYYY-MM-DD`
+  - `publishAtJst=2026-04-05T21:15:00+09:00`
+  - `status=published|scheduled`
+  - `source=auto|admin|manual-seed`
+
+### 3) 先手工验一次
+
+线上建议先跑：
+
+```bash
+curl -X POST https://your-domain/api/daily-ai-market/auto-publish \
+  -H "Authorization: Bearer $DAILY_AI_MARKET_CRON_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+成功时会返回：
+
+```json
+{
+  "ok": true,
+  "trigger": "post",
+  "mode": "created",
+  "analysisDate": "2026-04-05",
+  "status": "published",
+  "source": "auto",
+  "publishAtJst": "2026-04-05T21:15:00+09:00"
+}
+```
+
+然后检查两处：
+
+1. `https://your-domain/api/daily-ai-market`
+2. 首页是否已切到最新 `published`
+
+### 4) OpenClaw cron 实际接入思路
+
+OpenClaw cron 的核心就一件事：**每天 21:15 JST 发一次上面的 HTTP 请求**。
+
+如果你的 OpenClaw cron 支持直接配置 HTTP 请求：
+
+- schedule：`15 21 * * *`
+- timezone：`Asia/Tokyo`
+- method：`POST`
+- url：`https://your-domain/api/daily-ai-market/auto-publish`
+- headers：
+  - `Authorization: Bearer <你的 DAILY_AI_MARKET_CRON_TOKEN>`
+  - `Content-Type: application/json`
+- body：`{}`
+
+如果你的 OpenClaw cron 更适合执行 shell 命令，那就直接用一条 `curl`：
+
+```bash
+curl -X POST https://your-domain/api/daily-ai-market/auto-publish \
+  -H "Authorization: Bearer $DAILY_AI_MARKET_CRON_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### 5) OpenClaw cron 最小落地步骤
+
+按最少动作来做：
+
+1. 确保线上站点已部署这版代码
+2. 确保线上环境变量里已有 `DAILY_AI_MARKET_CRON_TOKEN`
+3. 用上面的 `curl` 手工测通一次
+4. 在 OpenClaw cron 新增一条每日任务：
+   - `15 21 * * *`
+   - `Asia/Tokyo`
+   - 调 `https://your-domain/api/daily-ai-market/auto-publish`
+5. 第二天 21:15 之后检查首页 / API / Supabase 记录是否自动更新
+
+### 6) 现在到底该怎么把“每天 21:15 自动执行”真正接上
+
+**现在最直接的接法就是：**
+
+- 保留当前 `/api/daily-ai-market/auto-publish`
+- 在线上配置 `DAILY_AI_MARKET_CRON_TOKEN`
+- 在 OpenClaw cron 新增一条 `Asia/Tokyo` 时区、`15 21 * * *` 的任务
+- 让这条任务每天执行下面这条请求：
+
+```bash
+curl -X POST https://your-domain/api/daily-ai-market/auto-publish \
+  -H "Authorization: Bearer <你的 DAILY_AI_MARKET_CRON_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+这样就是真的接上了。
+
+## Vercel Cron 兜底
+
+如果不想依赖 OpenClaw cron，项目当前也已经有一个 Vercel cron 兜底配置：
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/daily-ai-market/auto-publish",
+      "schedule": "15 12 * * *"
+    }
+  ]
+}
+```
+
+注意：
+
+- `15 12 * * *` 是 **UTC**，对应日本时间 `21:15 JST`
+- 若使用 Vercel Cron，通常仍建议让请求携带同一个 `DAILY_AI_MARKET_CRON_TOKEN`
+- 如果后续明确只走 OpenClaw cron，`vercel.json` 这条可以保留当兜底，也可以删掉避免双触发
 
 ## 后续可扩展方向
 
