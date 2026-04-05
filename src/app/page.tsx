@@ -107,8 +107,10 @@ export default function Home() {
               </div>
 
               <div className="daily-market-hero-card__signal">
+                <span className="daily-market-signal-label">策略主题</span>
                 <span className="daily-market-bias">{dailyAnalysis.marketBias}</span>
-                <strong>{dailyAnalysis.conviction}</strong>
+                <span className="daily-market-signal-label">主结论</span>
+                <strong className="daily-market-conviction">{dailyAnalysis.conviction}</strong>
                 <div className="daily-market-hero-card__meta">
                   <span>{workflow.timezone}</span>
                   <span>{workflow.preferredPublishTime} 固定更新</span>
@@ -190,11 +192,18 @@ export default function Home() {
                     <div className="trade-plan-column__top">
                       <div>
                         <span className="trade-plan-column__label">{setup.label}</span>
+                        <div className="trade-plan-column__stance-row">
+                          <span className="trade-plan-column__stance">{setup.stance}</span>
+                        </div>
                         <h3>{setup.direction}</h3>
                       </div>
                     </div>
 
                     <div className="trade-plan-list">
+                      <div className="trade-plan-item trade-plan-item--accent">
+                        <span>理由 / 条件</span>
+                        <strong>{setup.rationale}</strong>
+                      </div>
                       <div className="trade-plan-item">
                         <span>触发区间</span>
                         <strong>{setup.triggerZone}</strong>
