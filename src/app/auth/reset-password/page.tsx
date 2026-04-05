@@ -146,7 +146,7 @@ export default function ResetPasswordPage() {
             {mode === "update"
               ? `你已经通过邮件验证，可以直接设置新密码。设置完成后，回到${entryLabel}用邮箱 + 密码登录即可。`
               : next === "/admin-login"
-                ? "如果管理员邮箱目前还没有可用密码，或你忘了管理员密码，可以在这里直接发重置邮件。邮件里的 recovery 链接会自动回到 /admin-login，设置完成后就能直接进后台。"
+                ? "如果管理员邮箱目前还没有可用密码，或你忘了管理员密码，这里仍可作为邮件重置备用入口。但现在更推荐直接回 /admin-login 走站内设置 / 重设密码，不再依赖 recovery 邮件回跳链路。"
                 : "如果你以前一直用邮箱登录链接，或者忘了密码，可以在这里补密码。填入你的邮箱后，系统会发送一封设置密码邮件给你。若你是刚通过审核的新测试员，也可以优先向管理员索取“网页内首次设密链接”，这样不依赖邮件。"}
           </p>
         </div>
@@ -213,7 +213,7 @@ export default function ResetPasswordPage() {
         <div className="auth-reset-help">
           <div className="auth-reset-help__item">
             <strong>适合谁用</strong>
-            <p>{next === "/admin-login" ? "管理员邮箱还没设过密码，或者管理员单纯忘了密码时，用这里最快。" : "老用户以前只用 magic link 登录，想补一个固定密码；或者你单纯忘了密码。"}</p>
+            <p>{next === "/admin-login" ? "管理员邮箱还没设过密码，或者管理员忘了密码时，这里仅作邮件重置备用入口；现在更快的是直接回 /admin-login 站内设置 / 重设密码。" : "老用户以前只用 magic link 登录，想补一个固定密码；或者你单纯忘了密码。"}</p>
           </div>
           <div className="auth-reset-help__item">
             <strong>设置后怎么登录</strong>
