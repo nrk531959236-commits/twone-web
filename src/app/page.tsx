@@ -114,6 +114,16 @@ export default function Home() {
                 </div>
               </article>
             </div>
+
+            <a href="#trade-setups" className="home-scroll-guide" aria-label="下拉查看开单建议">
+              <div className="home-scroll-guide__copy">
+                <span className="home-scroll-guide__eyebrow">继续往下看</span>
+                <strong>下拉查看开单建议</strong>
+              </div>
+              <span className="home-scroll-guide__icon" aria-hidden="true">
+                ↓
+              </span>
+            </a>
           </article>
 
           <aside className="home-daily-side">

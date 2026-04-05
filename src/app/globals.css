@@ -2092,6 +2092,67 @@ button {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.home-scroll-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 190, 92, 0.2);
+  background: linear-gradient(135deg, rgba(255, 190, 92, 0.12), rgba(124, 140, 255, 0.08));
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.home-scroll-guide:hover,
+.home-scroll-guide:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 190, 92, 0.34);
+  background: linear-gradient(135deg, rgba(255, 190, 92, 0.16), rgba(124, 140, 255, 0.12));
+  box-shadow: 0 14px 34px rgba(8, 10, 20, 0.22);
+}
+
+.home-scroll-guide__copy {
+  display: grid;
+  gap: 6px;
+}
+
+.home-scroll-guide__eyebrow {
+  color: rgba(255, 231, 168, 0.78);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-scroll-guide strong {
+  font-size: 16px;
+  line-height: 1.35;
+  color: #fff0c9;
+}
+
+.home-scroll-guide__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 190, 92, 0.24);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffe7a8;
+  font-size: 18px;
+  line-height: 1;
+}
+
 .home-daily-side {
   align-content: start;
 }
@@ -2656,8 +2717,13 @@ button {
   .home-tool-header,
   .home-trade-card__header,
   .home-event-card__header,
-  .home-side-card__compact-head {
+  .home-side-card__compact-head,
+  .home-scroll-guide {
     flex-direction: column;
+  }
+
+  .home-scroll-guide {
+    align-items: flex-start;
   }
 
   .daily-market-card__top {
