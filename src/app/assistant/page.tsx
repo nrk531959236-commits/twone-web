@@ -9,6 +9,7 @@ import { toAssistantQuotaView } from "@/lib/assistant/view";
 import { AssistantChatShell } from "./assistant-chat-shell";
 import { AssistantQuotaPanel } from "./assistant-quota-panel";
 import { AssistantEntryCard } from "./assistant-entry-card";
+import { Suspense } from "react";
 import { getAuthCallbackErrorMessage } from "@/lib/auth-error";
 import { getFirstActivationContextForCurrentVisitor } from "@/lib/first-activation";
 
@@ -112,17 +113,19 @@ export default async function AssistantPage({
             </div>
           </div>
 
-          <AssistantChatShell
-            isAuthenticated={membership.isAuthenticated}
-            isMember={membership.isMember}
-            isPending={membership.isPending}
-            canUseAssistant={quota.canUseAssistant}
-            gateMessage={membership.detail}
-            initialSessionId={conversation.session?.id ?? null}
-            initialMessages={conversation.messages}
-            quota={toAssistantQuotaView(quota)}
-            userEmail={user?.email ?? null}
-          />
+          <Suspense fallback={null}>
+            <AssistantChatShell
+              isAuthenticated={membership.isAuthenticated}
+              isMember={membership.isMember}
+              isPending={membership.isPending}
+              canUseAssistant={quota.canUseAssistant}
+              gateMessage={membership.detail}
+              initialSessionId={conversation.session?.id ?? null}
+              initialMessages={conversation.messages}
+              quota={toAssistantQuotaView(quota)}
+              userEmail={user?.email ?? null}
+            />
+          </Suspense>
         </div>
 
         <aside className="assistant-sidebar">

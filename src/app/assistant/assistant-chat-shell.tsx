@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createAssistantReply, fetchAssistantQuota } from "@/lib/assistant/runtime";
 import type { AssistantQuotaView, ChatMessage } from "@/lib/assistant/types";
 
@@ -74,6 +75,7 @@ export function AssistantChatShell({
   quota: initialQuota,
   userEmail,
 }: AssistantChatShellProps) {
+  const searchParams = useSearchParams();
   const inferredPlan = extractMembershipPlanFromMessage(gateMessage);
   const canUseFreeChat = inferredPlan ? FREE_CHAT_PLANS.has(inferredPlan) : false;
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
@@ -83,8 +85,10 @@ export function AssistantChatShell({
   const [isLoading, setIsLoading] = useState(false);
   const [isQuotaRefreshing, setIsQuotaRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState<(typeof levelOptions)[number]>("4H");
-  const [selectedTask, setSelectedTask] = useState("主交易计划");
+  const urlLevel = searchParams.get("level");
+  const initialLevel = levelOptions.find((level) => level === urlLevel) ?? "4H";
+  const [selectedLevel, setSelectedLevel] = useState<(typeof levelOptions)[number]>(initialLevel);
+  const [selectedTask, setSelectedTask] = useState(searchParams.get("task")?.trim() || "主交易计划");
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const canUseAssistant = isAuthenticated && isMember && quota.monthlyRemaining > 0 && initialCanUseAssistant;

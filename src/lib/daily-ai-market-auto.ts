@@ -48,14 +48,43 @@ function createSlug(date: string) {
   return `daily-ai-market-${date}`;
 }
 
+function formatAnalysisDateLabel(date: string) {
+  return date.replace(/-/g, ".");
+}
+
+function createAutoStatusLine(analysisDate: string, publishAtJst: string) {
+  const publishTime = publishAtJst.slice(11, 16);
+  return `${formatAnalysisDateLabel(analysisDate)} JST ${publishTime} 自动发布占位版：若正式行情稿缺席，首页仍会切到当日版本，避免继续显示前一天完全相同的内容。`;
+}
+
 function buildAutoPayload(
   input: Pick<Required<DailyAiMarketAutoGenerateInput>, "analysisDate" | "publishAtJst" | "source" | "status">,
 ): DailyAiMarketAnalysis {
   const fallback = fallbackDailyAnalysisSeed;
+  const dateLabel = formatAnalysisDateLabel(input.analysisDate);
+  const publishTime = input.publishAtJst.slice(11, 16);
+  const autoStatusLine = createAutoStatusLine(input.analysisDate, input.publishAtJst);
 
   return {
     ...fallback,
+    title: `今日 AI 行情分析 · ${dateLabel}`,
+    headline: `${dateLabel} BTC 日更占位已自动刷新：当前仍沿用 fallback 框架，但当天文案与发布时间已切换。`,
+    summary: `${autoStatusLine} 当前结论仍沿用保守 fallback 框架：短线继续看确认后执行，长线继续等大级别重新一致，不把自动补位误当成新的实时盘中观点。`,
+    conviction: `${fallback.conviction}（自动发布时间：${dateLabel} ${publishTime} JST）`,
     publishAtJst: input.publishAtJst,
+    timeframe: `${fallback.timeframe} 自动版本日期：${dateLabel} / 发布时间：${publishTime} JST。`,
+    structure: `${fallback.structure} 当前为 ${dateLabel} 自动占位发布版本，未接入新的实盘结构前，不应视作新增方向切换信号。`,
+    vwap: `${fallback.vwap} 当前自动版本生成时间：${publishTime} JST。`,
+    macd: `${fallback.macd} 当前自动版本生成时间：${publishTime} JST。`,
+    rsi: `${fallback.rsi} 当前自动版本生成时间：${publishTime} JST。`,
+    focus: [
+      `确认 ${dateLabel} 正式分析是否已补齐，避免首页长期停留在自动占位版本。`,
+      ...fallback.focus.slice(0, 2),
+    ],
+    riskTips: [
+      `当前页面为 ${dateLabel} 自动补位发布版本，不代表新的实时盘中数据已更新。`,
+      ...fallback.riskTips.slice(0, 2),
+    ],
     status: input.status,
     source: input.source,
   };
