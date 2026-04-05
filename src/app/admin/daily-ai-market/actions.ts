@@ -127,6 +127,7 @@ function buildAnalysisFromForm(formData: FormData, fallback: DailyAiMarketAnalys
         note: toText(formData.get(`event_${index}_note`)) || base.note,
       };
     }),
+    tradeReviewCalendar: fallback.tradeReviewCalendar,
     status,
     source,
   };
