@@ -3197,6 +3197,30 @@ button {
   scroll-margin-top: 96px;
 }
 
+.home-trade-review-empty {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px dashed rgba(124, 140, 255, 0.24);
+  background: linear-gradient(135deg, rgba(124, 140, 255, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.home-trade-review-empty h3 {
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.home-trade-review-empty p:last-child {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.home-trade-review-empty .home-chip {
+  width: fit-content;
+}
+
 .home-trade-card,
 .home-event-card {
   display: grid;
