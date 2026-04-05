@@ -9,11 +9,11 @@ const insightCards = [
   },
   {
     title: "再进更深分析",
-    description: "上方高亮按钮直接导向 AI 助手，告诉用户进去后是做更细的结构拆解、节奏判断和计划推演。",
+    description: "上方高亮按钮直接导向 AI 助手，进去后继续看更细的结构拆解、节奏判断和计划推演。",
   },
   {
     title: "交易导向而非宣传导向",
-    description: "围绕关键位、确认位、否定位与执行路径组织页面，减少传统 landing page 的叙事噪音。",
+    description: "围绕主结论、关键位、风险提示和执行路径组织页面，减少传统 landing page 的叙事噪音。",
   },
 ];
 
@@ -25,9 +25,30 @@ const executionNotes = [
   "首页主视觉改成 AI 今日行情分析，AI 助手按钮只负责承接更详细分析。",
 ];
 
+function formatCountdown(targetIso: string) {
+  const now = new Date();
+  const target = new Date(targetIso);
+  const diffMs = target.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return "更新中";
+  }
+
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours <= 0) {
+    return `${minutes} 分钟`;
+  }
+
+  return `${hours} 小时 ${minutes} 分钟`;
+}
+
 export default function Home() {
   const dailyAnalysis = getDailyAiMarketAnalysis();
   const workflow = getDailyAiMarketWorkflowNote();
+  const nextUpdateCountdown = formatCountdown(dailyAnalysis.publishAtJst);
 
   return (
     <main className="page-shell">
@@ -36,162 +57,211 @@ export default function Home() {
       <section className="section hero ai-market-hero" id="daily-ai-market">
         <div className="hero__badge">首页主视觉 · AI 今日行情分析</div>
 
-        <div className="ai-market-hero__topbar">
-          <div className="ai-market-hero__intro">
-            <p className="eyebrow">先看结论，再决定是否进入更细分析</p>
-            <h1>
-              AI 今日行情分析
-              <br />
-              <span>直接成为首页第一眼</span>
-            </h1>
-            <p className="hero__description">
-              Twone 首页现在不再先做传统介绍，也不把空聊天框放在最前面。用户进入页面后，第一屏先看到今晚市场判断、关键位、风险提示；如果要看更详细的结构拆解，再点上方高亮 AI 助手入口继续深挖。
-            </p>
+        <div className="ai-market-hero__frame card-glow">
+          <div className="ai-market-hero__topbar">
+            <div className="ai-market-hero__intro">
+              <p className="eyebrow">先看结论，再决定是否进入更细分析</p>
+              <h1>
+                AI 今日行情分析
+                <br />
+                <span>首页第一眼先给方向，不先给空输入框</span>
+              </h1>
+              <p className="hero__description">
+                Twone 首页首屏已经改成聚焦型交易面板：用户进来先看到今晚判断、偏向、关键位和执行建议；如果要继续拆 BTC 多级别结构，再点高亮 AI 助手入口深挖。
+              </p>
+            </div>
+
+            <AccessEntryLink href="/assistant" mode="assistant" className="ai-assistant-banner card-glow">
+              <div className="ai-assistant-banner__chip">高亮入口</div>
+              <div className="ai-assistant-banner__body">
+                <div>
+                  <p className="ai-assistant-banner__title">打开 AI 助手，做更详细分析</p>
+                  <p className="ai-assistant-banner__text">
+                    进去后继续看 BTC 多级别结构、确认位 / 否定位、交易计划与更细的节奏拆解。
+                  </p>
+                </div>
+                <span className="ai-assistant-banner__cta">立即深入分析 →</span>
+              </div>
+            </AccessEntryLink>
           </div>
 
-          <AccessEntryLink href="/assistant" mode="assistant" className="ai-assistant-banner card-glow">
-            <div className="ai-assistant-banner__chip">高亮入口</div>
-            <div className="ai-assistant-banner__body">
-              <div>
-                <p className="ai-assistant-banner__title">打开 AI 助手，做更详细分析</p>
-                <p className="ai-assistant-banner__text">
-                  进去后可继续看 BTC 多级别结构、确认位 / 否定位、交易计划与更细的节奏拆解。
-                </p>
-              </div>
-              <span className="ai-assistant-banner__cta">立即深入分析 →</span>
-            </div>
-          </AccessEntryLink>
-        </div>
-
-        <div className="daily-market-hero-card card-glow">
-          <div className="daily-market-hero-card__head">
+          <div className="daily-update-strip">
             <div>
-              <p className="daily-market-hero-card__eyebrow">{dailyAnalysis.title}</p>
-              <div className="daily-market-hero-card__meta">
-                <span>预设发布时间：{dailyAnalysis.publishAtJst}</span>
-                <span>
-                  更新节奏：{workflow.timezone} {workflow.preferredPublishTime}
-                </span>
-              </div>
+              <span className="daily-update-strip__label">更新提示</span>
+              <strong>每日美股开盘前更新</strong>
             </div>
-            <div className="daily-market-bias">{dailyAnalysis.marketBias}</div>
+            <div className="daily-update-strip__meta">
+              <span>预设发布时间：{dailyAnalysis.publishAtJst}</span>
+              <span>
+                下次更新倒计时：<strong>{nextUpdateCountdown}</strong>
+              </span>
+            </div>
           </div>
 
-          <p className="daily-market-hero-card__summary">{dailyAnalysis.summary}</p>
+          <div className="daily-market-hero-card daily-market-hero-card--focused">
+            <div className="daily-market-hero-card__head daily-market-hero-card__head--focused">
+              <div className="daily-market-hero-card__headline-wrap">
+                <p className="daily-market-hero-card__eyebrow">{dailyAnalysis.title}</p>
+                <h2 className="daily-market-hero-card__headline">{dailyAnalysis.headline}</h2>
+                <p className="daily-market-hero-card__summary">{dailyAnalysis.summary}</p>
+              </div>
 
-          <div className="daily-market-columns daily-market-columns--hero">
-            <div>
-              <h3>关键位</h3>
-              <ul>
-                {dailyAnalysis.keyLevels.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
+              <div className="daily-market-hero-card__signal">
+                <span className="daily-market-bias">{dailyAnalysis.marketBias}</span>
+                <strong>{dailyAnalysis.conviction}</strong>
+                <div className="daily-market-hero-card__meta">
+                  <span>{workflow.timezone}</span>
+                  <span>{workflow.preferredPublishTime} 固定更新</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3>今晚重点</h3>
-              <ul>
-                {dailyAnalysis.focus.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
+
+            <div className="hero-keyline-grid">
+              <article className="hero-keyline-card hero-keyline-card--primary">
+                <span>上方确认</span>
+                <strong>{dailyAnalysis.keyLevels[0]}</strong>
+              </article>
+              <article className="hero-keyline-card">
+                <span>核心承接</span>
+                <strong>{dailyAnalysis.keyLevels[1]}</strong>
+              </article>
+              <article className="hero-keyline-card hero-keyline-card--danger">
+                <span>下方否定</span>
+                <strong>{dailyAnalysis.keyLevels[2]}</strong>
+              </article>
             </div>
-            <div>
-              <h3>风险提示</h3>
-              <ul>
-                {dailyAnalysis.riskTips.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
+
+            <div className="analysis-metrics-grid">
+              <article className="analysis-metric-card">
+                <span>时间级别</span>
+                <strong>{dailyAnalysis.timeframe}</strong>
+              </article>
+              <article className="analysis-metric-card analysis-metric-card--wide">
+                <span>结构分析</span>
+                <strong>{dailyAnalysis.structure}</strong>
+              </article>
+              <article className="analysis-metric-card">
+                <span>VWAP</span>
+                <strong>{dailyAnalysis.vwap}</strong>
+              </article>
+              <article className="analysis-metric-card">
+                <span>MACD</span>
+                <strong>{dailyAnalysis.macd}</strong>
+              </article>
+              <article className="analysis-metric-card">
+                <span>RSI</span>
+                <strong>{dailyAnalysis.rsi}</strong>
+              </article>
+            </div>
+
+            <div className="daily-market-columns daily-market-columns--hero">
+              <div>
+                <h3>今晚重点</h3>
+                <ul>
+                  {dailyAnalysis.focus.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3>风险提示</h3>
+                <ul>
+                  {dailyAnalysis.riskTips.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="hero-insight-grid">
-          <article className="trade-setup-card trade-setup-card--highlight card-glow">
-            <div className="trade-setup-card__header">
-              <div>
-                <p className="trade-setup-card__chip">高亮执行模块</p>
-                <h2>开单建议</h2>
+          <div className="hero-insight-grid">
+            <article className="trade-setup-card trade-setup-card--highlight card-glow">
+              <div className="trade-setup-card__header trade-setup-card__header--split">
+                <div>
+                  <p className="trade-setup-card__chip">高亮执行模块</p>
+                  <h2>开单建议</h2>
+                </div>
+                <p className="trade-setup-card__note">拆成短线 / 长线两栏，避免把不同节奏混成一套计划。</p>
               </div>
-              <div className="trade-setup-card__direction">{dailyAnalysis.tradeSetup.direction}</div>
-            </div>
 
-            <div className="trade-setup-grid">
-              <div className="trade-setup-metric trade-setup-metric--primary">
-                <span>开单位置 / 触发条件</span>
-                <strong>{dailyAnalysis.tradeSetup.triggerZone}</strong>
-              </div>
-              <div className="trade-setup-metric trade-setup-metric--danger">
-                <span>止损位</span>
-                <strong>{dailyAnalysis.tradeSetup.stopLoss}</strong>
-              </div>
-              <div className="trade-setup-metric">
-                <span>失效条件</span>
-                <strong>{dailyAnalysis.tradeSetup.invalidation}</strong>
-              </div>
-            </div>
+              <div className="trade-setup-dual-grid">
+                {Object.values(dailyAnalysis.tradeSetups).map((setup) => (
+                  <article key={setup.label} className="trade-plan-column">
+                    <div className="trade-plan-column__top">
+                      <div>
+                        <span className="trade-plan-column__label">{setup.label}</span>
+                        <h3>{setup.direction}</h3>
+                      </div>
+                    </div>
 
-            <div className="trade-setup-targets">
-              <div className="trade-setup-targets__header">
-                <span>目标位</span>
-                <strong>分批止盈，不一次性幻想吃满</strong>
-              </div>
-              <div className="trade-setup-targets__list">
-                {dailyAnalysis.tradeSetup.targets.map((item) => (
-                  <div key={item} className="trade-setup-target">
-                    {item}
-                  </div>
+                    <div className="trade-plan-list">
+                      <div className="trade-plan-item">
+                        <span>触发区间</span>
+                        <strong>{setup.triggerZone}</strong>
+                      </div>
+                      <div className="trade-plan-item trade-plan-item--danger">
+                        <span>止损位</span>
+                        <strong>{setup.stopLoss}</strong>
+                      </div>
+                      <div className="trade-plan-item">
+                        <span>目标位</span>
+                        <strong>{setup.targets.join(" / ")}</strong>
+                      </div>
+                      <div className="trade-plan-item">
+                        <span>失效条件</span>
+                        <strong>{setup.invalidation}</strong>
+                      </div>
+                      <div className="trade-plan-item trade-plan-item--accent">
+                        <span>一句话执行建议</span>
+                        <strong>{setup.executionLine}</strong>
+                      </div>
+                    </div>
+                  </article>
                 ))}
               </div>
-            </div>
+            </article>
 
-            <div className="trade-setup-execution">
-              <span>一句话执行建议</span>
-              <strong>{dailyAnalysis.tradeSetup.executionLine}</strong>
-            </div>
-          </article>
-
-          <article className="macro-events-card">
-            <div className="macro-events-card__header">
-              <div>
-                <p className="trade-setup-card__chip">事件节奏卡</p>
-                <h2>宏观事件时间卡</h2>
+            <article className="macro-events-card">
+              <div className="macro-events-card__header">
+                <div>
+                  <p className="trade-setup-card__chip">事件节奏卡</p>
+                  <h2>宏观事件时间卡</h2>
+                </div>
+                <p className="macro-events-card__note">至少先盯 FOMC / CPI / 非农，不在大事件前后盲追。</p>
               </div>
-              <p className="macro-events-card__note">至少先盯 FOMC / CPI / 非农，不在大事件前后盲追。</p>
-            </div>
 
-            <div className="macro-events-list">
-              {dailyAnalysis.macroEvents.map((event) => (
-                <article key={event.name} className="macro-event-item">
-                  <div className="macro-event-item__top">
-                    <div>
-                      <span className="macro-event-item__label">{event.name}</span>
-                      <strong>{event.nextTimeJst}</strong>
+              <div className="macro-events-list">
+                {dailyAnalysis.macroEvents.map((event) => (
+                  <article key={event.name} className="macro-event-item">
+                    <div className="macro-event-item__top">
+                      <div>
+                        <span className="macro-event-item__label">{event.name}</span>
+                        <strong>{event.nextTimeJst}</strong>
+                      </div>
+                      <span className="macro-event-item__status">{event.status}</span>
                     </div>
-                    <span className="macro-event-item__status">{event.status}</span>
-                  </div>
 
-                  <div className="macro-event-item__stats">
-                    <div>
-                      <span>当前</span>
-                      <strong>{event.current ?? "待接入"}</strong>
+                    <div className="macro-event-item__stats">
+                      <div>
+                        <span>当前</span>
+                        <strong>{event.current ?? "待接入"}</strong>
+                      </div>
+                      <div>
+                        <span>预期</span>
+                        <strong>{event.forecast ?? "待接入"}</strong>
+                      </div>
+                      <div>
+                        <span>前值</span>
+                        <strong>{event.previous ?? "待接入"}</strong>
+                      </div>
                     </div>
-                    <div>
-                      <span>预期</span>
-                      <strong>{event.forecast ?? "待接入"}</strong>
-                    </div>
-                    <div>
-                      <span>前值</span>
-                      <strong>{event.previous ?? "待接入"}</strong>
-                    </div>
-                  </div>
 
-                  <p>{event.note}</p>
-                </article>
-              ))}
-            </div>
-          </article>
+                    <p>{event.note}</p>
+                  </article>
+                ))}
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
