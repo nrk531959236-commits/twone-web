@@ -45,6 +45,13 @@ const marketBiasTheme = {
   "偏空": "bearish-strong",
 } as const;
 
+const tradeReviewStatusLabel = {
+  tp_hit: "止盈",
+  sl_hit: "止损",
+  holding: "持仓中",
+  watching: "观望",
+} as const;
+
 function formatCountdown(targetIso: string) {
   const now = new Date();
   const target = new Date(targetIso);
@@ -111,6 +118,7 @@ export default async function Home() {
   });
   const tradeSetups = [dailyAnalysis.tradeSetups.shortTerm, dailyAnalysis.tradeSetups.longTerm];
   const biasTheme = marketBiasTheme[dailyAnalysis.marketBias];
+  const tradeReviewCalendar = dailyAnalysis.tradeReviewCalendar;
 
   return (
     <main className="page-shell home-minimal-shell">
@@ -349,6 +357,90 @@ export default async function Home() {
                 <div>
                   <p className="home-chip home-chip--highlight-soft">执行备注</p>
                   <p>{setup.executionLine}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section home-minimal-section home-trade-review-section" id="trade-review-calendar">
+        <div className="home-section-heading home-section-heading--split">
+          <div>
+            <p className="section__label">C-2 · 建议复盘</p>
+            <h2>
+              <span className="home-heading-with-icon">
+                <TradeSetupIcon className="home-section-icon" />
+                {tradeReviewCalendar.title}
+              </span>
+            </h2>
+          </div>
+          <div className="home-trade-review-meta">
+            <p className="section__intro">{tradeReviewCalendar.subtitle}</p>
+            <div className="home-trade-review-summary">
+              <article>
+                <span>胜率亮化</span>
+                <strong>{tradeReviewCalendar.winRate}</strong>
+              </article>
+              <article>
+                <span>近阶段记录</span>
+                <strong>{tradeReviewCalendar.record}</strong>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <article className="home-trade-review-hero">
+          <p className="home-chip home-chip--highlight">复盘目的</p>
+          <h3>把前一天的开仓位、止盈止损和持仓状态直接挂到首页，避免开单建议只说不验。</h3>
+          <p>{tradeReviewCalendar.highlight}</p>
+        </article>
+
+        <div className="home-trade-review-calendar">
+          {tradeReviewCalendar.entries.map((entry) => (
+            <article
+              key={`${entry.date}-${entry.setupLabel}`}
+              className={`home-trade-review-card home-trade-review-card--${entry.status} home-trade-review-card--${entry.confidence}`}
+            >
+              <div className="home-trade-review-card__top">
+                <div>
+                  <p className="home-chip">{entry.date}</p>
+                  <h3>{entry.setupLabel}</h3>
+                </div>
+                <div className="home-trade-review-badges">
+                  <span className={`home-trade-review-direction home-trade-review-direction--${entry.direction}`}>
+                    {entry.direction === "long" ? "Long" : "Short"}
+                  </span>
+                  <span className={`home-trade-review-status home-trade-review-status--${entry.status}`}>
+                    {tradeReviewStatusLabel[entry.status]}
+                  </span>
+                </div>
+              </div>
+
+              <div className="home-trade-review-levels">
+                <article>
+                  <span>开仓位</span>
+                  <strong>{entry.entry}</strong>
+                </article>
+                <article>
+                  <span>止盈位</span>
+                  <strong>{entry.takeProfit}</strong>
+                </article>
+                <article>
+                  <span>止损位</span>
+                  <strong>{entry.stopLoss}</strong>
+                </article>
+              </div>
+
+              <div className="home-trade-review-footer">
+                <div>
+                  <span>当前 / 结果</span>
+                  <strong>{entry.currentZone}</strong>
+                  <p>{entry.note}</p>
+                </div>
+                <div className="home-trade-review-pnl-block">
+                  <span>{entry.resultLabel}</span>
+                  <strong>{entry.pnlLabel}</strong>
                 </div>
               </div>
             </article>

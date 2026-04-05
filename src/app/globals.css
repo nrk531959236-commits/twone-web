@@ -2847,6 +2847,202 @@ button {
   align-items: stretch;
 }
 
+.home-trade-review-meta,
+.home-trade-review-summary,
+.home-trade-review-calendar,
+.home-trade-review-levels,
+.home-trade-review-badges {
+  display: grid;
+  gap: 16px;
+}
+
+.home-trade-review-meta {
+  align-content: start;
+}
+
+.home-trade-review-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-trade-review-summary article,
+.home-trade-review-levels article {
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.home-trade-review-summary span,
+.home-trade-review-levels span,
+.home-trade-review-footer span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.home-trade-review-summary strong,
+.home-trade-review-levels strong,
+.home-trade-review-footer strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.home-trade-review-hero {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(124, 140, 255, 0.18);
+  background: linear-gradient(135deg, rgba(124, 140, 255, 0.12), rgba(77, 226, 197, 0.08));
+}
+
+.home-trade-review-hero h3 {
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.18;
+}
+
+.home-trade-review-calendar {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.home-trade-review-card {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.home-trade-review-card--tp_hit {
+  border-color: rgba(77, 226, 197, 0.28);
+  background: linear-gradient(180deg, rgba(18, 67, 58, 0.52), rgba(9, 21, 22, 0.96));
+  box-shadow: 0 20px 56px rgba(77, 226, 197, 0.12);
+}
+
+.home-trade-review-card--sl_hit {
+  border-color: rgba(255, 130, 130, 0.26);
+  background: linear-gradient(180deg, rgba(70, 28, 34, 0.52), rgba(18, 17, 24, 0.96));
+}
+
+.home-trade-review-card--holding {
+  border-color: rgba(255, 190, 92, 0.28);
+  background: linear-gradient(180deg, rgba(70, 47, 12, 0.52), rgba(17, 18, 26, 0.96));
+  box-shadow: 0 20px 56px rgba(255, 190, 92, 0.1);
+}
+
+.home-trade-review-card--watching {
+  border-color: rgba(124, 140, 255, 0.2);
+  background: linear-gradient(180deg, rgba(31, 39, 76, 0.44), rgba(11, 17, 30, 0.96));
+}
+
+.home-trade-review-card--high {
+  filter: saturate(1.06) brightness(1.03);
+}
+
+.home-trade-review-card__top,
+.home-trade-review-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.home-trade-review-badges {
+  justify-items: end;
+}
+
+.home-trade-review-direction,
+.home-trade-review-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.home-trade-review-direction--long {
+  color: #b8fff0;
+  border: 1px solid rgba(77, 226, 197, 0.22);
+  background: rgba(77, 226, 197, 0.12);
+}
+
+.home-trade-review-direction--short {
+  color: #ffd3d3;
+  border: 1px solid rgba(255, 130, 130, 0.22);
+  background: rgba(255, 130, 130, 0.12);
+}
+
+.home-trade-review-status--tp_hit {
+  color: #b8fff0;
+  border: 1px solid rgba(77, 226, 197, 0.24);
+  background: rgba(77, 226, 197, 0.14);
+}
+
+.home-trade-review-status--sl_hit {
+  color: #ffd3d3;
+  border: 1px solid rgba(255, 130, 130, 0.24);
+  background: rgba(255, 130, 130, 0.14);
+}
+
+.home-trade-review-status--holding {
+  color: #ffe7a8;
+  border: 1px solid rgba(255, 190, 92, 0.24);
+  background: rgba(255, 190, 92, 0.14);
+}
+
+.home-trade-review-status--watching {
+  color: #dfe5ff;
+  border: 1px solid rgba(124, 140, 255, 0.2);
+  background: rgba(124, 140, 255, 0.12);
+}
+
+.home-trade-review-levels {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.home-trade-review-footer {
+  align-items: stretch;
+}
+
+.home-trade-review-footer p {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.home-trade-review-pnl-block {
+  min-width: 148px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.home-trade-review-pnl-block strong {
+  font-size: 24px;
+}
+
+.home-trade-review-pnl-block span {
+  color: var(--muted);
+}
+
+.home-trade-review-section {
+  scroll-margin-top: 96px;
+}
+
 .home-trade-card,
 .home-event-card {
   display: grid;
@@ -3000,6 +3196,26 @@ button {
 
   .home-minimal-section {
     padding: 24px 20px;
+  }
+
+  .home-trade-review-summary,
+  .home-trade-review-calendar,
+  .home-trade-review-levels {
+    grid-template-columns: 1fr;
+  }
+
+  .home-trade-review-card__top,
+  .home-trade-review-footer {
+    flex-direction: column;
+  }
+
+  .home-trade-review-badges {
+    justify-items: start;
+  }
+
+  .home-trade-review-pnl-block {
+    min-width: 0;
+    width: 100%;
   }
 
   .home-daily-main,
