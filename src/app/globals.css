@@ -2912,6 +2912,11 @@ button {
   margin-top: 18px;
 }
 
+.home-trade-review-calendar--heatmap {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .home-trade-review-card {
   display: grid;
   align-content: start;
@@ -2921,6 +2926,54 @@ button {
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
+}
+
+.home-trade-review-card--heat {
+  gap: 14px;
+  min-height: 280px;
+  padding: 18px;
+}
+
+.home-trade-review-card__headline {
+  display: grid;
+  gap: 8px;
+}
+
+.home-trade-review-card__headline strong {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.home-trade-review-card__top--compact {
+  gap: 12px;
+}
+
+.home-trade-review-badges--inline {
+  gap: 10px;
+}
+
+.home-trade-review-levels--compact {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.home-trade-review-levels--compact article {
+  padding: 12px 14px;
+}
+
+.home-trade-review-levels--compact strong {
+  font-size: 16px;
+}
+
+.home-trade-review-footer--compact {
+  display: grid;
+  gap: 10px;
+}
+
+.home-trade-review-footer--compact p {
+  margin-top: 0;
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .home-trade-review-card--tp_hit {
@@ -2943,6 +2996,107 @@ button {
 .home-trade-review-card--watching {
   border-color: rgba(124, 140, 255, 0.2);
   background: linear-gradient(180deg, rgba(31, 39, 76, 0.44), rgba(11, 17, 30, 0.96));
+}
+
+.home-trade-review-card--tp_hit.home-trade-review-card--heat {
+  box-shadow:
+    0 20px 56px rgba(77, 226, 197, 0.12),
+    inset 0 0 0 1px rgba(135, 255, 223, 0.08),
+    0 0 32px rgba(77, 226, 197, 0.08);
+}
+
+.home-trade-review-card--holding.home-trade-review-card--heat {
+  box-shadow:
+    0 20px 56px rgba(255, 190, 92, 0.1),
+    inset 0 0 0 1px rgba(255, 230, 168, 0.08),
+    0 0 24px rgba(255, 190, 92, 0.08);
+}
+
+.home-trade-review-card--sl_hit.home-trade-review-card--heat {
+  box-shadow: inset 0 0 0 1px rgba(255, 164, 164, 0.05);
+}
+
+.home-trade-review-card--watching.home-trade-review-card--heat {
+  opacity: 0.9;
+}
+
+.home-trade-review-card--low.home-trade-review-card--heat {
+  filter: saturate(0.86) brightness(0.94);
+}
+
+.home-trade-review-card--medium.home-trade-review-card--heat {
+  filter: saturate(0.96) brightness(0.99);
+}
+
+.home-trade-review-card--high.home-trade-review-card--heat {
+  filter: saturate(1.08) brightness(1.04);
+}
+
+.home-trade-review-card--heat .home-chip {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.home-trade-review-card--heat .home-trade-review-card__headline h3 {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.home-trade-review-card--heat .home-trade-review-card__headline strong {
+  font-size: 24px;
+}
+
+.home-trade-review-card--heat .home-trade-review-footer strong {
+  font-size: 16px;
+}
+
+.home-trade-review-card--heat .home-trade-review-footer p {
+  color: rgba(237, 244, 255, 0.72);
+}
+
+.home-trade-review-card--heat .home-trade-review-status--tp_hit {
+  background: rgba(77, 226, 197, 0.18);
+}
+
+.home-trade-review-card--heat .home-trade-review-status--holding {
+  background: rgba(255, 190, 92, 0.18);
+}
+
+.home-trade-review-card--heat .home-trade-review-status--sl_hit {
+  background: rgba(255, 130, 130, 0.18);
+}
+
+.home-trade-review-card--heat .home-trade-review-levels article {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.home-trade-review-card--heat .home-trade-review-levels span,
+.home-trade-review-card--heat .home-trade-review-footer span {
+  font-size: 11px;
+}
+
+.home-trade-review-card--heat .home-trade-review-levels strong {
+  line-height: 1.45;
+}
+
+.home-trade-review-card--heat:hover {
+  transform: translateY(-2px);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.home-trade-review-card--heat:hover.home-trade-review-card--tp_hit {
+  border-color: rgba(135, 255, 223, 0.34);
+}
+
+.home-trade-review-card--heat:hover.home-trade-review-card--holding {
+  border-color: rgba(255, 220, 132, 0.34);
+}
+
+.home-trade-review-card--heat:hover.home-trade-review-card--sl_hit {
+  border-color: rgba(255, 164, 164, 0.3);
+}
+
+.home-trade-review-card--heat:hover.home-trade-review-card--watching {
+  border-color: rgba(160, 176, 255, 0.28);
 }
 
 .home-trade-review-card--high {
@@ -3200,6 +3354,7 @@ button {
 
   .home-trade-review-summary,
   .home-trade-review-calendar,
+  .home-trade-review-calendar--heatmap,
   .home-trade-review-levels {
     grid-template-columns: 1fr;
   }

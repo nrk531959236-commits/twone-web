@@ -396,18 +396,15 @@ export default async function Home() {
           <p>{tradeReviewCalendar.highlight}</p>
         </article>
 
-        <div className="home-trade-review-calendar">
+        <div className="home-trade-review-calendar home-trade-review-calendar--heatmap">
           {tradeReviewCalendar.entries.map((entry) => (
             <article
               key={`${entry.date}-${entry.setupLabel}`}
-              className={`home-trade-review-card home-trade-review-card--${entry.status} home-trade-review-card--${entry.confidence}`}
+              className={`home-trade-review-card home-trade-review-card--heat home-trade-review-card--${entry.status} home-trade-review-card--${entry.confidence}`}
             >
-              <div className="home-trade-review-card__top">
-                <div>
-                  <p className="home-chip">{entry.date}</p>
-                  <h3>{entry.setupLabel}</h3>
-                </div>
-                <div className="home-trade-review-badges">
+              <div className="home-trade-review-card__top home-trade-review-card__top--compact">
+                <p className="home-chip">{entry.date}</p>
+                <div className="home-trade-review-badges home-trade-review-badges--inline">
                   <span className={`home-trade-review-direction home-trade-review-direction--${entry.direction}`}>
                     {entry.direction === "long" ? "Long" : "Short"}
                   </span>
@@ -417,31 +414,32 @@ export default async function Home() {
                 </div>
               </div>
 
-              <div className="home-trade-review-levels">
+              <div className="home-trade-review-card__headline">
+                <h3>{entry.setupLabel}</h3>
+                <strong>{entry.pnlLabel}</strong>
+              </div>
+
+              <div className="home-trade-review-levels home-trade-review-levels--compact">
                 <article>
-                  <span>开仓位</span>
+                  <span>开仓</span>
                   <strong>{entry.entry}</strong>
                 </article>
                 <article>
-                  <span>止盈位</span>
+                  <span>止盈</span>
                   <strong>{entry.takeProfit}</strong>
                 </article>
                 <article>
-                  <span>止损位</span>
+                  <span>止损</span>
                   <strong>{entry.stopLoss}</strong>
                 </article>
               </div>
 
-              <div className="home-trade-review-footer">
+              <div className="home-trade-review-footer home-trade-review-footer--compact">
                 <div>
                   <span>当前 / 结果</span>
                   <strong>{entry.currentZone}</strong>
-                  <p>{entry.note}</p>
                 </div>
-                <div className="home-trade-review-pnl-block">
-                  <span>{entry.resultLabel}</span>
-                  <strong>{entry.pnlLabel}</strong>
-                </div>
+                <p>{entry.note}</p>
               </div>
             </article>
           ))}
