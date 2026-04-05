@@ -84,8 +84,10 @@ export default function Home() {
                 <h2>{dailyAnalysis.headline}</h2>
               </div>
               <div className="home-bias-box">
-                <span className="home-highlight-label">今日偏向</span>
-                <strong>{dailyAnalysis.marketBias}</strong>
+                <div className="home-bias-box__head">
+                  <span className="home-highlight-label">今日偏向</span>
+                  <strong>{dailyAnalysis.marketBias}</strong>
+                </div>
                 <em>{dailyAnalysis.conviction}</em>
               </div>
             </div>
@@ -117,8 +119,8 @@ export default function Home() {
 
             <a href="#trade-setups" className="home-scroll-guide" aria-label="下拉查看开单建议">
               <div className="home-scroll-guide__copy">
-                <span className="home-scroll-guide__eyebrow">继续往下看</span>
-                <strong>下拉查看开单建议</strong>
+                <span className="home-scroll-guide__eyebrow">继续往下看今日执行计划</span>
+                <strong>下拉查看开单建议与短线 / 长线执行框架</strong>
               </div>
               <span className="home-scroll-guide__icon" aria-hidden="true">
                 ↓
