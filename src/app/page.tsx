@@ -11,6 +11,8 @@ import {
 } from "@/components/section-icons";
 import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote } from "@/lib/daily-ai-market";
 
+export const dynamic = "force-dynamic";
+
 const contactChannels = [
   {
     name: "Discord",

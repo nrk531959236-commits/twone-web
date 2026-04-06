@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote, getLatestPublishedDailyAiMarketRecord } from "@/lib/daily-ai-market";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const [item, workflow, latestRecord] = await Promise.all([

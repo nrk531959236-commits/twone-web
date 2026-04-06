@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getDailyAiMarketAnalysis } from "@/lib/daily-ai-market";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "AI 胜率日历 | Twone Web3.0 Community",
   description: "按月份查看每天的开仓方向、开仓位，以及止盈止损结果。",
