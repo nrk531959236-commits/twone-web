@@ -118,6 +118,40 @@ function buildDirectionalSetup(options: {
   };
 }
 
+function normalizeForSimilarity(text: string) {
+  return text
+    .replace(/[：:，。、“”‘’（）()【】\-—\s]/g, "")
+    .replace(/短线|长线|波段|日内|今日|当前/g, "")
+    .replace(/只做|优先|先看|确认后|不追|观望/g, "")
+    .trim();
+}
+
+function similarityScore(a: string, b: string) {
+  const left = normalizeForSimilarity(a);
+  const right = normalizeForSimilarity(b);
+
+  if (!left || !right) return 0;
+  if (left === right) return 1;
+
+  const shorter = left.length <= right.length ? left : right;
+  const longer = left.length > right.length ? left : right;
+
+  if (longer.includes(shorter)) {
+    return shorter.length / longer.length;
+  }
+
+  let overlap = 0;
+  for (const char of new Set(shorter.split(""))) {
+    if (longer.includes(char)) overlap += 1;
+  }
+
+  return overlap / Math.max(new Set(longer.split("")).size, 1);
+}
+
+function shouldDeDuplicateTradeSetups(shortText: string, longText: string) {
+  return similarityScore(shortText, longText) >= 0.72;
+}
+
 function buildAutoPayload(
   input: Pick<Required<DailyAiMarketAutoGenerateInput>, "analysisDate" | "publishAtJst" | "source" | "status">,
 ): DailyAiMarketAnalysis {
@@ -257,8 +291,38 @@ function buildAutoPayload(
     scope: "long",
     seed: getDateSeed(`${input.analysisDate}-long-setup`),
   });
+  const shortTermRationale = pickByDate(`${input.analysisDate}-short-rationale`, [
+    "短线只回答今天怎么打：先看触发，再看止损和最近目标。",
+    "短线只做确认后的那一段，不在中位追单。",
+    "当前短线以节奏交易为主，优先小仓位、快进快出。",
+    "先定义失效位，再决定是否跟随。",
+  ]);
+  const shortTermExecutionLine = pickByDate(`${input.analysisDate}-short-execution`, [
+    "短线只做确认后的那一段，不预判。",
+    "先轻仓试单，确认延续再处理加减仓。",
+    "拿不到确认信号就继续观望。",
+    "中位不追，失效就撤。",
+  ]);
+  const longTermRationale = pickByDate(`${input.analysisDate}-long-rationale`, [
+    "长线只回答这一段值不值得拿，不重复短线触发区。",
+    "长线更看大级别结构是否重新一致，不急着在日内中位下注。",
+    "当前波段计划以结构确认优先，先看大级别是否修复。",
+    "若大级别方向仍未明确，长线先观望，不强行给第二套重复建议。",
+  ]);
+  const longTermExecutionLine = pickByDate(`${input.analysisDate}-long-execution`, [
+    "长线先看结构，不抢节奏。",
+    "等大级别确认后再放大仓位。",
+    "短线与长线同向时，长线只保留仓位原则，不重复日内触发。",
+    "先定义大级别失效条件，再谈持仓周期。",
+  ]);
+
+  const forceLongTermWatch = shouldDeDuplicateTradeSetups(
+    `${shortTermDirection}${shortDirectionalSetup.triggerZone}${shortTermRationale}${shortTermExecutionLine}`,
+    `${longTermDirection}${longDirectionalSetup.triggerZone}${longTermRationale}${longTermExecutionLine}`,
+  );
+
   const distinctLongDirection: DailyAiMarketAnalysis["tradeSetups"]["longTerm"]["direction"] =
-    longTermDirection === shortTermDirection && longTermDirection !== "观望等待"
+    forceLongTermWatch || (longTermDirection === shortTermDirection && longTermDirection !== "观望等待")
       ? "观望等待"
       : longTermDirection;
 
@@ -267,45 +331,29 @@ function buildAutoPayload(
       label: "短线策略",
       stance: shortTermStance,
       direction: shortTermDirection,
-      rationale: pickByDate(`${input.analysisDate}-short-rationale`, [
-        "短线只回答今天怎么打：先看触发，再看止损和最近目标。",
-        "短线只做确认后的那一段，不在中位追单。",
-        "当前短线以节奏交易为主，优先小仓位、快进快出。",
-        "先定义失效位，再决定是否跟随。",
-      ]),
+      rationale: shortTermRationale,
       triggerZone: shortDirectionalSetup.triggerZone,
       stopLoss: shortDirectionalSetup.stopLoss,
       targets: shortDirectionalSetup.targets,
       invalidation: shortDirectionalSetup.invalidation,
-      executionLine: pickByDate(`${input.analysisDate}-short-execution`, [
-        "短线只做确认后的那一段，不预判。",
-        "先轻仓试单，确认延续再处理加减仓。",
-        "拿不到确认信号就继续观望。",
-        "中位不追，失效就撤。",
-      ]),
+      executionLine: shortTermExecutionLine,
     },
     longTerm: {
       label: "长线策略",
       stance: distinctLongDirection === "观望等待" ? "长线观望" : longTermStance,
       direction: distinctLongDirection,
-      rationale: pickByDate(`${input.analysisDate}-long-rationale`, [
-        "长线只回答这一段值不值得拿，不重复短线触发区。",
-        "长线更看大级别结构是否重新一致，不急着在日内中位下注。",
-        "当前波段计划以结构确认优先，先看大级别是否修复。",
-        "若大级别方向仍未明确，长线先观望，不强行给第二套重复建议。",
-      ]),
+      rationale: distinctLongDirection === "观望等待"
+        ? "长线与短线内容过于接近时，不重复给第二套日内建议，先保留波段观察。"
+        : longTermRationale,
       triggerZone: distinctLongDirection === "观望等待" ? "等待更大级别确认后再评估" : longDirectionalSetup.triggerZone,
       stopLoss: distinctLongDirection === "观望等待" ? "以大级别结构失效为准" : longDirectionalSetup.stopLoss,
       targets: distinctLongDirection === "观望等待" ? ["不单独给波段目标，先等结构确认"] : longDirectionalSetup.targets,
       invalidation: distinctLongDirection === "观望等待"
         ? "若大级别重新转强或转弱，再更新波段观点。"
         : longDirectionalSetup.invalidation,
-      executionLine: pickByDate(`${input.analysisDate}-long-execution`, [
-        "长线先看结构，不抢节奏。",
-        "等大级别确认后再放大仓位。",
-        "短线与长线同向时，长线只保留仓位原则，不重复日内触发。",
-        "先定义大级别失效条件，再谈持仓周期。",
-      ]),
+      executionLine: distinctLongDirection === "观望等待"
+        ? "波段先看结构，不重复短线触发与目标。"
+        : longTermExecutionLine,
     },
   };
 
