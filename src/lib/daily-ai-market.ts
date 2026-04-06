@@ -25,6 +25,10 @@ export type TradeReviewCalendarEntry = {
   resultLabel: string;
   pnlLabel: string;
   note: string;
+  entryMin?: number;
+  entryMax?: number;
+  takeProfitPrice?: number;
+  stopLossPrice?: number;
 };
 
 export type DailyAiMarketAnalysis = {
@@ -185,10 +189,14 @@ export function syncTradeReviewCalendarFromShortTerm(
   const shortTerm = analysis.tradeSetups.shortTerm;
   const status = inferTradeReviewStatus(shortTerm.stance);
   const date = formatTradeReviewDate(analysisDate);
+  const entryLevels = parsePriceNumbers(shortTerm.triggerZone);
+  const takeProfitLevels = shortTerm.targets.flatMap((item) => parsePriceNumbers(item));
+  const stopLossLevels = parsePriceNumbers(shortTerm.stopLoss);
+  const direction = inferTradeReviewDirection(shortTerm.direction);
   const nextEntry: TradeReviewCalendarEntry = {
     date,
     setupLabel: shortTerm.label,
-    direction: inferTradeReviewDirection(shortTerm.direction),
+    direction,
     status,
     confidence: "medium",
     entry: shortTerm.triggerZone,
@@ -198,6 +206,15 @@ export function syncTradeReviewCalendarFromShortTerm(
     resultLabel: status === "watching" ? "观望" : "持仓中",
     pnlLabel: status === "watching" ? "0R" : "进行中",
     note: shortTerm.executionLine,
+    entryMin: entryLevels.length > 0 ? Math.min(...entryLevels) : undefined,
+    entryMax: entryLevels.length > 0 ? Math.max(...entryLevels) : undefined,
+    takeProfitPrice:
+      takeProfitLevels.length > 0
+        ? direction === "short"
+          ? Math.min(...takeProfitLevels)
+          : Math.max(...takeProfitLevels)
+        : undefined,
+    stopLossPrice: stopLossLevels[0],
   };
 
   const mergedEntries = [...previousEntries.filter((item) => item.date !== date), nextEntry].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
@@ -499,7 +516,7 @@ function normalizeStoredPayload(payload: unknown): DailyAiMarketAnalysis | null 
 }
 
 function parsePriceNumbers(text: string) {
-  return (text.match(/\d{1,3}(?:,\d{3})*(?:\.\d+)?/g) ?? [])
+  return (text.match(/\d{2,3},\d{3}(?:\.\d+)?|\d{5,6}(?:\.\d+)?/g) ?? [])
     .map((item) => Number(item.replace(/,/g, "")))
     .filter((value) => Number.isFinite(value));
 }
@@ -549,10 +566,12 @@ function settleTradeReviewEntry(entry: TradeReviewCalendarEntry, ticker: BtcTick
     return entry;
   }
 
-  const stopLossLevels = parsePriceNumbers(entry.stopLoss);
-  const takeProfitLevels = parsePriceNumbers(entry.takeProfit);
-  const stopLoss = stopLossLevels[0];
-  const takeProfit = entry.direction === "short" ? Math.min(...takeProfitLevels) : Math.max(...takeProfitLevels);
+  const stopLoss = entry.stopLossPrice ?? parsePriceNumbers(entry.stopLoss)[0];
+  const takeProfit =
+    entry.takeProfitPrice ??
+    (entry.direction === "short"
+      ? Math.min(...parsePriceNumbers(entry.takeProfit))
+      : Math.max(...parsePriceNumbers(entry.takeProfit)));
 
   if (!Number.isFinite(stopLoss) || !Number.isFinite(takeProfit)) {
     return {
