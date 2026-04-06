@@ -162,6 +162,10 @@ async function getCoinGlassSignalSnapshot(symbol = "BTC"): Promise<DailyAiMarket
       fundingState: readLine("- Funding: "),
       liquidationState: readLine("- Liquidation: "),
       cvdState: readLine("- CVD: "),
+      oiValue: readLine("- aggregate OI: "),
+      fundingValue: readLine("- average funding: "),
+      liquidationValue: readLine("- aggregate liquidation: "),
+      cvdValue: readLine("- interval delta change: "),
       rawText: text,
     };
   } catch {
@@ -256,6 +260,10 @@ function localizeCoinGlassSignal(signalSnapshot: DailyAiMarketSignalSnapshot | n
     fundingState: mapText(signalSnapshot.fundingState),
     liquidationState: mapText(signalSnapshot.liquidationState),
     cvdState: mapText(signalSnapshot.cvdState),
+    oiValue: signalSnapshot.oiValue,
+    fundingValue: signalSnapshot.fundingValue,
+    liquidationValue: signalSnapshot.liquidationValue,
+    cvdValue: signalSnapshot.cvdValue,
     rawText: signalSnapshot.rawText ? mapText(signalSnapshot.rawText) : signalSnapshot.rawText,
   };
 }

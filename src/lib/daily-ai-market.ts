@@ -40,6 +40,10 @@ export type DailyAiMarketSignalSnapshot = {
   fundingState: string;
   liquidationState: string;
   cvdState: string;
+  oiValue?: string;
+  fundingValue?: string;
+  liquidationValue?: string;
+  cvdValue?: string;
   rawText?: string;
 };
 

@@ -2471,6 +2471,13 @@ button {
   background: rgba(10, 12, 24, 0.26);
 }
 
+.home-signal-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .home-signal-card span {
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -2478,9 +2485,16 @@ button {
   color: var(--muted);
 }
 
+.home-signal-card em {
+  font-style: normal;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #ffdca0;
+}
+
 .home-signal-card strong {
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.45;
   color: #f4efe4;
 }
 

@@ -117,16 +117,16 @@ export default async function Home() {
   const signalSnapshot = dailyAnalysis.signalSnapshot;
   const signalCards = signalSnapshot
     ? [
-        { label: "OI", value: signalSnapshot.oiState },
-        { label: "Funding", value: signalSnapshot.fundingState },
-        { label: "Liquidation", value: signalSnapshot.liquidationState },
-        { label: "CVD", value: signalSnapshot.cvdState },
+        { label: "OI", value: signalSnapshot.oiState, metric: signalSnapshot.oiValue },
+        { label: "Funding", value: signalSnapshot.fundingState, metric: signalSnapshot.fundingValue?.replace("overall ", "") },
+        { label: "Liq", value: signalSnapshot.liquidationState, metric: signalSnapshot.liquidationValue },
+        { label: "CVD", value: signalSnapshot.cvdState, metric: signalSnapshot.cvdValue },
       ]
     : [
-        { label: "结构", value: dailyAnalysis.structure },
-        { label: "VWAP", value: dailyAnalysis.vwap },
-        { label: "MACD", value: dailyAnalysis.macd },
-        { label: "RSI", value: dailyAnalysis.rsi },
+        { label: "结构", value: dailyAnalysis.structure, metric: undefined },
+        { label: "VWAP", value: dailyAnalysis.vwap, metric: undefined },
+        { label: "MACD", value: dailyAnalysis.macd, metric: undefined },
+        { label: "RSI", value: dailyAnalysis.rsi, metric: undefined },
       ];
   const tradeReviewCalendar =
     dailyAnalysis.tradeReviewCalendar ?? {
@@ -202,7 +202,10 @@ export default async function Home() {
                 <div className="home-signal-grid">
                   {signalCards.map((item) => (
                     <article key={item.label} className="home-signal-card">
-                      <span>{item.label}</span>
+                      <div className="home-signal-card__topline">
+                        <span>{item.label}</span>
+                        {item.metric ? <em>{item.metric}</em> : null}
+                      </div>
                       <strong>{item.value}</strong>
                     </article>
                   ))}
