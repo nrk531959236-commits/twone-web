@@ -133,6 +133,86 @@ export type DailyAiMarketWorkflowNote = {
   todayAnalysisDate?: string | null;
 };
 
+function formatTradeReviewDate(analysisDate: string) {
+  const [year, month, day] = analysisDate.split("-");
+  if (!year || !month || !day) {
+    return analysisDate;
+  }
+
+  return `${month}-${day}`;
+}
+
+function inferTradeReviewDirection(direction: DailyAiMarketAnalysis["tradeSetups"]["shortTerm"]["direction"]): "long" | "short" {
+  return direction.includes("空") ? "short" : "long";
+}
+
+function inferTradeReviewStatus(stance: DailyAiMarketAnalysis["tradeSetups"]["shortTerm"]["stance"]): TradeReviewStatus {
+  return stance === "短线观望" ? "watching" : "holding";
+}
+
+function buildTradeReviewStats(entries: TradeReviewCalendarEntry[]) {
+  const wins = entries.filter((item) => item.status === "tp_hit").length;
+  const losses = entries.filter((item) => item.status === "sl_hit").length;
+  const holding = entries.filter((item) => item.status === "holding").length;
+  const watching = entries.filter((item) => item.status === "watching").length;
+  const settled = wins + losses;
+  const winRate = settled > 0 ? `${Math.round((wins / settled) * 100)}%` : holding > 0 ? "待结算" : "--";
+  const recordParts = [`${wins} 胜`, `${losses} 负`];
+
+  if (holding > 0) {
+    recordParts.push(`${holding} 持仓中`);
+  }
+
+  if (watching > 0) {
+    recordParts.push(`${watching} 观望`);
+  }
+
+  return {
+    winRate,
+    record: recordParts.join(" / "),
+    highlight:
+      holding > 0
+        ? "当前已开始接入真实短线建议回流；当日短线建议会先进入日历并标记为持仓中/观望，后续再继续补真实结果。"
+        : "当前已开始接入真实短线建议回流；历史旧样例会逐步被新的真实短线记录替换。",
+  };
+}
+
+export function syncTradeReviewCalendarFromShortTerm(
+  analysisDate: string,
+  analysis: DailyAiMarketAnalysis,
+  previousEntries: TradeReviewCalendarEntry[] = [],
+): DailyAiMarketAnalysis["tradeReviewCalendar"] {
+  const shortTerm = analysis.tradeSetups.shortTerm;
+  const status = inferTradeReviewStatus(shortTerm.stance);
+  const date = formatTradeReviewDate(analysisDate);
+  const nextEntry: TradeReviewCalendarEntry = {
+    date,
+    setupLabel: shortTerm.label,
+    direction: inferTradeReviewDirection(shortTerm.direction),
+    status,
+    confidence: "medium",
+    entry: shortTerm.triggerZone,
+    takeProfit: shortTerm.targets.join(" / "),
+    stopLoss: shortTerm.stopLoss.replace(/^止损[:：]\s*/u, ""),
+    currentZone: status === "watching" ? "等待触发" : "发布后待跟踪",
+    resultLabel: status === "watching" ? "观望" : "持仓中",
+    pnlLabel: status === "watching" ? "0R" : "进行中",
+    note: shortTerm.executionLine,
+  };
+
+  const mergedEntries = [...previousEntries.filter((item) => item.date !== date), nextEntry].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const stats = buildTradeReviewStats(mergedEntries);
+
+  return {
+    title: "前一日开单建议复盘",
+    subtitle: "当前先把短线开单建议真实回流到日历表，至少保证新日期不是演示数据。",
+    winRate: stats.winRate,
+    record: stats.record,
+    highlight: stats.highlight,
+    entries: mergedEntries,
+  };
+}
+
 export const fallbackDailyAnalysisSeed: DailyAiMarketAnalysis = {
   title: "今日 AI 行情分析",
   publishAtJst: "2026-04-05T21:15:00+09:00",

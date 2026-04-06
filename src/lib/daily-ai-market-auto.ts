@@ -1,5 +1,10 @@
 import { createSupabaseAdminClient } from "@/lib/admin";
-import { fallbackDailyAnalysisSeed, type DailyAiMarketAnalysis, type DailyAiMarketRecord } from "@/lib/daily-ai-market";
+import {
+  fallbackDailyAnalysisSeed,
+  syncTradeReviewCalendarFromShortTerm,
+  type DailyAiMarketAnalysis,
+  type DailyAiMarketRecord,
+} from "@/lib/daily-ai-market";
 
 export type DailyAiMarketAutoGenerateInput = {
   analysisDate?: string;
@@ -263,7 +268,7 @@ function buildAutoPayload(
     },
   };
 
-  return {
+  const payload: DailyAiMarketAnalysis = {
     ...fallback,
     title: `今日 AI 行情分析 · ${dateLabel}`,
     marketBias: pickByDate(input.analysisDate, biasOptions),
@@ -291,6 +296,10 @@ function buildAutoPayload(
     status: input.status,
     source: input.source,
   };
+
+  payload.tradeReviewCalendar = syncTradeReviewCalendarFromShortTerm(input.analysisDate, payload, fallback.tradeReviewCalendar.entries);
+
+  return payload;
 }
 
 export function generateDailyAiMarketAutoPayload(input: DailyAiMarketAutoGenerateInput = {}) {

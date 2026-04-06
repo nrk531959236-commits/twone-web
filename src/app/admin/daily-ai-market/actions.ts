@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAdminAccess, createSupabaseAdminClient } from "@/lib/admin";
-import { getFallbackDailyAiMarketAnalysis, type DailyAiMarketAnalysis, type DailyAiMarketSource, type DailyAiMarketStatus } from "@/lib/daily-ai-market";
+import {
+  getFallbackDailyAiMarketAnalysis,
+  syncTradeReviewCalendarFromShortTerm,
+  type DailyAiMarketAnalysis,
+  type DailyAiMarketSource,
+  type DailyAiMarketStatus,
+} from "@/lib/daily-ai-market";
 
 function ensureAdmin(access: Awaited<ReturnType<typeof getAdminAccess>>) {
   if (!access.user || !access.isAdmin) {
@@ -147,6 +153,7 @@ export async function upsertDailyAiMarketAction(formData: FormData) {
   }
 
   const payload = buildAnalysisFromForm(formData, fallback);
+  payload.tradeReviewCalendar = syncTradeReviewCalendarFromShortTerm(analysisDate, payload, fallback.tradeReviewCalendar.entries);
   const publishAtJst = payload.publishAtJst;
   const now = new Date().toISOString();
   const publishedAt = status === "published" ? now : null;
