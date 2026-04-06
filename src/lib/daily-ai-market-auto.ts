@@ -203,6 +203,63 @@ function shouldDeDuplicateTradeSetups(shortText: string, longText: string) {
   return similarityScore(shortText, longText) >= 0.72;
 }
 
+function localizeCoinGlassSignal(signalSnapshot: DailyAiMarketSignalSnapshot | null): DailyAiMarketSignalSnapshot | null {
+  if (!signalSnapshot) return null;
+
+  const mapText = (value: string) => {
+    const replacements: Array<[string, string]> = [
+      ["squeeze aftermath, short-term sellers are pushing back", "挤空后整理，短线卖压回流"],
+      ["flush aftermath, dip buyers are stepping in", "杀多后修复，抄底买盘回流"],
+      ["bullish continuation bias, but only if price still accepts higher", "短线偏多延续，但前提是价格继续接受更高位置"],
+      ["bearish continuation bias, but only if price still accepts lower", "短线偏空延续，但前提是价格继续接受更低位置"],
+      ["flow is directional, but broader positioning is not fully aligned yet", "短线主动流有方向，但更大结构还没完全共振"],
+      ["mixed tape, wait for cleaner alignment", "信号混合，先等更清晰共振"],
+      ["recent upside already spent squeeze fuel, so chasing green candles blindly is dangerous", "上冲已经消耗部分挤空燃料，盲目追涨风险上升"],
+      ["recent downside already spent flush fuel, so pressing late shorts blindly is dangerous", "下冲已经消耗部分杀多燃料，盲目追空风险上升"],
+      ["late longs are vulnerable if price stalls because crowding is already elevated", "多头拥挤已抬升，若价格停滞，追多容易吃回撤"],
+      ["late shorts are vulnerable if price bounces because crowding is already elevated", "空头拥挤已抬升，若价格反抽，追空容易被挤"],
+      ["medium-term expansion, short-term digestion", "中期增仓，短线消化"],
+      ["broad OI expansion", "整体增仓扩张"],
+      ["broad de-risking / OI contraction", "整体去杠杆，持仓收缩"],
+      ["short-term re-leveraging against weaker hourly backdrop", "弱小时结构里的短线再加杠杆"],
+      ["short-term flush inside a still-expanded structure", "扩张结构内的短线洗盘"],
+      ["mixed positioning across venues", "各交易所持仓分化"],
+      ["mildly short-biased funding", "资金费率轻微偏空"],
+      ["mildly long-biased funding", "资金费率轻微偏多"],
+      ["balanced funding", "资金费率整体平衡"],
+      ["long crowding elevated", "多头拥挤升温"],
+      ["short crowding elevated", "空头拥挤升温"],
+      ["short squeeze dominance", "空头主导爆仓"],
+      ["long flush dominance", "多头主导爆仓"],
+      ["two-way liquidation", "多空双向清算"],
+      ["strong aggressive selling", "主动卖盘明显增强"],
+      ["strong aggressive buying", "主动买盘明显增强"],
+      ["mild aggressive selling", "主动卖盘温和占优"],
+      ["mild aggressive buying", "主动买盘温和占优"],
+      ["balanced taker flow", "主动买卖盘大致平衡"],
+      ["This looks more like a squeeze aftermath than a clean fresh downtrend: shorts were forced out, and now short-term sellers are leaning back in. Treat it as a digestion phase unless price starts accepting lower with support from OI.", "当前更像挤空后的整理，而不是干净的新一轮下跌趋势。空头刚被动离场，短线卖盘开始回流，除非价格继续接受更低位置并得到 OI 配合，否则先按消化阶段理解。"],
+      ["This looks more like a flush aftermath than a clean fresh uptrend: longs were forced out, and now dip buyers are leaning back in. Treat it as a rebound attempt unless price starts accepting higher with support from OI.", "当前更像杀多后的修复，而不是干净的新一轮上涨趋势。多头刚被动离场，抄底买盘开始回流，除非价格继续接受更高位置并得到 OI 配合，否则先按反抽修复理解。"],
+      ["Fresh positioning, crowding, and taker flow are leaning the same way, so upside continuation has a real case, but only while price keeps accepting higher rather than stalling into crowded longs.", "增仓、拥挤度和主动流目前同向，短线继续上行有依据，但前提是价格继续接受更高位置，而不是在多头拥挤中停滞。"],
+      ["Positioning and taker flow are lining up on the downside, so bearish continuation has a real case, but only while price keeps accepting lower instead of bouncing into crowded shorts.", "持仓结构和主动流正在向下共振，短线继续回落有依据，但前提是价格继续接受更低位置，而不是反抽去挤拥挤空头。"],
+      ["The signal mix is informative but not fully aligned yet. Flow is giving a short-term push, but broader positioning is not clean enough to treat this as a high-conviction trend continuation setup.", "当前信号有信息量，但还没完全共振。短线主动流给出了推动方向，但更大持仓结构还不够干净，暂时不算高确定性趋势延续。"],
+    ];
+
+    return replacements.reduce((text, [from, to]) => text.replaceAll(from, to), value);
+  };
+
+  return {
+    ...signalSnapshot,
+    shortTermBias: mapText(signalSnapshot.shortTermBias),
+    mainRisk: mapText(signalSnapshot.mainRisk),
+    actionableRead: mapText(signalSnapshot.actionableRead),
+    oiState: mapText(signalSnapshot.oiState),
+    fundingState: mapText(signalSnapshot.fundingState),
+    liquidationState: mapText(signalSnapshot.liquidationState),
+    cvdState: mapText(signalSnapshot.cvdState),
+    rawText: signalSnapshot.rawText ? mapText(signalSnapshot.rawText) : signalSnapshot.rawText,
+  };
+}
+
 function buildAutoPayload(
   input: Pick<Required<DailyAiMarketAutoGenerateInput>, "analysisDate" | "publishAtJst" | "source" | "status">,
   signalSnapshot: DailyAiMarketSignalSnapshot | null,
@@ -211,13 +268,14 @@ function buildAutoPayload(
   const dateLabel = formatAnalysisDateLabel(input.analysisDate);
   const publishTime = input.publishAtJst.slice(11, 16);
   const autoStatusLine = createAutoStatusLine(input.analysisDate, input.publishAtJst);
+  const localizedSignal = localizeCoinGlassSignal(signalSnapshot);
 
   const biasOptions: DailyAiMarketAnalysis["marketBias"][] = ["偏空", "中性偏空", "震荡", "中性偏多"];
 
-  const signalDrivenMarketBias: DailyAiMarketAnalysis["marketBias"] | null = signalSnapshot
-    ? signalSnapshot.shortTermBias.includes("bullish") || signalSnapshot.shortTermBias.includes("dip buyers")
+  const signalDrivenMarketBias: DailyAiMarketAnalysis["marketBias"] | null = localizedSignal
+    ? localizedSignal.shortTermBias.includes("偏多") || localizedSignal.shortTermBias.includes("抄底买盘")
       ? "中性偏多"
-      : signalSnapshot.shortTermBias.includes("bearish") || signalSnapshot.shortTermBias.includes("sellers")
+      : localizedSignal.shortTermBias.includes("偏空") || localizedSignal.shortTermBias.includes("卖压")
         ? "中性偏空"
         : "震荡"
     : null;
@@ -417,25 +475,25 @@ function buildAutoPayload(
     },
   };
 
-  const signalHeadline = signalSnapshot
-    ? `BTC 今日思路：${signalSnapshot.shortTermBias}，先看结构确认，不把波动误判成新趋势。`
+  const signalHeadline = localizedSignal
+    ? `BTC 今日思路：${localizedSignal.shortTermBias}，先看结构确认，不把当前波动误判成新趋势。`
     : pickByDate(input.analysisDate, headlineOptions);
 
-  const signalSummary = signalSnapshot
-    ? `${signalSnapshot.actionableRead} 短线只回答怎么执行，长线只回答结构是否已经重新一致，不重复给两套同方向日内建议。`
+  const signalSummary = localizedSignal
+    ? `${localizedSignal.actionableRead} 短线只回答怎么执行，长线只回答结构是否重新一致，不重复给两套同方向日内建议。`
     : pickByDate(`${input.analysisDate}-summary`, summaryOptions);
 
-  const signalConviction = signalSnapshot
-    ? `主结论：${signalSnapshot.shortTermBias}，当前置信度 ${signalSnapshot.conviction}，核心风险在于${signalSnapshot.mainRisk}。（自动发布时间：${dateLabel} ${publishTime} JST）`
+  const signalConviction = localizedSignal
+    ? `主结论：${localizedSignal.shortTermBias}，当前置信度 ${localizedSignal.conviction === "high" ? "高" : localizedSignal.conviction === "medium" ? "中" : "低"}，核心风险在于${localizedSignal.mainRisk}。（自动发布时间：${dateLabel} ${publishTime} JST）`
     : `${pickByDate(`${input.analysisDate}-conviction`, convictionOptions)}（自动发布时间：${dateLabel} ${publishTime} JST）`;
 
-  const signalStructure = signalSnapshot
-    ? `当前衍生品结构显示：OI ${signalSnapshot.oiState}，Funding ${signalSnapshot.fundingState}，Liquidation ${signalSnapshot.liquidationState}，CVD ${signalSnapshot.cvdState}。先把它理解为结构判断，再决定是否执行。`
+  const signalStructure = localizedSignal
+    ? `当前衍生品结构显示：OI ${localizedSignal.oiState}，Funding ${localizedSignal.fundingState}，Liquidation ${localizedSignal.liquidationState}，CVD ${localizedSignal.cvdState}。先把它理解为结构判断，再决定是否执行。`
     : pickByDate(`${input.analysisDate}-structure`, structureOptions);
 
-  const signalRiskTips = signalSnapshot
+  const signalRiskTips = localizedSignal
     ? [
-        `核心风险：${signalSnapshot.mainRisk}。`,
+        `核心风险：${localizedSignal.mainRisk}。`,
         `若价格没有继续接受更高或更低位置，不要把当前波动直接当成新趋势启动。`,
         `短线先看价格与 OI 是否继续共振，再决定是否跟随。`,
       ]
@@ -459,9 +517,9 @@ function buildAutoPayload(
     macd: pickByDate(`${input.analysisDate}-macd`, macdOptions),
     rsi: pickByDate(`${input.analysisDate}-rsi`, rsiOptions),
     indicatorPanels,
-    focus: signalSnapshot
+    focus: localizedSignal
       ? [
-          `短线先看 ${signalSnapshot.shortTermBias} 是否继续得到价格确认。`,
+          `短线先看 ${localizedSignal.shortTermBias} 是否继续得到价格确认。`,
           `四项信号中，优先观察 OI 与 CVD 是否继续同向，而不是只盯一根K线。`,
           `短线只看执行，长线只看结构，不把两套逻辑混在一起。`,
         ]
@@ -474,7 +532,7 @@ function buildAutoPayload(
     tradeSetups,
     status: input.status,
     source: input.source,
-    signalSnapshot: signalSnapshot ?? undefined,
+    signalSnapshot: localizedSignal ?? undefined,
   };
 
   payload.tradeReviewCalendar = syncTradeReviewCalendarFromShortTerm(input.analysisDate, payload, fallback.tradeReviewCalendar.entries);
