@@ -114,6 +114,20 @@ export default async function Home() {
   });
   const tradeSetups = [dailyAnalysis.tradeSetups.shortTerm, dailyAnalysis.tradeSetups.longTerm];
   const biasTheme = marketBiasTheme[dailyAnalysis.marketBias];
+  const signalSnapshot = dailyAnalysis.signalSnapshot;
+  const signalCards = signalSnapshot
+    ? [
+        { label: "OI", value: signalSnapshot.oiState },
+        { label: "Funding", value: signalSnapshot.fundingState },
+        { label: "Liquidation", value: signalSnapshot.liquidationState },
+        { label: "CVD", value: signalSnapshot.cvdState },
+      ]
+    : [
+        { label: "结构", value: dailyAnalysis.structure },
+        { label: "VWAP", value: dailyAnalysis.vwap },
+        { label: "MACD", value: dailyAnalysis.macd },
+        { label: "RSI", value: dailyAnalysis.rsi },
+      ];
   const tradeReviewCalendar =
     dailyAnalysis.tradeReviewCalendar ?? {
       title: "前一日开单建议复盘",
@@ -169,10 +183,6 @@ export default async function Home() {
         <div className="home-daily-grid">
           <article className="home-daily-main card-glow">
             <div className="home-daily-main__top">
-              <div className="home-daily-main__summary-block">
-                <p className="home-chip">每日结论</p>
-                <h2>{dailyAnalysis.headline}</h2>
-              </div>
               <div className={`home-bias-box home-bias-box--${biasTheme}`}>
                 <div className="home-bias-box__head">
                   <span className="home-highlight-label">
@@ -182,6 +192,21 @@ export default async function Home() {
                   <strong>{dailyAnalysis.marketBias}</strong>
                 </div>
                 <em>{dailyAnalysis.conviction}</em>
+              </div>
+
+              <div className="home-daily-main__signal-block">
+                <div className="home-daily-main__signal-head">
+                  <p className="home-chip">信号辅助卡</p>
+                  <strong>{signalSnapshot ? "衍生品结构辅助判断" : "结构辅助判断"}</strong>
+                </div>
+                <div className="home-signal-grid">
+                  {signalCards.map((item) => (
+                    <article key={item.label} className="home-signal-card">
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                    </article>
+                  ))}
+                </div>
               </div>
             </div>
 
