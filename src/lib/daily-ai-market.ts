@@ -31,6 +31,18 @@ export type TradeReviewCalendarEntry = {
   stopLossPrice?: number;
 };
 
+export type DailyAiMarketSignalSnapshot = {
+  shortTermBias: string;
+  conviction: "low" | "medium" | "high";
+  mainRisk: string;
+  actionableRead: string;
+  oiState: string;
+  fundingState: string;
+  liquidationState: string;
+  cvdState: string;
+  rawText?: string;
+};
+
 export type DailyAiMarketAnalysis = {
   title: string;
   publishAtJst: string;
@@ -109,6 +121,7 @@ export type DailyAiMarketAnalysis = {
   };
   status: Exclude<DailyAiMarketStatus, "draft">;
   source: DailyAiMarketSource;
+  signalSnapshot?: DailyAiMarketSignalSnapshot;
 };
 
 export type DailyAiMarketRecord = {
@@ -486,8 +499,9 @@ const fallbackWorkflowNote: DailyAiMarketWorkflowNote = {
     "当前已提供可被 cron 触发的自动发布接口。若尚未建定时器，首页会继续回退到本地固定模板；一旦定时任务开始调用该入口，首页将自动切到最新 published 数据。",
 };
 
-export function getFallbackDailyAiMarketAnalysis(): DailyAiMarketAnalysis {
-  return generateDailyAiMarketAutoPayload().payload;
+export async function getFallbackDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis> {
+  const generated = await generateDailyAiMarketAutoPayload();
+  return generated.payload;
 }
 
 function isSupabaseConfigured() {
@@ -767,7 +781,7 @@ export async function getLatestPublishedDailyAiMarketRecord(): Promise<DailyAiMa
 
 export async function getDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis> {
   const latest = await getLatestPublishedDailyAiMarketRecord();
-  const analysis = latest?.payload ?? getFallbackDailyAiMarketAnalysis();
+  const analysis = latest?.payload ?? await getFallbackDailyAiMarketAnalysis();
 
   if (!latest) {
     return applyLiveTradeReviewSettlement(analysis);

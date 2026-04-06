@@ -4,7 +4,10 @@ import {
   syncTradeReviewCalendarFromShortTerm,
   type DailyAiMarketAnalysis,
   type DailyAiMarketRecord,
+  type DailyAiMarketSignalSnapshot,
 } from "@/lib/daily-ai-market";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 export type DailyAiMarketAutoGenerateInput = {
   analysisDate?: string;
@@ -18,6 +21,9 @@ export type DailyAiMarketAutoPublishResult = {
   record: DailyAiMarketRecord;
   mode: "created" | "updated";
 };
+
+const execFileAsync = promisify(execFile);
+const coinglassSnapshotScript = "/Users/eryi/.openclaw/workspace/skills/coinglass-api/scripts/market_structure_snapshot.py";
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -118,6 +124,51 @@ function buildDirectionalSetup(options: {
   };
 }
 
+async function getCoinGlassSignalSnapshot(symbol = "BTC"): Promise<DailyAiMarketSignalSnapshot | null> {
+  try {
+    const { stdout } = await execFileAsync("python3", [
+      coinglassSnapshotScript,
+      "--symbol",
+      symbol,
+      "--range",
+      "24h",
+      "--interval",
+      "1h",
+    ], {
+      env: process.env,
+      timeout: 45000,
+      maxBuffer: 1024 * 1024,
+    });
+
+    const text = stdout.trim();
+    if (!text) return null;
+
+    const readLine = (prefix: string) => {
+      const line = text.split("\n").find((item) => item.startsWith(prefix));
+      return line ? line.slice(prefix.length).trim() : "";
+    };
+
+    const convictionValue = readLine("- conviction: ");
+    const conviction = convictionValue === "high" || convictionValue === "medium" || convictionValue === "low"
+      ? convictionValue
+      : "medium";
+
+    return {
+      shortTermBias: readLine("- short-term bias: "),
+      conviction,
+      mainRisk: readLine("- main risk: "),
+      actionableRead: readLine("- actionable read: "),
+      oiState: readLine("- OI: "),
+      fundingState: readLine("- Funding: "),
+      liquidationState: readLine("- Liquidation: "),
+      cvdState: readLine("- CVD: "),
+      rawText: text,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function normalizeForSimilarity(text: string) {
   return text
     .replace(/[：:，。、“”‘’（）()【】\-—\s]/g, "")
@@ -154,6 +205,7 @@ function shouldDeDuplicateTradeSetups(shortText: string, longText: string) {
 
 function buildAutoPayload(
   input: Pick<Required<DailyAiMarketAutoGenerateInput>, "analysisDate" | "publishAtJst" | "source" | "status">,
+  signalSnapshot: DailyAiMarketSignalSnapshot | null,
 ): DailyAiMarketAnalysis {
   const fallback = fallbackDailyAnalysisSeed;
   const dateLabel = formatAnalysisDateLabel(input.analysisDate);
@@ -161,6 +213,14 @@ function buildAutoPayload(
   const autoStatusLine = createAutoStatusLine(input.analysisDate, input.publishAtJst);
 
   const biasOptions: DailyAiMarketAnalysis["marketBias"][] = ["偏空", "中性偏空", "震荡", "中性偏多"];
+
+  const signalDrivenMarketBias: DailyAiMarketAnalysis["marketBias"] | null = signalSnapshot
+    ? signalSnapshot.shortTermBias.includes("bullish") || signalSnapshot.shortTermBias.includes("dip buyers")
+      ? "中性偏多"
+      : signalSnapshot.shortTermBias.includes("bearish") || signalSnapshot.shortTermBias.includes("sellers")
+        ? "中性偏空"
+        : "震荡"
+    : null;
   const convictionOptions = [
     "主结论：震荡市先看确认位与失效位，不在中位追单。",
     "主结论：先按关键位做交易决策，确认前轻仓，失效后重算。",
@@ -357,33 +417,64 @@ function buildAutoPayload(
     },
   };
 
+  const signalHeadline = signalSnapshot
+    ? `BTC 今日思路：${signalSnapshot.shortTermBias}，先看结构确认，不把波动误判成新趋势。`
+    : pickByDate(input.analysisDate, headlineOptions);
+
+  const signalSummary = signalSnapshot
+    ? `${signalSnapshot.actionableRead} 短线只回答怎么执行，长线只回答结构是否已经重新一致，不重复给两套同方向日内建议。`
+    : pickByDate(`${input.analysisDate}-summary`, summaryOptions);
+
+  const signalConviction = signalSnapshot
+    ? `主结论：${signalSnapshot.shortTermBias}，当前置信度 ${signalSnapshot.conviction}，核心风险在于${signalSnapshot.mainRisk}。（自动发布时间：${dateLabel} ${publishTime} JST）`
+    : `${pickByDate(`${input.analysisDate}-conviction`, convictionOptions)}（自动发布时间：${dateLabel} ${publishTime} JST）`;
+
+  const signalStructure = signalSnapshot
+    ? `当前衍生品结构显示：OI ${signalSnapshot.oiState}，Funding ${signalSnapshot.fundingState}，Liquidation ${signalSnapshot.liquidationState}，CVD ${signalSnapshot.cvdState}。先把它理解为结构判断，再决定是否执行。`
+    : pickByDate(`${input.analysisDate}-structure`, structureOptions);
+
+  const signalRiskTips = signalSnapshot
+    ? [
+        `核心风险：${signalSnapshot.mainRisk}。`,
+        `若价格没有继续接受更高或更低位置，不要把当前波动直接当成新趋势启动。`,
+        `短线先看价格与 OI 是否继续共振，再决定是否跟随。`,
+      ]
+    : [
+        `未确认前轻仓，不追中位。`,
+        `跌破失效位后，放弃原计划，重新评估。`,
+        `宏观事件临近或波动突然放大时，优先等待下一根确认K线。`,
+      ];
+
   const payload: DailyAiMarketAnalysis = {
     ...fallback,
     title: `今日 AI 行情分析 · ${dateLabel}`,
-    marketBias: pickByDate(input.analysisDate, biasOptions),
-    headline: pickByDate(input.analysisDate, headlineOptions),
-    summary: pickByDate(`${input.analysisDate}-summary`, summaryOptions),
-    conviction: `${pickByDate(`${input.analysisDate}-conviction`, convictionOptions)}（自动发布时间：${dateLabel} ${publishTime} JST）`,
+    marketBias: signalDrivenMarketBias ?? pickByDate(input.analysisDate, biasOptions),
+    headline: signalHeadline,
+    summary: signalSummary,
+    conviction: signalConviction,
     publishAtJst: input.publishAtJst,
     timeframe: `${fallback.timeframe} 自动版本日期：${dateLabel} / 发布时间：${publishTime} JST。`,
-    structure: pickByDate(`${input.analysisDate}-structure`, structureOptions),
+    structure: signalStructure,
     vwap: pickByDate(`${input.analysisDate}-vwap`, vwapOptions),
     macd: pickByDate(`${input.analysisDate}-macd`, macdOptions),
     rsi: pickByDate(`${input.analysisDate}-rsi`, rsiOptions),
     indicatorPanels,
-    focus: [
-      `优先看确认位与失效位是否仍成立，再决定是否出手。`,
-      `短线只看执行，波段只看结构，不把两套逻辑混在一起。`,
-      `若波动突然放大，先等下一根确认K线，不在中位追单。`,
-    ],
-    riskTips: [
-      `未确认前轻仓，不追中位。`,
-      `跌破失效位后，放弃原计划，重新评估。`,
-      `宏观事件临近或波动突然放大时，优先等待下一根确认K线。`,
-    ],
+    focus: signalSnapshot
+      ? [
+          `短线先看 ${signalSnapshot.shortTermBias} 是否继续得到价格确认。`,
+          `四项信号中，优先观察 OI 与 CVD 是否继续同向，而不是只盯一根K线。`,
+          `短线只看执行，长线只看结构，不把两套逻辑混在一起。`,
+        ]
+      : [
+          `优先看确认位与失效位是否仍成立，再决定是否出手。`,
+          `短线只看执行，波段只看结构，不把两套逻辑混在一起。`,
+          `若波动突然放大，先等下一根确认K线，不在中位追单。`,
+        ],
+    riskTips: signalRiskTips,
     tradeSetups,
     status: input.status,
     source: input.source,
+    signalSnapshot: signalSnapshot ?? undefined,
   };
 
   payload.tradeReviewCalendar = syncTradeReviewCalendarFromShortTerm(input.analysisDate, payload, fallback.tradeReviewCalendar.entries);
@@ -391,11 +482,12 @@ function buildAutoPayload(
   return payload;
 }
 
-export function generateDailyAiMarketAutoPayload(input: DailyAiMarketAutoGenerateInput = {}) {
+export async function generateDailyAiMarketAutoPayload(input: DailyAiMarketAutoGenerateInput = {}) {
   const analysisDate = input.analysisDate ?? formatDateJst();
   const publishAtJst = input.publishAtJst ?? buildPublishAtJst(analysisDate);
   const source = input.source ?? "auto";
   const status = input.status ?? "published";
+  const signalSnapshot = await getCoinGlassSignalSnapshot("BTC");
 
   return {
     analysisDate,
@@ -403,17 +495,20 @@ export function generateDailyAiMarketAutoPayload(input: DailyAiMarketAutoGenerat
     source,
     status,
     slug: createSlug(analysisDate),
-    payload: buildAutoPayload({
-      analysisDate,
-      publishAtJst,
-      source,
-      status,
-    }),
+    payload: buildAutoPayload(
+      {
+        analysisDate,
+        publishAtJst,
+        source,
+        status,
+      },
+      signalSnapshot,
+    ),
   };
 }
 
 export async function upsertDailyAiMarketAutoPublish(input: DailyAiMarketAutoGenerateInput = {}): Promise<DailyAiMarketAutoPublishResult> {
-  const generated = generateDailyAiMarketAutoPayload(input);
+  const generated = await generateDailyAiMarketAutoPayload(input);
   const supabase = createSupabaseAdminClient();
   const now = new Date().toISOString();
 

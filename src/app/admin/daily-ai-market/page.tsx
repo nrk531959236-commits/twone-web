@@ -90,7 +90,7 @@ export default async function AdminDailyAiMarketPage({
   const flashType = resolvedSearchParams?.type?.trim();
   const latestRecords = await getLatestRecords();
   const latestRecord = latestRecords[0] ?? null;
-  const fallback = latestRecord?.payload ?? getFallbackDailyAiMarketAnalysis();
+  const fallback = latestRecord?.payload ?? await getFallbackDailyAiMarketAnalysis();
 
   return (
     <main className="page-shell">

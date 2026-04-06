@@ -143,7 +143,7 @@ export async function upsertDailyAiMarketAction(formData: FormData) {
   const access = await getAdminAccess();
   ensureAdmin(access);
 
-  const fallback = getFallbackDailyAiMarketAnalysis();
+  const fallback = await getFallbackDailyAiMarketAnalysis();
   const analysisDate = toText(formData.get("analysisDate"));
   const status = (toText(formData.get("status")) || "published") as DailyAiMarketStatus;
   const source = (toText(formData.get("source")) || "admin") as DailyAiMarketSource;
