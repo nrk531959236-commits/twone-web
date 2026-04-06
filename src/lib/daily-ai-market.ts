@@ -562,13 +562,23 @@ function settleTradeReviewEntry(entry: TradeReviewCalendarEntry, ticker: BtcTick
   }
 
   if (entry.direction === "short") {
-    if (ticker.highPrice >= stopLoss) {
+    if (ticker.lastPrice <= takeProfit) {
+      return {
+        ...entry,
+        status: "tp_hit",
+        resultLabel: "止盈",
+        pnlLabel: "已止盈",
+        currentZone: `最新价 ${formatPrice(ticker.lastPrice)} 已下破止盈 ${formatPrice(takeProfit)}`,
+      };
+    }
+
+    if (ticker.lastPrice >= stopLoss) {
       return {
         ...entry,
         status: "sl_hit",
         resultLabel: "止损",
         pnlLabel: "已止损",
-        currentZone: `24h 最高 ${formatPrice(ticker.highPrice)} 已触发止损 ${formatPrice(stopLoss)}`,
+        currentZone: `最新价 ${formatPrice(ticker.lastPrice)} 已上破止损 ${formatPrice(stopLoss)}`,
       };
     }
 
@@ -581,14 +591,34 @@ function settleTradeReviewEntry(entry: TradeReviewCalendarEntry, ticker: BtcTick
         currentZone: `24h 最低 ${formatPrice(ticker.lowPrice)} 已触发止盈 ${formatPrice(takeProfit)}`,
       };
     }
-  } else {
-    if (ticker.lowPrice <= stopLoss) {
+
+    if (ticker.highPrice >= stopLoss) {
       return {
         ...entry,
         status: "sl_hit",
         resultLabel: "止损",
         pnlLabel: "已止损",
-        currentZone: `24h 最低 ${formatPrice(ticker.lowPrice)} 已触发止损 ${formatPrice(stopLoss)}`,
+        currentZone: `24h 最高 ${formatPrice(ticker.highPrice)} 已触发止损 ${formatPrice(stopLoss)}`,
+      };
+    }
+  } else {
+    if (ticker.lastPrice >= takeProfit) {
+      return {
+        ...entry,
+        status: "tp_hit",
+        resultLabel: "止盈",
+        pnlLabel: "已止盈",
+        currentZone: `最新价 ${formatPrice(ticker.lastPrice)} 已上破止盈 ${formatPrice(takeProfit)}`,
+      };
+    }
+
+    if (ticker.lastPrice <= stopLoss) {
+      return {
+        ...entry,
+        status: "sl_hit",
+        resultLabel: "止损",
+        pnlLabel: "已止损",
+        currentZone: `最新价 ${formatPrice(ticker.lastPrice)} 已下破止损 ${formatPrice(stopLoss)}`,
       };
     }
 
@@ -599,6 +629,16 @@ function settleTradeReviewEntry(entry: TradeReviewCalendarEntry, ticker: BtcTick
         resultLabel: "止盈",
         pnlLabel: "已止盈",
         currentZone: `24h 最高 ${formatPrice(ticker.highPrice)} 已触发止盈 ${formatPrice(takeProfit)}`,
+      };
+    }
+
+    if (ticker.lowPrice <= stopLoss) {
+      return {
+        ...entry,
+        status: "sl_hit",
+        resultLabel: "止损",
+        pnlLabel: "已止损",
+        currentZone: `24h 最低 ${formatPrice(ticker.lowPrice)} 已触发止损 ${formatPrice(stopLoss)}`,
       };
     }
   }
