@@ -128,46 +128,46 @@ function buildAutoPayload(
 
   const biasOptions: DailyAiMarketAnalysis["marketBias"][] = ["偏空", "中性偏空", "震荡", "中性偏多"];
   const convictionOptions = [
-    "主结论：先按确认后执行，自动版本只给方向框架，不替代盘中人工判断。",
-    "主结论：优先等关键位确认，不在中位追单，自动版本更偏防守型。",
-    "主结论：当前自动版本偏向区间处理，未出现新的趋势切换信号前不做激进预判。",
-    "主结论：自动发布已刷新，先看确认位与否定位，再决定短线节奏是否切换。",
+    "主结论：震荡市先看确认位与失效位，不在中位追单。",
+    "主结论：先按关键位做交易决策，确认前轻仓，失效后重算。",
+    "主结论：当前更适合等承接或反压确认，不做激进预判。",
+    "主结论：今日先守纪律，先看确认，再看延续。",
   ];
   const headlineOptions = [
-    `${dateLabel} 自动日更已刷新：当前更适合按确认位执行，不把日更占位稿误读成盘中强信号。`,
-    `${dateLabel} 首页日更已切到新版本：核心仍是先看关键位确认，再决定是否跟随延续。`,
-    `${dateLabel} 自动版本已生成：当前先按结构框架处理，重点防止中位追单。`,
-    `${dateLabel} 自动发布完成：在没有正式盘中补稿前，优先看区间确认与失效条件。`,
+    `${dateLabel} 今日思路：先看关键位确认，不追中位。`,
+    `${dateLabel} 今日思路：震荡处理为主，确认后再跟。`,
+    `${dateLabel} 今日思路：先守承接与失效，再决定是否扩展。`,
+    `${dateLabel} 今日思路：没有确认前，先按区间交易处理。`,
   ];
   const summaryOptions = [
-    `${autoStatusLine} 当前自动版本更强调风险控制：短线只在确认后动手，长线继续等更大级别方向重新一致。`,
-    `${autoStatusLine} 这版自动结果的重点不是给你激进结论，而是把确认位、失效位和执行顺序重新刷成当日版本。`,
-    `${autoStatusLine} 当日自动发布已刷新，页面内容不再停留在前一日 seed；但若没有正式补稿，仍应按框架而非喊单去理解。`,
-    `${autoStatusLine} 这一版自动稿优先保留执行框架与风险提示，避免首页继续挂着前一天完全不变的内容。`,
+    `先看确认位和失效位，不在中位追单；短线只做执行，波段只看结构。`,
+    `今天先按关键位做交易决策：确认后跟，失效后撤，未确认前轻仓。`,
+    `当前优先执行纪律，不做情绪追单；先看承接是否成立，再看方向延续。`,
+    `短线和波段分开处理：短线看触发，波段看结构，不把两套逻辑混在一起。`,
   ];
   const structureOptions = [
-    `当前自动版本判断为弱趋势内震荡处理，先看区间确认，未出现明确站稳前不把反弹当趋势反转。`,
-    `结构上仍以确认位前后的博弈为主，自动版本不提前给趋势翻转结论。`,
-    `自动生成结果偏向“区间先行、突破再跟”，大级别方向没有新增确认前不做单边扩展。`,
-    `当前结构仍适合分级别处理：短线看承接，长线看是否重新进入压力区后再决定。`,
+    `当前更像区间内博弈，先看关键位是否被有效突破或跌破。`,
+    `结构仍在确认阶段，未出现明确站稳前，不把反抽直接当趋势反转。`,
+    `先按区间与关键位处理，突破再跟，失效就撤。`,
+    `当前主线仍是承接与反压的争夺，方向要等价格自己给确认。`,
   ];
   const vwapOptions = [
-    `自动版本提示：若价格持续压在 VWAP 下方，先按弱反弹看待；站回并企稳后再谈节奏切换。`,
-    `VWAP 当前仍是自动稿中的方向过滤器：压制未解除前，不把局部反抽当趋势修复。`,
-    `自动发布版本里，VWAP 继续用来区分“承接延续”与“冲高回落”两种执行路径。`,
-    `先看 VWAP 上下的站稳与失守，不在中位凭主观猜测扩仓。`,
+    `若价格持续压在 VWAP 下方，优先按弱反弹处理；重新站回并企稳后再看节奏切换。`,
+    `VWAP 仍是强弱分界线：压制未解除前，不把局部反抽当趋势修复。`,
+    `先看 VWAP 上下的站稳与失守，再决定是做承接还是做回落。`,
+    `价格围绕 VWAP 来回反复时，优先观望，不在中位扩仓。`,
   ];
   const macdOptions = [
-    `MACD 自动摘要：更偏向观察动能是否延续，而不是提前下趋势切换结论。`,
-    `MACD 自动版本维持保守解释：柱体未扩张前，先看确认，不追情绪单。`,
-    `当前 MACD 摘要更像节奏过滤器，提醒你先定义失效，再谈方向。`,
-    `自动发布结果中，MACD 仍只作为辅助，不独立承担翻多/翻空结论。`,
+    `MACD 先看动能是否延续，不提前下趋势切换结论。`,
+    `柱体未扩张前，优先看确认，不追情绪单。`,
+    `MACD 当前更适合作为节奏过滤器，先定义失效，再谈方向。`,
+    `MACD 只作辅助，不单独承担翻多或翻空结论。`,
   ];
   const rsiOptions = [
-    `RSI 自动摘要：修复不代表反转，强弱区能否站稳才决定后续节奏。`,
-    `RSI 当前在自动版本里仍只用来判断强弱修复，不单独给趋势结论。`,
-    `自动稿里的 RSI 提醒是：先看能否进入强势区并站稳，否则反抽仍按弱修复处理。`,
-    `RSI 若只是低位回升，优先理解为跌势放缓，而不是方向反转。`,
+    `RSI 修复不代表反转，强弱区能否站稳才决定后续节奏。`,
+    `RSI 当前只用于判断强弱修复，不单独下趋势结论。`,
+    `若 RSI 只是低位回升，优先理解为跌势放缓，而不是方向反转。`,
+    `先看 RSI 能否进入并站稳强势区，否则反抽仍按弱修复处理。`,
   ];
   const indicatorPanels = [
     {
@@ -257,16 +257,21 @@ function buildAutoPayload(
     scope: "long",
     seed: getDateSeed(`${input.analysisDate}-long-setup`),
   });
+  const distinctLongDirection: DailyAiMarketAnalysis["tradeSetups"]["longTerm"]["direction"] =
+    longTermDirection === shortTermDirection && longTermDirection !== "观望等待"
+      ? "观望等待"
+      : longTermDirection;
+
   const tradeSetups = {
     shortTerm: {
       label: "短线策略",
       stance: shortTermStance,
       direction: shortTermDirection,
       rationale: pickByDate(`${input.analysisDate}-short-rationale`, [
-        "自动版本更偏向先等确认后的短线执行，不在中位直接追单。",
-        "短线只看确认后的承接或反抽承压，不把日更自动稿当即时喊单。",
-        "当前短线建议以节奏交易为主，优先小仓位、快进快出。",
-        "自动版本下，短线执行先定义失效位，再考虑是否跟随。",
+        "短线只回答今天怎么打：先看触发，再看止损和最近目标。",
+        "短线只做确认后的那一段，不在中位追单。",
+        "当前短线以节奏交易为主，优先小仓位、快进快出。",
+        "先定义失效位，再决定是否跟随。",
       ]),
       triggerZone: shortDirectionalSetup.triggerZone,
       stopLoss: shortDirectionalSetup.stopLoss,
@@ -276,28 +281,30 @@ function buildAutoPayload(
         "短线只做确认后的那一段，不预判。",
         "先轻仓试单，确认延续再处理加减仓。",
         "拿不到确认信号就继续观望。",
-        "自动版本下，先做纪律，不做冲动。",
+        "中位不追，失效就撤。",
       ]),
     },
     longTerm: {
       label: "长线策略",
-      stance: longTermStance,
-      direction: longTermDirection,
+      stance: distinctLongDirection === "观望等待" ? "长线观望" : longTermStance,
+      direction: distinctLongDirection,
       rationale: pickByDate(`${input.analysisDate}-long-rationale`, [
-        "长线更看大级别是否重新一致，不在自动稿里提前给重仓结论。",
-        "当前长线思路偏向等压力区或趋势确认，不急着在中位下注。",
-        "长线计划以结构确认优先，先看大级别是否修复。",
-        "自动版本更适合给框架，不适合替代正式长线研究稿。",
+        "长线只回答这一段值不值得拿，不重复短线触发区。",
+        "长线更看大级别结构是否重新一致，不急着在日内中位下注。",
+        "当前波段计划以结构确认优先，先看大级别是否修复。",
+        "若大级别方向仍未明确，长线先观望，不强行给第二套重复建议。",
       ]),
-      triggerZone: longDirectionalSetup.triggerZone,
-      stopLoss: longDirectionalSetup.stopLoss,
-      targets: longDirectionalSetup.targets,
-      invalidation: longDirectionalSetup.invalidation,
+      triggerZone: distinctLongDirection === "观望等待" ? "等待更大级别确认后再评估" : longDirectionalSetup.triggerZone,
+      stopLoss: distinctLongDirection === "观望等待" ? "以大级别结构失效为准" : longDirectionalSetup.stopLoss,
+      targets: distinctLongDirection === "观望等待" ? ["不单独给波段目标，先等结构确认"] : longDirectionalSetup.targets,
+      invalidation: distinctLongDirection === "观望等待"
+        ? "若大级别重新转强或转弱，再更新波段观点。"
+        : longDirectionalSetup.invalidation,
       executionLine: pickByDate(`${input.analysisDate}-long-execution`, [
         "长线先看结构，不抢节奏。",
         "等大级别确认后再放大仓位。",
-        "自动版本只给框架，正式出手仍要看确认。",
-        "先定义失效条件，再谈持仓周期。",
+        "短线与长线同向时，长线只保留仓位原则，不重复日内触发。",
+        "先定义大级别失效条件，再谈持仓周期。",
       ]),
     },
   };
@@ -317,14 +324,14 @@ function buildAutoPayload(
     rsi: pickByDate(`${input.analysisDate}-rsi`, rsiOptions),
     indicatorPanels,
     focus: [
-      `确认 ${dateLabel} 的正式分析是否已补齐；当前首页已切到新的自动版本。`,
-      `优先检查确认位与否定位是否仍成立，不在自动稿基础上直接放大仓位。`,
-      `若晚间有正式盘中补稿，应让正式稿覆盖当前自动版本。`,
+      `优先看确认位与失效位是否仍成立，再决定是否出手。`,
+      `短线只看执行，波段只看结构，不把两套逻辑混在一起。`,
+      `若波动突然放大，先等下一根确认K线，不在中位追单。`,
     ],
     riskTips: [
-      `当前页面为 ${dateLabel} 自动生成版本，不等同于人工盘中实时稿。`,
-      `自动版本已更新，但仍应先看关键位确认，不在中位追单。`,
-      `若宏观事件临近或波动突然放大，优先等待下一根确认K线。`,
+      `未确认前轻仓，不追中位。`,
+      `跌破失效位后，放弃原计划，重新评估。`,
+      `宏观事件临近或波动突然放大时，优先等待下一根确认K线。`,
     ],
     tradeSetups,
     status: input.status,
