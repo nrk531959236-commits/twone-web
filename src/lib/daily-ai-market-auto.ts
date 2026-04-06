@@ -70,6 +70,54 @@ function createAutoStatusLine(analysisDate: string, publishAtJst: string) {
   return `${formatAnalysisDateLabel(analysisDate)} JST ${publishTime} 自动发布版：当日结果由接口重新生成，不再原样复用旧 seed。`;
 }
 
+function formatLevel(value: number) {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.round(value));
+}
+
+function buildDirectionalSetup(options: {
+  direction: "long" | "short" | "watch";
+  scope: "short" | "long";
+  seed: number;
+}) {
+  const center = 67200 + (options.seed % 9) * 120;
+  const width = options.scope === "short" ? 90 : 140;
+  const entryLow = center - width;
+  const entryHigh = center + width;
+
+  if (options.direction === "watch") {
+    return {
+      triggerZone: `${formatLevel(entryLow)} - ${formatLevel(entryHigh)} 等确认后再执行。`,
+      stopLoss: `止损：等待确认，不抢预判单。`,
+      targets: ["第一目标：等待确认", "第二目标：等待确认后再给"],
+      invalidation: `失效：没有确认前不进场，继续观望。`,
+    };
+  }
+
+  if (options.direction === "long") {
+    const stopLoss = entryLow - (options.scope === "short" ? 220 : 320);
+    const target1 = entryHigh + (options.scope === "short" ? 260 : 340);
+    const target2 = entryHigh + (options.scope === "short" ? 520 : 760);
+
+    return {
+      triggerZone: `${formatLevel(entryLow)} - ${formatLevel(entryHigh)} 回踩承接后再执行。`,
+      stopLoss: `止损：${formatLevel(stopLoss)} 跌破且反抽失败。`,
+      targets: [`第一目标：${formatLevel(target1)}`, `第二目标：${formatLevel(target2)} 上方分批止盈`],
+      invalidation: `失效：${formatLevel(stopLoss)} 跌破后 15M / 1H 无法收回。`,
+    };
+  }
+
+  const stopLoss = entryHigh + (options.scope === "short" ? 220 : 320);
+  const target1 = entryLow - (options.scope === "short" ? 260 : 340);
+  const target2 = entryLow - (options.scope === "short" ? 520 : 760);
+
+  return {
+    triggerZone: `${formatLevel(entryLow)} - ${formatLevel(entryHigh)} 反弹承压后再执行。`,
+    stopLoss: `止损：${formatLevel(stopLoss)} 上破且回踩不破。`,
+    targets: [`第一目标：${formatLevel(target1)}`, `第二目标：${formatLevel(target2)} 下方分批止盈`],
+    invalidation: `失效：${formatLevel(stopLoss)} 上方放量站稳。`,
+  };
+}
+
 function buildAutoPayload(
   input: Pick<Required<DailyAiMarketAutoGenerateInput>, "analysisDate" | "publishAtJst" | "source" | "status">,
 ): DailyAiMarketAnalysis {
@@ -185,8 +233,30 @@ function buildAutoPayload(
   ];
   const shortTermStance = pickByDate(`${input.analysisDate}-short-stance`, ["短线偏多", "短线偏空", "短线震荡", "短线观望"] as const);
   const longTermStance = pickByDate(`${input.analysisDate}-long-stance`, ["长线偏多", "长线偏空", "长线震荡", "长线观望"] as const);
-  const shortTermDirection = pickByDate(`${input.analysisDate}-short-direction`, ["回落承接做多", "反弹承压做空", "区间低吸做多", "观望等待"] as const);
-  const longTermDirection = pickByDate(`${input.analysisDate}-long-direction`, ["回落承接做多", "反弹承压做空", "突破追多", "观望等待"] as const);
+  const shortTermDirection: DailyAiMarketAnalysis["tradeSetups"]["shortTerm"]["direction"] =
+    shortTermStance === "短线偏空" ? "反弹承压做空"
+    : shortTermStance === "短线观望" ? "观望等待"
+    : "回落承接做多";
+  const longTermDirection: DailyAiMarketAnalysis["tradeSetups"]["longTerm"]["direction"] =
+    longTermStance === "长线偏空" ? "反弹承压做空"
+    : longTermStance === "长线观望" ? "观望等待"
+    : "回落承接做多";
+  const shortDirectionalSetup = buildDirectionalSetup({
+    direction:
+      shortTermDirection === "反弹承压做空" ? "short"
+      : shortTermDirection === "观望等待" ? "watch"
+      : "long",
+    scope: "short",
+    seed: getDateSeed(`${input.analysisDate}-short-setup`),
+  });
+  const longDirectionalSetup = buildDirectionalSetup({
+    direction:
+      longTermDirection === "反弹承压做空" ? "short"
+      : longTermDirection === "观望等待" ? "watch"
+      : "long",
+    scope: "long",
+    seed: getDateSeed(`${input.analysisDate}-long-setup`),
+  });
   const tradeSetups = {
     shortTerm: {
       label: "短线策略",
@@ -198,28 +268,10 @@ function buildAutoPayload(
         "当前短线建议以节奏交易为主，优先小仓位、快进快出。",
         "自动版本下，短线执行先定义失效位，再考虑是否跟随。",
       ]),
-      triggerZone: pickByDate(`${input.analysisDate}-short-trigger`, [
-        "67,120 - 67,280 回踩承接后再执行。",
-        "67,360 - 67,520 二次确认后再进。",
-        "66,980 - 67,160 不破并收回后再考虑。",
-        "67,520 上方站稳后再处理追随。",
-      ]),
-      stopLoss: pickByDate(`${input.analysisDate}-short-stop`, [
-        "止损：66,780 有效跌破。",
-        "止损：67,000 下方收不回。",
-        "止损：66,920 跌破且反抽失败。",
-        "止损：67,180 确认失败后离场。",
-      ]),
-      targets: [
-        pickByDate(`${input.analysisDate}-short-target-1`, ["第一目标：67,680", "第一目标：67,820", "第一目标：67,980", "第一目标：68,120"]),
-        pickByDate(`${input.analysisDate}-short-target-2`, ["第二目标：68,120 - 68,260", "第二目标：68,280 - 68,420", "第二目标：68,480 上方分批止盈", "第二目标：68,600 附近看是否继续"]),
-      ],
-      invalidation: pickByDate(`${input.analysisDate}-short-invalidation`, [
-        "失效：66,780 跌破后 15M 无法收回。",
-        "失效：67,120 承接失败并持续压在 VWAP 下。",
-        "失效：冲高后重新跌回 67,000 下方。",
-        "失效：67,360 上不去且量能同步衰减。",
-      ]),
+      triggerZone: shortDirectionalSetup.triggerZone,
+      stopLoss: shortDirectionalSetup.stopLoss,
+      targets: shortDirectionalSetup.targets,
+      invalidation: shortDirectionalSetup.invalidation,
       executionLine: pickByDate(`${input.analysisDate}-short-execution`, [
         "短线只做确认后的那一段，不预判。",
         "先轻仓试单，确认延续再处理加减仓。",
@@ -237,28 +289,10 @@ function buildAutoPayload(
         "长线计划以结构确认优先，先看大级别是否修复。",
         "自动版本更适合给框架，不适合替代正式长线研究稿。",
       ]),
-      triggerZone: pickByDate(`${input.analysisDate}-long-trigger`, [
-        "67,850 - 68,120 反弹承压后再空。",
-        "跌破 66,780 后反抽不过再跟空。",
-        "68,120 上不去并转弱时处理。",
-        "若重新站稳 68,250，上方改看多头确认。",
-      ]),
-      stopLoss: pickByDate(`${input.analysisDate}-long-stop`, [
-        "止损：68,250 上方 1H 放量站稳。",
-        "止损：68,420 回踩不破。",
-        "止损：67,850 空头触发后被重新收回。",
-        "止损：66,780 跌破逻辑被快速反包。",
-      ]),
-      targets: [
-        pickByDate(`${input.analysisDate}-long-target-1`, ["第一目标：67,180", "第一目标：66,980", "第一目标：66,780", "第一目标：66,520"]),
-        pickByDate(`${input.analysisDate}-long-target-2`, ["第二目标：66,200", "第二目标：65,880", "第二目标：65,500 附近", "第二目标：若失守再看更低一级支撑"]),
-      ],
-      invalidation: pickByDate(`${input.analysisDate}-long-invalidation`, [
-        "失效：68,250 上方站稳并回踩不破。",
-        "失效：VWAP 与 1H 压力带同步被收回。",
-        "失效：67,850 - 68,120 压力区被放量突破。",
-        "失效：跌破 66,780 后快速收回且量能转强。",
-      ]),
+      triggerZone: longDirectionalSetup.triggerZone,
+      stopLoss: longDirectionalSetup.stopLoss,
+      targets: longDirectionalSetup.targets,
+      invalidation: longDirectionalSetup.invalidation,
       executionLine: pickByDate(`${input.analysisDate}-long-execution`, [
         "长线先看结构，不抢节奏。",
         "等大级别确认后再放大仓位。",
