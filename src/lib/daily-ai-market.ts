@@ -531,6 +531,13 @@ type BtcTickerSnapshot = {
   lowPrice: number;
 };
 
+type TradeReviewSettlementResult = {
+  entries: TradeReviewCalendarEntry[];
+  stats: ReturnType<typeof buildTradeReviewStats>;
+  ticker: BtcTickerSnapshot;
+  changed: boolean;
+};
+
 async function fetchBtcTickerSnapshot(): Promise<BtcTickerSnapshot | null> {
   try {
     const response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT", {
@@ -668,34 +675,53 @@ function settleTradeReviewEntry(entry: TradeReviewCalendarEntry, ticker: BtcTick
   };
 }
 
-async function applyLiveTradeReviewSettlement(analysis: DailyAiMarketAnalysis): Promise<DailyAiMarketAnalysis> {
+async function settleTradeReviewCalendar(analysis: DailyAiMarketAnalysis): Promise<TradeReviewSettlementResult | null> {
   const entries = analysis.tradeReviewCalendar?.entries ?? [];
 
   if (entries.length === 0) {
-    return analysis;
+    return null;
   }
 
   const needsSettlement = entries.some((item) => item.status === "holding");
   if (!needsSettlement) {
-    return analysis;
+    return null;
   }
 
   const ticker = await fetchBtcTickerSnapshot();
   if (!ticker) {
-    return analysis;
+    return null;
   }
 
   const settledEntries = entries.map((entry) => settleTradeReviewEntry(entry, ticker));
   const stats = buildTradeReviewStats(settledEntries);
+  const changed = settledEntries.some((entry, index) => {
+    const previous = entries[index];
+    return previous && (entry.status !== previous.status || entry.resultLabel !== previous.resultLabel || entry.pnlLabel !== previous.pnlLabel || entry.currentZone !== previous.currentZone);
+  });
+
+  return {
+    entries: settledEntries,
+    stats,
+    ticker,
+    changed,
+  };
+}
+
+async function applyLiveTradeReviewSettlement(analysis: DailyAiMarketAnalysis): Promise<DailyAiMarketAnalysis> {
+  const settled = await settleTradeReviewCalendar(analysis);
+
+  if (!settled) {
+    return analysis;
+  }
 
   return {
     ...analysis,
     tradeReviewCalendar: {
       ...analysis.tradeReviewCalendar,
-      entries: settledEntries,
-      winRate: stats.winRate,
-      record: stats.record,
-      highlight: `${stats.highlight} 当前 BTC 最新价 ${formatPrice(ticker.lastPrice)}，24h 区间 ${formatPrice(ticker.lowPrice)} - ${formatPrice(ticker.highPrice)}。`,
+      entries: settled.entries,
+      winRate: settled.stats.winRate,
+      record: settled.stats.record,
+      highlight: `${settled.stats.highlight} 当前 BTC 最新价 ${formatPrice(settled.ticker.lastPrice)}，24h 区间 ${formatPrice(settled.ticker.lowPrice)} - ${formatPrice(settled.ticker.highPrice)}。`,
     },
   };
 }
@@ -742,7 +768,43 @@ export async function getLatestPublishedDailyAiMarketRecord(): Promise<DailyAiMa
 export async function getDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis> {
   const latest = await getLatestPublishedDailyAiMarketRecord();
   const analysis = latest?.payload ?? getFallbackDailyAiMarketAnalysis();
-  return applyLiveTradeReviewSettlement(analysis);
+
+  if (!latest) {
+    return applyLiveTradeReviewSettlement(analysis);
+  }
+
+  const settled = await settleTradeReviewCalendar(analysis);
+  if (!settled) {
+    return analysis;
+  }
+
+  const nextAnalysis: DailyAiMarketAnalysis = {
+    ...analysis,
+    tradeReviewCalendar: {
+      ...analysis.tradeReviewCalendar,
+      entries: settled.entries,
+      winRate: settled.stats.winRate,
+      record: settled.stats.record,
+      highlight: `${settled.stats.highlight} 当前 BTC 最新价 ${formatPrice(settled.ticker.lastPrice)}，24h 区间 ${formatPrice(settled.ticker.lowPrice)} - ${formatPrice(settled.ticker.highPrice)}。`,
+    },
+  };
+
+  if (settled.changed && isSupabaseConfigured()) {
+    try {
+      const supabase = createSupabaseAdminClient();
+      await supabase
+        .from("daily_ai_market_analyses")
+        .update({
+          payload: nextAnalysis,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", latest.id);
+    } catch {
+      // Best-effort writeback; keep serving the settled in-memory result.
+    }
+  }
+
+  return nextAnalysis;
 }
 
 export async function getTodayPublishedDailyAiMarketRecord(): Promise<DailyAiMarketRecord | null> {
