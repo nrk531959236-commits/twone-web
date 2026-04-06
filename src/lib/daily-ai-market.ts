@@ -498,6 +498,149 @@ function normalizeStoredPayload(payload: unknown): DailyAiMarketAnalysis | null 
   return payload as DailyAiMarketAnalysis;
 }
 
+function parsePriceNumbers(text: string) {
+  return (text.match(/\d{1,3}(?:,\d{3})*(?:\.\d+)?/g) ?? [])
+    .map((item) => Number(item.replace(/,/g, "")))
+    .filter((value) => Number.isFinite(value));
+}
+
+function formatPrice(value: number) {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+}
+
+type BtcTickerSnapshot = {
+  lastPrice: number;
+  highPrice: number;
+  lowPrice: number;
+};
+
+async function fetchBtcTickerSnapshot(): Promise<BtcTickerSnapshot | null> {
+  try {
+    const response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as {
+      lastPrice?: string;
+      highPrice?: string;
+      lowPrice?: string;
+    };
+
+    const lastPrice = Number(data.lastPrice ?? "");
+    const highPrice = Number(data.highPrice ?? "");
+    const lowPrice = Number(data.lowPrice ?? "");
+
+    if (!Number.isFinite(lastPrice) || !Number.isFinite(highPrice) || !Number.isFinite(lowPrice)) {
+      return null;
+    }
+
+    return { lastPrice, highPrice, lowPrice };
+  } catch {
+    return null;
+  }
+}
+
+function settleTradeReviewEntry(entry: TradeReviewCalendarEntry, ticker: BtcTickerSnapshot): TradeReviewCalendarEntry {
+  if (entry.status !== "holding") {
+    return entry;
+  }
+
+  const stopLossLevels = parsePriceNumbers(entry.stopLoss);
+  const takeProfitLevels = parsePriceNumbers(entry.takeProfit);
+  const stopLoss = stopLossLevels[0];
+  const takeProfit = entry.direction === "short" ? Math.min(...takeProfitLevels) : Math.max(...takeProfitLevels);
+
+  if (!Number.isFinite(stopLoss) || !Number.isFinite(takeProfit)) {
+    return {
+      ...entry,
+      currentZone: `最新价 ${formatPrice(ticker.lastPrice)}，等待价格规则补齐`,
+    };
+  }
+
+  if (entry.direction === "short") {
+    if (ticker.highPrice >= stopLoss) {
+      return {
+        ...entry,
+        status: "sl_hit",
+        resultLabel: "止损",
+        pnlLabel: "已止损",
+        currentZone: `24h 最高 ${formatPrice(ticker.highPrice)} 已触发止损 ${formatPrice(stopLoss)}`,
+      };
+    }
+
+    if (ticker.lowPrice <= takeProfit) {
+      return {
+        ...entry,
+        status: "tp_hit",
+        resultLabel: "止盈",
+        pnlLabel: "已止盈",
+        currentZone: `24h 最低 ${formatPrice(ticker.lowPrice)} 已触发止盈 ${formatPrice(takeProfit)}`,
+      };
+    }
+  } else {
+    if (ticker.lowPrice <= stopLoss) {
+      return {
+        ...entry,
+        status: "sl_hit",
+        resultLabel: "止损",
+        pnlLabel: "已止损",
+        currentZone: `24h 最低 ${formatPrice(ticker.lowPrice)} 已触发止损 ${formatPrice(stopLoss)}`,
+      };
+    }
+
+    if (ticker.highPrice >= takeProfit) {
+      return {
+        ...entry,
+        status: "tp_hit",
+        resultLabel: "止盈",
+        pnlLabel: "已止盈",
+        currentZone: `24h 最高 ${formatPrice(ticker.highPrice)} 已触发止盈 ${formatPrice(takeProfit)}`,
+      };
+    }
+  }
+
+  return {
+    ...entry,
+    currentZone: `最新价 ${formatPrice(ticker.lastPrice)}，24h 区间 ${formatPrice(ticker.lowPrice)} - ${formatPrice(ticker.highPrice)}`,
+  };
+}
+
+async function applyLiveTradeReviewSettlement(analysis: DailyAiMarketAnalysis): Promise<DailyAiMarketAnalysis> {
+  const entries = analysis.tradeReviewCalendar?.entries ?? [];
+
+  if (entries.length === 0) {
+    return analysis;
+  }
+
+  const needsSettlement = entries.some((item) => item.status === "holding");
+  if (!needsSettlement) {
+    return analysis;
+  }
+
+  const ticker = await fetchBtcTickerSnapshot();
+  if (!ticker) {
+    return analysis;
+  }
+
+  const settledEntries = entries.map((entry) => settleTradeReviewEntry(entry, ticker));
+  const stats = buildTradeReviewStats(settledEntries);
+
+  return {
+    ...analysis,
+    tradeReviewCalendar: {
+      ...analysis.tradeReviewCalendar,
+      entries: settledEntries,
+      winRate: stats.winRate,
+      record: stats.record,
+      highlight: `${stats.highlight} 当前 BTC 最新价 ${formatPrice(ticker.lastPrice)}，24h 区间 ${formatPrice(ticker.lowPrice)} - ${formatPrice(ticker.highPrice)}。`,
+    },
+  };
+}
+
 export async function getLatestPublishedDailyAiMarketRecord(): Promise<DailyAiMarketRecord | null> {
   if (!isSupabaseConfigured()) {
     return null;
@@ -539,7 +682,8 @@ export async function getLatestPublishedDailyAiMarketRecord(): Promise<DailyAiMa
 
 export async function getDailyAiMarketAnalysis(): Promise<DailyAiMarketAnalysis> {
   const latest = await getLatestPublishedDailyAiMarketRecord();
-  return latest?.payload ?? getFallbackDailyAiMarketAnalysis();
+  const analysis = latest?.payload ?? getFallbackDailyAiMarketAnalysis();
+  return applyLiveTradeReviewSettlement(analysis);
 }
 
 export async function getTodayPublishedDailyAiMarketRecord(): Promise<DailyAiMarketRecord | null> {
