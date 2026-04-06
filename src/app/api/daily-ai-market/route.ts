@@ -3,7 +3,12 @@ import { getDailyAiMarketAnalysis, getDailyAiMarketWorkflowNote, getLatestPublis
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+function isDebugEnabled(request: Request) {
+  const { searchParams } = new URL(request.url);
+  return searchParams.get("debug") === "1";
+}
+
+export async function GET(request: Request) {
   try {
     const [item, workflow, latestRecord] = await Promise.all([
       getDailyAiMarketAnalysis(),
@@ -15,6 +20,14 @@ export async function GET() {
       item,
       workflow,
       latestRecord,
+      ...(isDebugEnabled(request)
+        ? {
+            debug: {
+              itemTradeReview: item.tradeReviewCalendar,
+              latestRecordTradeReview: latestRecord?.payload?.tradeReviewCalendar ?? null,
+            },
+          }
+        : {}),
     });
   } catch (error) {
     console.error("/api/daily-ai-market error", error);
