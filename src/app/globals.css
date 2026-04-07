@@ -579,6 +579,77 @@ html[data-theme="pixel"] .admin-tab-links {
   background: #ffffff;
 }
 
+html[data-theme="pixel"] .hero__description,
+html[data-theme="pixel"] .section__intro,
+html[data-theme="pixel"] .info-card p,
+html[data-theme="pixel"] .membership-block p,
+html[data-theme="pixel"] .course-card p,
+html[data-theme="pixel"] .ai-block p,
+html[data-theme="pixel"] .cta-block p,
+html[data-theme="pixel"] .footer p,
+html[data-theme="pixel"] .footer__meta,
+html[data-theme="pixel"] .admin-data-grid span,
+html[data-theme="pixel"] .admin-record-card__body span,
+html[data-theme="pixel"] .admin-record-card__meta span,
+html[data-theme="pixel"] .assistant-overview-list,
+html[data-theme="pixel"] .assistant-prompt-preview p,
+html[data-theme="pixel"] .quota-card span,
+html[data-theme="pixel"] .chat-bubble__role,
+html[data-theme="pixel"] .form-actions p,
+html[data-theme="pixel"] .panel__list article span,
+html[data-theme="pixel"] .membership-list__item span,
+html[data-theme="pixel"] .assistant-sidebar-flow__item p,
+html[data-theme="pixel"] .assistant-overview-metrics article span {
+  color: #2b2b31;
+}
+
+html[data-theme="pixel"] .assistant-overview-metrics article,
+html[data-theme="pixel"] .assistant-sidebar-flow__item,
+html[data-theme="pixel"] .quota-card,
+html[data-theme="pixel"] .quota-inline-card,
+html[data-theme="pixel"] .chat-bubble,
+html[data-theme="pixel"] .assistant-prompt-preview,
+html[data-theme="pixel"] .membership-list__item,
+html[data-theme="pixel"] .panel__list article,
+html[data-theme="pixel"] .admin-data-grid div,
+html[data-theme="pixel"] .admin-record-card__body > div,
+html[data-theme="pixel"] .daily-market-mini-card,
+html[data-theme="pixel"] .assistant-chat__badge,
+html[data-theme="pixel"] .tag-pill {
+  background: #ffffff;
+  border: 3px solid #151515;
+  box-shadow: inset 0 -4px 0 #e2e2dc, 3px 3px 0 rgba(21, 21, 21, 0.22);
+  border-radius: 12px;
+}
+
+html[data-theme="pixel"] .assistant-overview-metrics article strong,
+html[data-theme="pixel"] .quota-card strong,
+html[data-theme="pixel"] .quota-inline-card strong,
+html[data-theme="pixel"] .admin-data-grid strong,
+html[data-theme="pixel"] .assistant-sidebar-flow__item strong,
+html[data-theme="pixel"] .panel__list article strong,
+html[data-theme="pixel"] .membership-list__item strong {
+  color: #121212;
+}
+
+html[data-theme="pixel"] .review-badge,
+html[data-theme="pixel"] .hero__badge,
+html[data-theme="pixel"] .section__label,
+html[data-theme="pixel"] .panel__topline,
+html[data-theme="pixel"] .course-card__label,
+html[data-theme="pixel"] .ai-block__chip,
+html[data-theme="pixel"] .site-header__assistant-note {
+  border: 2px solid #151515;
+}
+
+html[data-theme="pixel"] .assistant-chat__badge,
+html[data-theme="pixel"] .tag-pill,
+html[data-theme="pixel"] .site-header__nav-item,
+html[data-theme="pixel"] .site-header__nav-item--assistant,
+html[data-theme="pixel"] .site-header__nav-item--planned {
+  padding: 8px 12px;
+}
+
 html[data-theme="pixel"] .tag-pill--active {
   box-shadow: 3px 3px 0 rgba(255, 97, 216, 0.12);
 }
