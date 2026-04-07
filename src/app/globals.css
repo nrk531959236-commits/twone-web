@@ -1124,8 +1124,24 @@ html[data-theme="pixel"] .daily-market-hero-card__summary,
 html[data-theme="pixel"] .hero-focus-panel__note,
 html[data-theme="pixel"] .trade-setup-card__note,
 html[data-theme="pixel"] .macro-events-card__note,
-html[data-theme="pixel"] .macro-event-item p {
+html[data-theme="pixel"] .macro-event-item p,
+html[data-theme="pixel"] .trade-review-page-back,
+html[data-theme="pixel"] .trade-review-page-back span,
+html[data-theme="pixel"] .trade-review-page-back strong {
   color: #2b2b31 !important;
+}
+
+html[data-theme="pixel"] .home-section-icon,
+html[data-theme="pixel"] .home-card-icon,
+html[data-theme="pixel"] .page-heading-icon,
+html[data-theme="pixel"] .section-title-icon,
+html[data-theme="pixel"] .home-inline-icon,
+html[data-theme="pixel"] .home-label-icon,
+html[data-theme="pixel"] .macro-events-card .home-section-icon,
+html[data-theme="pixel"] .trade-review-page-back .home-inline-icon,
+html[data-theme="pixel"] .trade-review-page-back svg {
+  color: #5b67c8 !important;
+  opacity: 1 !important;
 }
 
 html[data-theme="pixel"] .tag-pill--active {
