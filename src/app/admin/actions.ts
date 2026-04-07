@@ -210,14 +210,16 @@ export async function updateApprovedApplicationQuotaAction(formData: FormData) {
   const actor = access.email ?? access.user.id;
 
   if (target.mode === "membership_user") {
-    const { error } = await supabase
-      .from("memberships")
-      .update({
+    const { error } = await supabase.from("memberships").upsert(
+      {
+        user_id: target.userId,
+        status: "active",
         plan,
         assistant_monthly_quota: assistantMonthlyQuota,
         updated_at: now,
-      })
-      .eq("user_id", target.userId);
+      },
+      { onConflict: "user_id" },
+    );
 
     if (error) {
       throw error;

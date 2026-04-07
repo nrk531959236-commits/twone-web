@@ -179,7 +179,7 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
               <span>AI 月额度</span>
               <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue="2" />
             </label>
-            <button type="submit" className="button button--ghost">
+            <button type="submit" className="button button--primary admin-inline-save-button">
               保存方案 / 次数
             </button>
             <p className="admin-reject-form__hint">

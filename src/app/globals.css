@@ -3582,6 +3582,23 @@ button {
   line-height: 1.7;
 }
 
+.admin-inline-save-button {
+  background: linear-gradient(135deg, rgba(130, 103, 255, 0.95), rgba(96, 165, 250, 0.92));
+  border-color: rgba(140, 120, 255, 0.6);
+  color: #f8fbff;
+  box-shadow: 0 10px 30px rgba(96, 165, 250, 0.18);
+}
+
+.admin-inline-save-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 34px rgba(96, 165, 250, 0.24);
+}
+
+.admin-inline-save-button:active {
+  transform: translateY(0);
+}
+
 .review-badge {
   display: inline-flex;
   align-items: center;
