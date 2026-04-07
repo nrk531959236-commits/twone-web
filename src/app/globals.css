@@ -819,7 +819,6 @@ html[data-theme="pixel"] .assistant-mode-card--pro,
 html[data-theme="pixel"] .auth-login-mode-tab--active,
 html[data-theme="pixel"] .home-select-pill--active,
 html[data-theme="pixel"] .site-header__link--assistant,
-html[data-theme="pixel"] .daily-market-bias,
 html[data-theme="pixel"] .macro-event-item__status,
 html[data-theme="pixel"] .trade-plan-column__stance,
 html[data-theme="pixel"] .ai-assistant-banner {
@@ -847,6 +846,7 @@ html[data-theme="pixel"] .trade-review-month-cell--tp_hit {
 
 html[data-theme="pixel"] .home-indicator-tone--bearish,
 html[data-theme="pixel"] .home-indicator-signal--bearish,
+html[data-theme="pixel"] .daily-market-bias,
 html[data-theme="pixel"] .review-badge--rejected,
 html[data-theme="pixel"] .form-status--error,
 html[data-theme="pixel"] .trade-review-legend--sl_hit,
@@ -859,6 +859,32 @@ html[data-theme="pixel"] .trade-review-month-cell--sl_hit {
   color: #ffffff !important;
   border-color: #151515 !important;
   box-shadow: inset 0 -4px 0 #a53f55, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
+}
+
+html[data-theme="pixel"] .home-chip,
+html[data-theme="pixel"] .home-side-mini-tag,
+html[data-theme="pixel"] .home-tool-badge,
+html[data-theme="pixel"] .trade-review-month-cell__status,
+html[data-theme="pixel"] .trade-review-month-cell__direction,
+html[data-theme="pixel"] .success-step__index,
+html[data-theme="pixel"] .courses-placeholder-status,
+html[data-theme="pixel"] .assistant-mode-card__tag,
+html[data-theme="pixel"] .auth-login-mode-tab,
+html[data-theme="pixel"] .home-select-pill,
+html[data-theme="pixel"] .suggestion-chip,
+html[data-theme="pixel"] .trade-review-page-back,
+html[data-theme="pixel"] .assistant-entrance-card,
+html[data-theme="pixel"] .review-badge,
+html[data-theme="pixel"] .panel__topline,
+html[data-theme="pixel"] .section__label,
+html[data-theme="pixel"] .hero__badge,
+html[data-theme="pixel"] .course-card__label,
+html[data-theme="pixel"] .ai-block__chip,
+html[data-theme="pixel"] .site-header__assistant-note {
+  background: #ffffff !important;
+  color: #121212 !important;
+  border-color: #151515 !important;
+  box-shadow: inset 0 -3px 0 #dfdfd8, 3px 3px 0 rgba(21, 21, 21, 0.24) !important;
 }
 
 html[data-theme="pixel"] .hero__description,
