@@ -415,6 +415,21 @@ html[data-theme="pixel"] .admin-record-card__body > div {
   box-shadow: inset 0 -5px 0 #e2e2dc, 4px 4px 0 rgba(21, 21, 21, 0.26);
 }
 
+html[data-theme="pixel"] .home-daily-column-card {
+  padding: 22px 24px !important;
+  min-height: 180px;
+}
+
+html[data-theme="pixel"] .home-daily-column-card h3 {
+  font-size: 22px;
+}
+
+html[data-theme="pixel"] .home-daily-column-card p,
+html[data-theme="pixel"] .home-daily-column-card li {
+  font-size: 15px;
+  line-height: 1.75;
+}
+
 html[data-theme="pixel"] .site-header__link,
 html[data-theme="pixel"] .button,
 html[data-theme="pixel"] .tag-pill,
