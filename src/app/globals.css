@@ -868,6 +868,26 @@ html[data-theme="pixel"] .home-bias-box span {
   color: #ffffff !important;
 }
 
+html[data-theme="pixel"] .home-bias-box__head,
+html[data-theme="pixel"] .home-bias-box__head p,
+html[data-theme="pixel"] .home-bias-box__head span,
+html[data-theme="pixel"] .home-bias-box__head strong {
+  color: #ffffff !important;
+}
+
+html[data-theme="pixel"] .home-daily-main__signal-block h3,
+html[data-theme="pixel"] .home-signal-card span,
+html[data-theme="pixel"] .home-signal-card strong,
+html[data-theme="pixel"] .home-signal-card em,
+html[data-theme="pixel"] .home-signal-card p,
+html[data-theme="pixel"] .home-signal-card__topline,
+html[data-theme="pixel"] .home-side-card--indicator h3,
+html[data-theme="pixel"] .home-side-card--indicator p,
+html[data-theme="pixel"] .home-side-card--indicator span,
+html[data-theme="pixel"] .home-side-card--indicator strong {
+  color: #1b1b20 !important;
+}
+
 html[data-theme="pixel"] .home-chip--highlight-soft,
 html[data-theme="pixel"] .home-indicator-tone--neutral,
 html[data-theme="pixel"] .home-indicator-signal--neutral,
