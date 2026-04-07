@@ -594,12 +594,41 @@ html[data-theme="pixel"] .button:active {
 
 html[data-theme="pixel"] .button--secondary,
 html[data-theme="pixel"] .button--ghost {
-  background: #ffffff;
+  background: #efefea;
   border-color: #151515;
 }
 
 html[data-theme="pixel"] .button--primary {
-  background: #ffffff;
+  background: #f08a36;
+  color: #ffffff;
+  box-shadow: inset 0 -6px 0 #cf6f20, 4px 4px 0 #151515;
+}
+
+html[data-theme="pixel"] .button--secondary {
+  background: #6b78d1;
+  color: #ffffff;
+  box-shadow: inset 0 -6px 0 #4f5bb1, 4px 4px 0 #151515;
+}
+
+html[data-theme="pixel"] .button--ghost {
+  background: #f3e0a0;
+  color: #2a2110;
+  box-shadow: inset 0 -6px 0 #d1b56b, 4px 4px 0 #151515;
+}
+
+html[data-theme="pixel"] .auth-login-mode-tab,
+html[data-theme="pixel"] .home-select-pill,
+html[data-theme="pixel"] .suggestion-chip,
+html[data-theme="pixel"] .trade-review-page-back {
+  background: #efefea !important;
+  color: #1b1b20 !important;
+}
+
+html[data-theme="pixel"] .auth-login-mode-tab--active,
+html[data-theme="pixel"] .home-select-pill--active {
+  background: #f08a36 !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 -5px 0 #cf6f20, 4px 4px 0 rgba(21, 21, 21, 0.24) !important;
 }
 
 html[data-theme="pixel"] .site-header__link--assistant,
