@@ -717,6 +717,185 @@ html[data-theme="pixel"] .site-header__nav-item--planned {
   padding: 8px 12px;
 }
 
+html[data-theme="pixel"] .home-chip,
+html[data-theme="pixel"] .home-highlight-label,
+html[data-theme="pixel"] .home-side-mini-tag,
+html[data-theme="pixel"] .home-indicator-tone,
+html[data-theme="pixel"] .home-indicator-signal,
+html[data-theme="pixel"] .home-tool-badge,
+html[data-theme="pixel"] .home-trade-stance,
+html[data-theme="pixel"] .home-event-status,
+html[data-theme="pixel"] .trade-review-legend,
+html[data-theme="pixel"] .trade-review-month-cell__direction,
+html[data-theme="pixel"] .trade-review-month-cell__status,
+html[data-theme="pixel"] .success-step__index,
+html[data-theme="pixel"] .courses-placeholder-status,
+html[data-theme="pixel"] .assistant-mode-card__tag,
+html[data-theme="pixel"] .daily-market-bias,
+html[data-theme="pixel"] .macro-event-item__status,
+html[data-theme="pixel"] .trade-setup-card__chip,
+html[data-theme="pixel"] .trade-plan-column__stance,
+html[data-theme="pixel"] .home-select-pill,
+html[data-theme="pixel"] .suggestion-chip,
+html[data-theme="pixel"] .auth-login-mode-tab,
+html[data-theme="pixel"] .trade-review-page-back,
+html[data-theme="pixel"] .assistant-entrance-card,
+html[data-theme="pixel"] .home-signal-card,
+html[data-theme="pixel"] .home-indicator-stack,
+html[data-theme="pixel"] .home-analysis-highlight,
+html[data-theme="pixel"] .home-key-levels article,
+html[data-theme="pixel"] .home-daily-column-card,
+html[data-theme="pixel"] .home-pro-input,
+html[data-theme="pixel"] .home-trade-points article,
+html[data-theme="pixel"] .home-event-stats article,
+html[data-theme="pixel"] .home-trade-columns div,
+html[data-theme="pixel"] .courses-placeholder-card li,
+html[data-theme="pixel"] .auth-password-help,
+html[data-theme="pixel"] .auth-reset-help__item,
+html[data-theme="pixel"] .assistant-note-item,
+html[data-theme="pixel"] .upload-placeholder,
+html[data-theme="pixel"] .success-step,
+html[data-theme="pixel"] .trade-review-page-stats article,
+html[data-theme="pixel"] .trade-review-day__grid article,
+html[data-theme="pixel"] .trade-review-month-cell,
+html[data-theme="pixel"] .hero-keyline-card,
+html[data-theme="pixel"] .analysis-metric-card,
+html[data-theme="pixel"] .trade-plan-item,
+html[data-theme="pixel"] .macro-event-item__stats div,
+html[data-theme="pixel"] .hero-focus-point,
+html[data-theme="pixel"] .trade-plan-column,
+html[data-theme="pixel"] .daily-update-strip,
+html[data-theme="pixel"] .ai-assistant-banner,
+html[data-theme="pixel"] .daily-market-hero-card,
+html[data-theme="pixel"] .daily-market-hero-card__signal,
+html[data-theme="pixel"] .hero-focus-panel,
+html[data-theme="pixel"] .trade-setup-card,
+html[data-theme="pixel"] .macro-events-card,
+html[data-theme="pixel"] .home-bias-box,
+html[data-theme="pixel"] .home-daily-main__signal-block,
+html[data-theme="pixel"] .home-side-card,
+html[data-theme="pixel"] .home-pro-panel,
+html[data-theme="pixel"] .home-membership-card,
+html[data-theme="pixel"] .home-contact-card,
+html[data-theme="pixel"] .home-instant-tool,
+html[data-theme="pixel"] .home-trade-card,
+html[data-theme="pixel"] .home-event-card,
+html[data-theme="pixel"] .home-trade-review-trigger,
+html[data-theme="pixel"] .courses-placeholder-card,
+html[data-theme="pixel"] .auth-card,
+html[data-theme="pixel"] .assistant-input,
+html[data-theme="pixel"] .chat-thread,
+html[data-theme="pixel"] .application-form,
+html[data-theme="pixel"] .hero__panel,
+html[data-theme="pixel"] .membership-list,
+html[data-theme="pixel"] .ai-block__right,
+html[data-theme="pixel"] .cta-block,
+html[data-theme="pixel"] .daily-market-card,
+html[data-theme="pixel"] .site-header__link {
+  background: #ffffff !important;
+  color: #121212;
+  border-color: #151515 !important;
+  box-shadow: inset 0 -4px 0 #dfdfd8, 4px 4px 0 rgba(21, 21, 21, 0.28) !important;
+}
+
+html[data-theme="pixel"] .home-chip--highlight,
+html[data-theme="pixel"] .trade-setup-card__chip,
+html[data-theme="pixel"] .home-trade-stance,
+html[data-theme="pixel"] .review-badge--pending,
+html[data-theme="pixel"] .daily-update-strip,
+html[data-theme="pixel"] .button--warning {
+  background: #f0b84b !important;
+  color: #ffffff !important;
+  border-color: #151515 !important;
+  box-shadow: inset 0 -4px 0 #c18d28, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
+}
+
+html[data-theme="pixel"] .home-chip--highlight-soft,
+html[data-theme="pixel"] .home-indicator-tone--neutral,
+html[data-theme="pixel"] .home-indicator-signal--neutral,
+html[data-theme="pixel"] .trade-review-legend--watching,
+html[data-theme="pixel"] .trade-review-month-cell__status--watching,
+html[data-theme="pixel"] .assistant-mode-card--pro,
+html[data-theme="pixel"] .auth-login-mode-tab--active,
+html[data-theme="pixel"] .home-select-pill--active,
+html[data-theme="pixel"] .site-header__link--assistant,
+html[data-theme="pixel"] .daily-market-bias,
+html[data-theme="pixel"] .macro-event-item__status,
+html[data-theme="pixel"] .trade-plan-column__stance,
+html[data-theme="pixel"] .ai-assistant-banner {
+  background: #5b67c8 !important;
+  color: #ffffff !important;
+  border-color: #151515 !important;
+  box-shadow: inset 0 -4px 0 #414b9a, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
+}
+
+html[data-theme="pixel"] .home-indicator-tone--bullish,
+html[data-theme="pixel"] .home-indicator-signal--bullish,
+html[data-theme="pixel"] .review-badge--approved,
+html[data-theme="pixel"] .form-status--success,
+html[data-theme="pixel"] .trade-review-legend--tp_hit,
+html[data-theme="pixel"] .trade-review-month-cell__status--tp_hit,
+html[data-theme="pixel"] .trade-review-month-cell__direction--long,
+html[data-theme="pixel"] .assistant-mode-card--default,
+html[data-theme="pixel"] .home-side-card--indicator.home-side-card--bullish,
+html[data-theme="pixel"] .trade-review-month-cell--tp_hit {
+  background: #2fa66e !important;
+  color: #ffffff !important;
+  border-color: #151515 !important;
+  box-shadow: inset 0 -4px 0 #237651, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
+}
+
+html[data-theme="pixel"] .home-indicator-tone--bearish,
+html[data-theme="pixel"] .home-indicator-signal--bearish,
+html[data-theme="pixel"] .review-badge--rejected,
+html[data-theme="pixel"] .form-status--error,
+html[data-theme="pixel"] .trade-review-legend--sl_hit,
+html[data-theme="pixel"] .trade-review-month-cell__status--sl_hit,
+html[data-theme="pixel"] .trade-review-month-cell__direction--short,
+html[data-theme="pixel"] .button--danger,
+html[data-theme="pixel"] .home-side-card--indicator.home-side-card--bearish,
+html[data-theme="pixel"] .trade-review-month-cell--sl_hit {
+  background: #d45871 !important;
+  color: #ffffff !important;
+  border-color: #151515 !important;
+  box-shadow: inset 0 -4px 0 #a53f55, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
+}
+
+html[data-theme="pixel"] .hero__description,
+html[data-theme="pixel"] .section__intro,
+html[data-theme="pixel"] .info-card p,
+html[data-theme="pixel"] .membership-block p,
+html[data-theme="pixel"] .course-card p,
+html[data-theme="pixel"] .ai-block p,
+html[data-theme="pixel"] .cta-block p,
+html[data-theme="pixel"] .footer p,
+html[data-theme="pixel"] .footer__meta,
+html[data-theme="pixel"] .panel__list article span,
+html[data-theme="pixel"] .assistant-sidebar-flow__item p,
+html[data-theme="pixel"] .assistant-overview-metrics article span,
+html[data-theme="pixel"] .home-daily-main__summary,
+html[data-theme="pixel"] .home-side-card p,
+html[data-theme="pixel"] .home-pro-panel p,
+html[data-theme="pixel"] .home-membership-card p,
+html[data-theme="pixel"] .home-contact-card p,
+html[data-theme="pixel"] .home-diff-list li,
+html[data-theme="pixel"] .home-tool-actions span,
+html[data-theme="pixel"] .home-trade-rationale,
+html[data-theme="pixel"] .home-trade-columns li,
+html[data-theme="pixel"] .home-trade-columns p,
+html[data-theme="pixel"] .home-event-note,
+html[data-theme="pixel"] .daily-market-card__summary,
+html[data-theme="pixel"] .daily-market-card__footnote,
+html[data-theme="pixel"] .daily-market-columns li,
+html[data-theme="pixel"] .daily-market-card__time,
+html[data-theme="pixel"] .daily-market-hero-card__summary,
+html[data-theme="pixel"] .hero-focus-panel__note,
+html[data-theme="pixel"] .trade-setup-card__note,
+html[data-theme="pixel"] .macro-events-card__note,
+html[data-theme="pixel"] .macro-event-item p {
+  color: #2b2b31 !important;
+}
+
 html[data-theme="pixel"] .tag-pill--active {
   box-shadow: 3px 3px 0 rgba(255, 97, 216, 0.12);
 }
