@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AccessEntryLink } from "@/components/access-entry-link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type SiteHeaderProps = {
   current?: "home" | "apply" | "assistant" | "courses" | "admin";
@@ -80,6 +81,7 @@ export function SiteHeader({ current }: SiteHeaderProps) {
       </nav>
 
       <div className="site-header__actions">
+        <ThemeToggle />
         <AccessEntryLink href="/assistant" mode="login" className="button button--secondary">
           会员登录
         </AccessEntryLink>
