@@ -1146,6 +1146,20 @@ html[data-theme="pixel"] .trade-review-page-back strong {
   color: #d45871 !important;
 }
 
+html[data-theme="pixel"] .home-trade-review-trigger,
+html[data-theme="pixel"] .home-trade-review-trigger strong,
+html[data-theme="pixel"] .home-trade-review-trigger p,
+html[data-theme="pixel"] .home-trade-review-trigger__meta,
+html[data-theme="pixel"] .home-trade-review-trigger span {
+  color: #d45871 !important;
+}
+
+html[data-theme="pixel"] .home-trade-review-trigger .home-inline-icon,
+html[data-theme="pixel"] .home-trade-review-trigger svg {
+  color: #5b67c8 !important;
+  opacity: 1 !important;
+}
+
 html[data-theme="pixel"] .home-section-icon,
 html[data-theme="pixel"] .home-card-icon,
 html[data-theme="pixel"] .page-heading-icon,
