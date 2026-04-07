@@ -177,6 +177,83 @@ export async function updateMembershipAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function updateApprovedApplicationQuotaAction(formData: FormData) {
+  const access = await getAdminAccess();
+
+  if (!access.user || !access.isAdmin) {
+    throw new Error("无权限执行后台操作。");
+  }
+
+  const applicationId = toText(formData.get("applicationId"));
+  const contact = toText(formData.get("applicationContact"));
+  const manualUserId = toText(formData.get("targetUserId"));
+  const plan = toNullableText(formData.get("plan")) ?? "free";
+  const assistantMonthlyQuota = toNullableQuota(formData.get("assistantMonthlyQuota"));
+
+  if (!applicationId) {
+    throw new Error("缺少 applicationId。");
+  }
+
+  if (assistantMonthlyQuota === null) {
+    throw new Error("缺少 assistant_monthly_quota。");
+  }
+
+  const snapshot = await getApplicationReviewSnapshot(applicationId);
+
+  if (snapshot.review_status !== "approved") {
+    redirect(`/admin?type=error&message=${encodeURIComponent("只有已通过并开通的申请，才能单独保存 AI 月额度。")}`);
+  }
+
+  const target = await resolveApprovalTarget({ manualUserId, contact });
+  const supabase = createSupabaseAdminClient();
+  const now = new Date().toISOString();
+  const actor = access.email ?? access.user.id;
+
+  if (target.mode === "membership_user") {
+    const { error } = await supabase
+      .from("memberships")
+      .update({
+        plan,
+        assistant_monthly_quota: assistantMonthlyQuota,
+        updated_at: now,
+      })
+      .eq("user_id", target.userId);
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  const approvalEmail = target.mode === "email_approval" ? target.approvalEmail : target.approvalEmail;
+
+  if (approvalEmail) {
+    const { error: approvalError } = await supabase
+      .from("membership_email_approvals")
+      .update({
+        plan,
+        assistant_monthly_quota: assistantMonthlyQuota,
+        updated_at: now,
+      })
+      .eq("email", approvalEmail);
+
+    if (approvalError) {
+      throw approvalError;
+    }
+  }
+
+  await appendApplicationReviewNote({
+    applicationId,
+    reviewStatus: "approved",
+    actor,
+    reviewedAt: now,
+    existingNotes: snapshot.notes,
+    extraNotes: [`quota_saved_after_approval=${assistantMonthlyQuota}`, `plan_saved_after_approval=${plan}`],
+  });
+
+  revalidatePath("/admin");
+  redirect(`/admin?type=success&message=${encodeURIComponent("已保存该申请的方案和 AI 月额度。")}`);
+}
+
 async function getApplicationReviewSnapshot(applicationId: string) {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase

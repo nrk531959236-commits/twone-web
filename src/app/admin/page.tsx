@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { getAdminAccess, createSupabaseAdminClient } from "@/lib/admin";
-import { approveApplicationAction, createPasswordSetupLinkAction, rejectApplicationAction, updateMembershipAction } from "./actions";
+import { approveApplicationAction, createPasswordSetupLinkAction, rejectApplicationAction, updateApprovedApplicationQuotaAction, updateMembershipAction } from "./actions";
 
 export const metadata: Metadata = {
   title: "管理后台 | Twone Web3.0 Community",
@@ -158,6 +158,35 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
             </button>
           </div>
         </form>
+
+        {normalizedStatus === "approved" ? (
+          <form action={updateApprovedApplicationQuotaAction} className="admin-reject-form">
+            <input type="hidden" name="applicationId" value={application.id} />
+            <input type="hidden" name="applicationContact" value={application.contact ?? ""} />
+            <label className="form-field admin-inline-field">
+              <span>已通过后单独保存 target user_id（可留空）</span>
+              <input
+                name="targetUserId"
+                type="text"
+                placeholder="优先按邮箱找现有 auth user；找不到时可手填 user_id"
+              />
+            </label>
+            <label className="form-field admin-inline-field">
+              <span>方案</span>
+              <input name="plan" type="text" defaultValue="free" placeholder="例如：free / pro / core / vip" />
+            </label>
+            <label className="form-field admin-inline-field">
+              <span>AI 月额度</span>
+              <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue="2" />
+            </label>
+            <button type="submit" className="button button--ghost">
+              保存方案 / 次数
+            </button>
+            <p className="admin-reject-form__hint">
+              这条申请已经通过后，审批按钮不会再提交；如果你只是想补改方案或 AI 月额度，直接用这里保存，不需要去下面会员管理区找。
+            </p>
+          </form>
+        ) : null}
 
         <form action={createPasswordSetupLinkAction} className="admin-reject-form">
           <input type="hidden" name="applicationId" value={application.id} />
