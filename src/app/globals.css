@@ -3498,9 +3498,49 @@ button {
   margin-top: 20px;
 }
 
+.admin-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.6fr) repeat(2, minmax(160px, 1fr)) auto auto;
+  gap: 14px;
+  align-items: end;
+  margin-top: 20px;
+}
+
+.admin-filter-field {
+  min-width: 0;
+}
+
+.admin-filter-field--search {
+  grid-column: span 1;
+}
+
+.admin-filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-pending-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: var(--muted);
+}
+
 .admin-card-list {
   display: grid;
   gap: 18px;
+}
+
+@media (max-width: 980px) {
+  .admin-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-filter-actions {
+    width: 100%;
+  }
 }
 
 .admin-record-card {

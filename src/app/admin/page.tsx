@@ -390,7 +390,15 @@ function getFlashTypeClassName(type: string | undefined) {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ type?: string; message?: string }>;
+  searchParams?: Promise<{
+    type?: string;
+    message?: string;
+    tab?: string;
+    q?: string;
+    applicationStatus?: string;
+    membershipStatus?: string;
+    pendingOnly?: string;
+  }>;
 }) {
   const access = await getAdminAccess();
 
@@ -407,9 +415,59 @@ export default async function AdminPage({
   const flashMessage = resolvedSearchParams?.message?.trim() || null;
   const flashType = resolvedSearchParams?.type?.trim();
   const { applications, memberships, emailApprovals } = await getAdminDashboardData();
+  const activeTab = resolvedSearchParams?.tab === "memberships" ? "memberships" : "applications";
+  const query = resolvedSearchParams?.q?.trim().toLowerCase() ?? "";
+  const applicationStatusFilter = resolvedSearchParams?.applicationStatus?.trim().toLowerCase() ?? "all";
+  const membershipStatusFilter = resolvedSearchParams?.membershipStatus?.trim().toLowerCase() ?? "all";
+  const pendingOnly = resolvedSearchParams?.pendingOnly === "1";
   const pendingCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "pending").length;
   const approvedCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "approved").length;
   const rejectedCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "rejected").length;
+  const filteredApplications = applications.filter((application) => {
+    const normalizedStatus = normalizeReviewStatus(application.review_status);
+    if (pendingOnly && normalizedStatus !== "pending") {
+      return false;
+    }
+
+    if (applicationStatusFilter !== "all" && normalizedStatus !== applicationStatusFilter) {
+      return false;
+    }
+
+    if (!query) {
+      return true;
+    }
+
+    const haystack = [
+      application.nickname,
+      application.contact,
+      application.identity,
+      application.region,
+      application.reason,
+      application.id,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(query);
+  });
+  const filteredMemberships = memberships.filter((membership) => {
+    const normalizedStatus = (membership.status ?? "").trim().toLowerCase();
+    if (membershipStatusFilter !== "all" && normalizedStatus !== membershipStatusFilter) {
+      return false;
+    }
+
+    if (!query) {
+      return true;
+    }
+
+    const haystack = [membership.user_id, membership.status, membership.plan]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(query);
+  });
 
   return (
     <main className="page-shell">
@@ -478,14 +536,52 @@ export default async function AdminPage({
             <p className="section__label">后台导航</p>
             <h2>后台区块</h2>
           </div>
-          <p className="section__intro">先做两个核心块：申请管理 + 会员管理，足够替掉大部分手工查表和更新 SQL。</p>
+          <p className="section__intro">先做两个核心块：申请管理 + 会员管理。现在加上搜索、筛选和只看待审核，先把找人和审核效率提上来。</p>
         </div>
 
+        <form method="get" className="admin-filter-bar">
+          <input type="hidden" name="tab" value={activeTab} />
+          <label className="form-field admin-filter-field admin-filter-field--search">
+            <span>搜索</span>
+            <input name="q" type="text" defaultValue={resolvedSearchParams?.q ?? ""} placeholder="搜邮箱、昵称、user_id、申请理由" />
+          </label>
+
+          <label className="form-field admin-filter-field">
+            <span>申请状态</span>
+            <select name="applicationStatus" defaultValue={applicationStatusFilter}>
+              <option value="all">全部</option>
+              <option value="pending">待处理</option>
+              <option value="approved">已通过</option>
+              <option value="rejected">已拒绝</option>
+            </select>
+          </label>
+
+          <label className="form-field admin-filter-field">
+            <span>会员状态</span>
+            <select name="membershipStatus" defaultValue={membershipStatusFilter}>
+              <option value="all">全部</option>
+              <option value="active">已启用</option>
+              <option value="inactive">未启用</option>
+              <option value="guest">访客</option>
+            </select>
+          </label>
+
+          <label className="admin-pending-toggle">
+            <input type="checkbox" name="pendingOnly" value="1" defaultChecked={pendingOnly} />
+            <span>只看待审核</span>
+          </label>
+
+          <div className="admin-filter-actions">
+            <button type="submit" className="button button--primary">应用筛选</button>
+            <a href={`/admin?tab=${activeTab}`} className="button button--ghost">清空</a>
+          </div>
+        </form>
+
         <div className="admin-tab-links">
-          <a href="#applications" className="site-header__link site-header__link--active">
+          <a href="/admin?tab=applications" className={`site-header__link ${activeTab === "applications" ? "site-header__link--active" : ""}`}>
             申请管理
           </a>
-          <a href="#memberships" className="site-header__link site-header__link--active">
+          <a href="/admin?tab=memberships" className={`site-header__link ${activeTab === "memberships" ? "site-header__link--active" : ""}`}>
             会员管理
           </a>
           <a href="/admin/daily-ai-market" className="site-header__link site-header__link--active">
@@ -494,7 +590,7 @@ export default async function AdminPage({
         </div>
       </section>
 
-      <section className="section admin-section" id="applications">
+      <section className="section admin-section" id="applications" hidden={activeTab !== "applications"}>
         <div className="section-heading admin-section__heading">
           <div>
             <p className="section__label">申请管理</p>
@@ -508,8 +604,8 @@ export default async function AdminPage({
         </div>
 
         <div className="admin-card-list">
-          {applications.length ? (
-            applications.map((application) => (
+          {filteredApplications.length ? (
+            filteredApplications.map((application) => (
               <article key={application.id} className="admin-record-card">
                 <div className="admin-record-card__top">
                   <div>
@@ -585,12 +681,12 @@ export default async function AdminPage({
               </article>
             ))
           ) : (
-            <div className="admin-empty-state">暂无申请数据。</div>
+            <div className="admin-empty-state">当前筛选条件下暂无申请数据。</div>
           )}
         </div>
       </section>
 
-      <section className="section admin-section" id="memberships">
+      <section className="section admin-section" id="memberships" hidden={activeTab !== "memberships"}>
         <div className="section-heading admin-section__heading">
           <div>
             <p className="section__label">会员管理</p>
@@ -602,8 +698,8 @@ export default async function AdminPage({
         </div>
 
         <div className="admin-card-list">
-          {memberships.length ? (
-            memberships.map((membership) => (
+          {filteredMemberships.length ? (
+            filteredMemberships.map((membership) => (
               <article key={membership.user_id} className="admin-record-card admin-record-card--membership">
                 <div className="admin-record-card__top">
                   <div>
@@ -675,7 +771,7 @@ export default async function AdminPage({
               </article>
             ))
           ) : (
-            <div className="admin-empty-state">暂无会员数据。</div>
+            <div className="admin-empty-state">当前筛选条件下暂无会员数据。</div>
           )}
         </div>
       </section>
