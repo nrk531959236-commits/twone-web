@@ -352,6 +352,27 @@ html[data-theme="pixel"] .hero__badge {
   box-shadow: 4px 4px 0 rgba(125, 255, 139, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
+html[data-theme="pixel"] .section,
+html[data-theme="pixel"] .application-form,
+html[data-theme="pixel"] .sidebar-card,
+html[data-theme="pixel"] .assistant-chat,
+html[data-theme="pixel"] .success-layout__main,
+html[data-theme="pixel"] .success-sidebar,
+html[data-theme="pixel"] .admin-record-card,
+html[data-theme="pixel"] .daily-market-mini-card,
+html[data-theme="pixel"] .hero__panel,
+html[data-theme="pixel"] .card-glow,
+html[data-theme="pixel"] .assistant-overview-card,
+html[data-theme="pixel"] .assistant-overview-metrics article,
+html[data-theme="pixel"] .assistant-sidebar-flow__item,
+html[data-theme="pixel"] .quota-card,
+html[data-theme="pixel"] .quota-inline-card,
+html[data-theme="pixel"] .chat-thread,
+html[data-theme="pixel"] .chat-bubble,
+html[data-theme="pixel"] .assistant-prompt-preview {
+  clip-path: polygon(0 8px, 8px 8px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px));
+}
+
 html[data-theme="pixel"] .site-header__link,
 html[data-theme="pixel"] .section,
 html[data-theme="pixel"] .application-form,
@@ -377,6 +398,87 @@ html[data-theme="pixel"] .site-header__link:hover,
 html[data-theme="pixel"] .site-header__link--active {
   background: rgba(83, 215, 255, 0.12);
   border-color: rgba(83, 215, 255, 0.44);
+}
+
+html[data-theme="pixel"] .button {
+  border-radius: 0;
+  border-width: 2px;
+  padding: 12px 18px;
+  box-shadow: 3px 3px 0 rgba(83, 215, 255, 0.12);
+}
+
+html[data-theme="pixel"] .button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 rgba(255, 97, 216, 0.12);
+}
+
+html[data-theme="pixel"] .button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 rgba(125, 255, 139, 0.14);
+}
+
+html[data-theme="pixel"] .button--secondary,
+html[data-theme="pixel"] .button--ghost {
+  background: rgba(16, 12, 30, 0.92);
+  border-color: rgba(83, 215, 255, 0.34);
+}
+
+html[data-theme="pixel"] .hero__badge,
+html[data-theme="pixel"] .section__label,
+html[data-theme="pixel"] .ai-block__chip,
+html[data-theme="pixel"] .course-card__label,
+html[data-theme="pixel"] .panel__topline,
+html[data-theme="pixel"] .review-badge,
+html[data-theme="pixel"] .site-header__assistant-note {
+  border-radius: 0;
+  border-width: 1px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 2px 2px 0 rgba(83, 215, 255, 0.08);
+}
+
+html[data-theme="pixel"] .form-field input,
+html[data-theme="pixel"] .form-field textarea,
+html[data-theme="pixel"] .form-field select,
+html[data-theme="pixel"] .input-bar input,
+html[data-theme="pixel"] .assistant-form textarea,
+html[data-theme="pixel"] .theme-select select {
+  border-width: 2px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+html[data-theme="pixel"] .form-field input:focus,
+html[data-theme="pixel"] .form-field textarea:focus,
+html[data-theme="pixel"] .form-field select:focus,
+html[data-theme="pixel"] .input-bar input:focus,
+html[data-theme="pixel"] .assistant-form textarea:focus,
+html[data-theme="pixel"] .theme-select select:focus {
+  border-color: rgba(125, 255, 139, 0.72);
+  box-shadow: 0 0 0 2px rgba(125, 255, 139, 0.14), 4px 4px 0 rgba(255, 97, 216, 0.08);
+}
+
+html[data-theme="pixel"] .tag-pill,
+html[data-theme="pixel"] .site-header__nav-item,
+html[data-theme="pixel"] .site-header__nav-item--assistant,
+html[data-theme="pixel"] .site-header__nav-item--planned,
+html[data-theme="pixel"] .admin-review-actions,
+html[data-theme="pixel"] .admin-filter-bar,
+html[data-theme="pixel"] .admin-tab-links,
+html[data-theme="pixel"] .assistant-chat__badge {
+  border-radius: 0;
+}
+
+html[data-theme="pixel"] .tag-pill--active {
+  box-shadow: 3px 3px 0 rgba(255, 97, 216, 0.12);
+}
+
+html[data-theme="pixel"] .site-header__logo,
+html[data-theme="pixel"] .hero__badge,
+html[data-theme="pixel"] .section__label,
+html[data-theme="pixel"] .button,
+html[data-theme="pixel"] .review-badge,
+html[data-theme="pixel"] .site-header__link,
+html[data-theme="pixel"] .tag-pill {
+  text-transform: uppercase;
 }
 
 html[data-theme="pixel"] .page-shell::before {
