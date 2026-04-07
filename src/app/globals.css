@@ -810,6 +810,33 @@ html[data-theme="pixel"] .button--warning {
   box-shadow: inset 0 -4px 0 #c18d28, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
 }
 
+html[data-theme="pixel"] .home-bias-box--bearish-soft,
+html[data-theme="pixel"] .home-bias-box--bearish-strong {
+  background: #d45871 !important;
+  border: 4px solid #151515 !important;
+  box-shadow: inset 0 -6px 0 #a53f55, 4px 4px 0 rgba(21, 21, 21, 0.34) !important;
+}
+
+html[data-theme="pixel"] .home-bias-box--bullish-soft,
+html[data-theme="pixel"] .home-bias-box--bullish-strong {
+  background: #2fa66e !important;
+  border: 4px solid #151515 !important;
+  box-shadow: inset 0 -6px 0 #237651, 4px 4px 0 rgba(21, 21, 21, 0.34) !important;
+}
+
+html[data-theme="pixel"] .home-bias-box--neutral {
+  background: #5b67c8 !important;
+  border: 4px solid #151515 !important;
+  box-shadow: inset 0 -6px 0 #414b9a, 4px 4px 0 rgba(21, 21, 21, 0.34) !important;
+}
+
+html[data-theme="pixel"] .home-bias-box strong,
+html[data-theme="pixel"] .home-bias-box em,
+html[data-theme="pixel"] .home-bias-box p,
+html[data-theme="pixel"] .home-bias-box span {
+  color: #ffffff !important;
+}
+
 html[data-theme="pixel"] .home-chip--highlight-soft,
 html[data-theme="pixel"] .home-indicator-tone--neutral,
 html[data-theme="pixel"] .home-indicator-signal--neutral,
