@@ -25,7 +25,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const savedTheme = cookieStore.get("twone-theme")?.value === "cyber" ? "cyber" : "default";
+  const rawTheme = cookieStore.get("twone-theme")?.value;
+  const savedTheme = rawTheme === "cyber" || rawTheme === "pixel" ? rawTheme : "default";
 
   return (
     <html lang="zh-CN" data-theme={savedTheme} className={`${geistSans.variable} ${geistMono.variable}`}>
