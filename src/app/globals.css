@@ -369,6 +369,64 @@ html[data-theme="pixel"] .quota-card,
 html[data-theme="pixel"] .quota-inline-card,
 html[data-theme="pixel"] .chat-thread,
 html[data-theme="pixel"] .chat-bubble,
+html[data-theme="pixel"] .assistant-prompt-preview,
+html[data-theme="pixel"] .hero__stats div,
+html[data-theme="pixel"] .info-card,
+html[data-theme="pixel"] .course-card,
+html[data-theme="pixel"] .membership-list__item,
+html[data-theme="pixel"] .panel__list article {
+  position: relative;
+  background: linear-gradient(180deg, rgba(22, 29, 48, 0.98) 0%, rgba(12, 17, 30, 0.98) 100%);
+}
+
+html[data-theme="pixel"] .section::before,
+html[data-theme="pixel"] .application-form::before,
+html[data-theme="pixel"] .sidebar-card::before,
+html[data-theme="pixel"] .assistant-chat::before,
+html[data-theme="pixel"] .success-layout__main::before,
+html[data-theme="pixel"] .success-sidebar::before,
+html[data-theme="pixel"] .admin-record-card::before,
+html[data-theme="pixel"] .daily-market-mini-card::before,
+html[data-theme="pixel"] .hero__panel::before,
+html[data-theme="pixel"] .card-glow::before,
+html[data-theme="pixel"] .assistant-overview-card::before,
+html[data-theme="pixel"] .assistant-overview-metrics article::before,
+html[data-theme="pixel"] .assistant-sidebar-flow__item::before,
+html[data-theme="pixel"] .quota-card::before,
+html[data-theme="pixel"] .quota-inline-card::before,
+html[data-theme="pixel"] .chat-thread::before,
+html[data-theme="pixel"] .chat-bubble::before,
+html[data-theme="pixel"] .assistant-prompt-preview::before,
+html[data-theme="pixel"] .hero__stats div::before,
+html[data-theme="pixel"] .info-card::before,
+html[data-theme="pixel"] .course-card::before,
+html[data-theme="pixel"] .membership-list__item::before,
+html[data-theme="pixel"] .panel__list article::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+html[data-theme="pixel"] .section,
+html[data-theme="pixel"] .application-form,
+html[data-theme="pixel"] .sidebar-card,
+html[data-theme="pixel"] .assistant-chat,
+html[data-theme="pixel"] .success-layout__main,
+html[data-theme="pixel"] .success-sidebar,
+html[data-theme="pixel"] .admin-record-card,
+html[data-theme="pixel"] .daily-market-mini-card,
+html[data-theme="pixel"] .hero__panel,
+html[data-theme="pixel"] .card-glow,
+html[data-theme="pixel"] .assistant-overview-card,
+html[data-theme="pixel"] .assistant-overview-metrics article,
+html[data-theme="pixel"] .assistant-sidebar-flow__item,
+html[data-theme="pixel"] .quota-card,
+html[data-theme="pixel"] .quota-inline-card,
+html[data-theme="pixel"] .chat-thread,
+html[data-theme="pixel"] .chat-bubble,
 html[data-theme="pixel"] .assistant-prompt-preview {
   clip-path: polygon(0 12px, 4px 12px, 4px 8px, 8px 8px, 8px 4px, 12px 4px, 12px 0, calc(100% - 12px) 0, calc(100% - 12px) 4px, calc(100% - 8px) 4px, calc(100% - 8px) 8px, calc(100% - 4px) 8px, calc(100% - 4px) 12px, 100% 12px, 100% calc(100% - 12px), calc(100% - 4px) calc(100% - 12px), calc(100% - 4px) calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) calc(100% - 4px), calc(100% - 12px) calc(100% - 4px), calc(100% - 12px) 100%, 12px 100%, 12px calc(100% - 4px), 8px calc(100% - 4px), 8px calc(100% - 8px), 4px calc(100% - 8px), 4px calc(100% - 12px), 0 calc(100% - 12px));
 }
@@ -407,6 +465,15 @@ html[data-theme="pixel"] .button {
   background: linear-gradient(180deg, #18223f 0%, #0f1831 100%);
   color: #f8fafc;
   box-shadow: inset 0 -6px 0 #223867, 4px 4px 0 #0a0d19, 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+html[data-theme="pixel"] .button::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  pointer-events: none;
 }
 
 html[data-theme="pixel"] .button:hover {
@@ -460,8 +527,8 @@ html[data-theme="pixel"] .panel__topline,
 html[data-theme="pixel"] .review-badge,
 html[data-theme="pixel"] .site-header__assistant-note {
   border-radius: 12px;
-  border-width: 1px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 2px 2px 0 rgba(83, 215, 255, 0.08);
+  border-width: 2px;
+  box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.08), 2px 2px 0 rgba(10, 13, 25, 0.4);
 }
 
 html[data-theme="pixel"] .form-field input,
@@ -470,9 +537,10 @@ html[data-theme="pixel"] .form-field select,
 html[data-theme="pixel"] .input-bar input,
 html[data-theme="pixel"] .assistant-form textarea,
 html[data-theme="pixel"] .theme-select select {
-  border-width: 2px;
+  border-width: 4px;
   padding-top: 12px;
   padding-bottom: 12px;
+  background: linear-gradient(180deg, #11182c 0%, #0b1120 100%);
 }
 
 html[data-theme="pixel"] .form-field input:focus,
@@ -494,6 +562,16 @@ html[data-theme="pixel"] .admin-filter-bar,
 html[data-theme="pixel"] .admin-tab-links,
 html[data-theme="pixel"] .assistant-chat__badge {
   border-radius: 12px;
+}
+
+html[data-theme="pixel"] .site-header__link,
+html[data-theme="pixel"] .tag-pill,
+html[data-theme="pixel"] .theme-select,
+html[data-theme="pixel"] .theme-select select,
+html[data-theme="pixel"] .admin-filter-bar,
+html[data-theme="pixel"] .admin-review-actions,
+html[data-theme="pixel"] .admin-tab-links {
+  background: linear-gradient(180deg, #151c35 0%, #0d1428 100%);
 }
 
 html[data-theme="pixel"] .tag-pill--active {
