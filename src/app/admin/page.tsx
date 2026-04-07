@@ -46,6 +46,20 @@ type MembershipRow = {
   updated_at?: string | null;
 };
 
+type EmailApprovalRow = {
+  email: string;
+  status: string | null;
+  plan: string | null;
+  assistant_monthly_quota: number | null;
+  approved_application_id: string | null;
+  updated_at?: string | null;
+};
+
+type ApplicationResolvedValues = {
+  plan: string;
+  assistantMonthlyQuota: number;
+};
+
 const STATUS_LABELS: Record<string, string> = {
   guest: "访客",
   inactive: "未启用",
@@ -96,7 +110,13 @@ function formatStatusWithValue(status: string | null | undefined) {
   return label === status ? status : `${label}（${status}）`;
 }
 
-function ApplicationReviewFooter({ application }: { application: ApplicationRow }) {
+function ApplicationReviewFooter({
+  application,
+  resolvedValues,
+}: {
+  application: ApplicationRow;
+  resolvedValues: ApplicationResolvedValues;
+}) {
   const normalizedStatus = normalizeReviewStatus(application.review_status);
   const approveDisabled = normalizedStatus !== "pending";
   const rejectDisabled = normalizedStatus !== "pending";
@@ -138,12 +158,12 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
 
           <label className="form-field">
             <span>方案</span>
-            <input name="plan" type="text" defaultValue="free" placeholder="例如：free / pro / core / vip" />
+            <input name="plan" type="text" defaultValue={resolvedValues.plan} placeholder="例如：free / pro / core / vip" />
           </label>
 
           <label className="form-field">
             <span>AI 月额度（assistant_monthly_quota）</span>
-            <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue="2" />
+            <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue={resolvedValues.assistantMonthlyQuota} />
           </label>
 
           <div className="admin-approve-form__hint">
@@ -173,11 +193,11 @@ function ApplicationReviewFooter({ application }: { application: ApplicationRow 
             </label>
             <label className="form-field admin-inline-field">
               <span>方案</span>
-              <input name="plan" type="text" defaultValue="free" placeholder="例如：free / pro / core / vip" />
+              <input name="plan" type="text" defaultValue={resolvedValues.plan} placeholder="例如：free / pro / core / vip" />
             </label>
             <label className="form-field admin-inline-field">
               <span>AI 月额度</span>
-              <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue="2" />
+              <input name="assistantMonthlyQuota" type="number" min="0" step="1" defaultValue={resolvedValues.assistantMonthlyQuota} />
             </label>
             <button type="submit" className="button button--primary admin-inline-save-button">
               保存方案 / 次数
@@ -275,7 +295,7 @@ function getReviewStatusClassName(status: ReviewStatus | null) {
 async function getAdminDashboardData() {
   const supabase = createSupabaseAdminClient();
 
-  const [{ data: applications, error: applicationsError }, { data: memberships, error: membershipsError }] =
+  const [{ data: applications, error: applicationsError }, { data: memberships, error: membershipsError }, { data: emailApprovals, error: emailApprovalsError }] =
     await Promise.all([
       supabase
         .from("member_applications")
@@ -289,6 +309,11 @@ async function getAdminDashboardData() {
         .select("user_id, status, plan, assistant_monthly_quota, started_at, expires_at, updated_at")
         .order("updated_at", { ascending: false, nullsFirst: false })
         .limit(100),
+      supabase
+        .from("membership_email_approvals")
+        .select("email, status, plan, assistant_monthly_quota, approved_application_id, updated_at")
+        .order("updated_at", { ascending: false, nullsFirst: false })
+        .limit(100),
     ]);
 
   if (applicationsError) {
@@ -299,9 +324,14 @@ async function getAdminDashboardData() {
     throw membershipsError;
   }
 
+  if (emailApprovalsError) {
+    throw emailApprovalsError;
+  }
+
   return {
     applications: (applications ?? []) as ApplicationRow[],
     memberships: (memberships ?? []) as MembershipRow[],
+    emailApprovals: (emailApprovals ?? []) as EmailApprovalRow[],
   };
 }
 
@@ -376,7 +406,7 @@ export default async function AdminPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const flashMessage = resolvedSearchParams?.message?.trim() || null;
   const flashType = resolvedSearchParams?.type?.trim();
-  const { applications, memberships } = await getAdminDashboardData();
+  const { applications, memberships, emailApprovals } = await getAdminDashboardData();
   const pendingCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "pending").length;
   const approvedCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "approved").length;
   const rejectedCount = applications.filter((application) => normalizeReviewStatus(application.review_status) === "rejected").length;
@@ -539,7 +569,19 @@ export default async function AdminPage({
                   </div>
                 </div>
 
-                <ApplicationReviewFooter application={application} />
+                <ApplicationReviewFooter
+                  application={application}
+                  resolvedValues={(() => {
+                    const normalizedContact = (application.contact ?? "").trim().toLowerCase();
+                    const matchedApproval = emailApprovals.find((item) => item.approved_application_id === application.id)
+                      ?? emailApprovals.find((item) => item.email === normalizedContact);
+
+                    return {
+                      plan: matchedApproval?.plan ?? "free",
+                      assistantMonthlyQuota: matchedApproval?.assistant_monthly_quota ?? 2,
+                    };
+                  })()}
+                />
               </article>
             ))
           ) : (
