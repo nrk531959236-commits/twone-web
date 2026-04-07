@@ -393,8 +393,8 @@ html[data-theme="pixel"] .hero__panel,
 html[data-theme="pixel"] .card-glow,
 html[data-theme="pixel"] .info-card,
 html[data-theme="pixel"] .course-card {
-  border: 10px solid #151515;
-  box-shadow: inset 0 -12px 0 #dfdfd8, 14px 14px 0 rgba(21, 21, 21, 0.82);
+  border: 16px solid #151515;
+  box-shadow: inset 0 -14px 0 #dfdfd8, 18px 18px 0 rgba(21, 21, 21, 0.9);
 }
 
 html[data-theme="pixel"] .daily-market-mini-card,
