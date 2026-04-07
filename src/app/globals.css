@@ -378,6 +378,8 @@ html[data-theme="pixel"] .membership-list__item,
 html[data-theme="pixel"] .panel__list article {
   position: relative;
   background: #ffffff;
+  border: 4px solid #151515 !important;
+  box-shadow: inset 0 -6px 0 #d9d9d2, 4px 4px 0 rgba(21, 21, 21, 0.34) !important;
 }
 
 html[data-theme="pixel"] .section,
@@ -411,6 +413,74 @@ html[data-theme="pixel"] .admin-data-grid div,
 html[data-theme="pixel"] .admin-record-card__body > div {
   border: 4px solid #151515;
   box-shadow: inset 0 -5px 0 #e2e2dc, 4px 4px 0 rgba(21, 21, 21, 0.26);
+}
+
+html[data-theme="pixel"] .site-header__link,
+html[data-theme="pixel"] .button,
+html[data-theme="pixel"] .tag-pill,
+html[data-theme="pixel"] .theme-select,
+html[data-theme="pixel"] .theme-select select,
+html[data-theme="pixel"] .admin-filter-bar,
+html[data-theme="pixel"] .admin-review-actions,
+html[data-theme="pixel"] .admin-tab-links,
+html[data-theme="pixel"] .assistant-chat__badge,
+html[data-theme="pixel"] .home-chip,
+html[data-theme="pixel"] .home-select-pill,
+html[data-theme="pixel"] .review-badge,
+html[data-theme="pixel"] .hero__badge,
+html[data-theme="pixel"] .section__label,
+html[data-theme="pixel"] .panel__topline,
+html[data-theme="pixel"] .course-card__label,
+html[data-theme="pixel"] .ai-block__chip,
+html[data-theme="pixel"] .site-header__assistant-note,
+html[data-theme="pixel"] .assistant-mode-card__tag,
+html[data-theme="pixel"] .trade-review-page-back,
+html[data-theme="pixel"] .suggestion-chip,
+html[data-theme="pixel"] .auth-login-mode-tab,
+html[data-theme="pixel"] .success-step__index,
+html[data-theme="pixel"] .courses-placeholder-status,
+html[data-theme="pixel"] .home-tool-badge,
+html[data-theme="pixel"] .home-side-mini-tag,
+html[data-theme="pixel"] .trade-review-month-cell__status,
+html[data-theme="pixel"] .trade-review-month-cell__direction,
+html[data-theme="pixel"] .home-daily-main__signal-block,
+html[data-theme="pixel"] .home-signal-card,
+html[data-theme="pixel"] .home-key-levels article,
+html[data-theme="pixel"] .home-trade-points article,
+html[data-theme="pixel"] .home-event-stats article,
+html[data-theme="pixel"] .home-trade-columns div,
+html[data-theme="pixel"] .assistant-note-item,
+html[data-theme="pixel"] .upload-placeholder,
+html[data-theme="pixel"] .success-step,
+html[data-theme="pixel"] .trade-review-page-stats article,
+html[data-theme="pixel"] .trade-review-day__grid article,
+html[data-theme="pixel"] .trade-review-month-cell,
+html[data-theme="pixel"] .hero-focus-point,
+html[data-theme="pixel"] .trade-plan-column,
+html[data-theme="pixel"] .daily-market-card,
+html[data-theme="pixel"] .daily-market-hero-card,
+html[data-theme="pixel"] .hero-focus-panel,
+html[data-theme="pixel"] .trade-setup-card,
+html[data-theme="pixel"] .macro-events-card,
+html[data-theme="pixel"] .home-bias-box,
+html[data-theme="pixel"] .home-side-card,
+html[data-theme="pixel"] .home-pro-panel,
+html[data-theme="pixel"] .home-membership-card,
+html[data-theme="pixel"] .home-contact-card,
+html[data-theme="pixel"] .home-trade-card,
+html[data-theme="pixel"] .home-event-card,
+html[data-theme="pixel"] .courses-placeholder-card,
+html[data-theme="pixel"] .auth-card,
+html[data-theme="pixel"] .assistant-input,
+html[data-theme="pixel"] .home-scroll-guide {
+  border: 4px solid #151515 !important;
+  box-shadow: inset 0 -6px 0 #d9d9d2, 4px 4px 0 rgba(21, 21, 21, 0.34) !important;
+}
+
+html[data-theme="pixel"] *,
+html[data-theme="pixel"] *::before,
+html[data-theme="pixel"] *::after {
+  font-weight: 700;
 }
 
 html[data-theme="pixel"] .section::before,
