@@ -483,6 +483,21 @@ html[data-theme="pixel"] *::after {
   font-weight: 700;
 }
 
+html[data-theme="pixel"] .button,
+html[data-theme="pixel"] .button span,
+html[data-theme="pixel"] .button strong,
+html[data-theme="pixel"] .button em,
+html[data-theme="pixel"] .home-scroll-guide,
+html[data-theme="pixel"] .home-scroll-guide__eyebrow,
+html[data-theme="pixel"] .home-scroll-guide__copy,
+html[data-theme="pixel"] .home-scroll-guide strong,
+html[data-theme="pixel"] .auth-login-mode-tab,
+html[data-theme="pixel"] .home-select-pill,
+html[data-theme="pixel"] .suggestion-chip,
+html[data-theme="pixel"] .trade-review-page-back {
+  font-weight: 800 !important;
+}
+
 html[data-theme="pixel"] .section::before,
 html[data-theme="pixel"] .application-form::before,
 html[data-theme="pixel"] .sidebar-card::before,
