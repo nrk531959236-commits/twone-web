@@ -143,24 +143,6 @@ export default async function Home() {
       <SiteHeader current="home" />
 
       <section className="section home-minimal-section home-daily-section" id="daily-ai-market">
-        <div className="home-content-pillars">
-          <span>
-            <DailyAnalysisIcon className="home-inline-icon" />
-            每日 AI 行情分析
-          </span>
-          <span>
-            <TradeSetupIcon className="home-inline-icon" />
-            开单建议
-          </span>
-          <span>
-            <MacroEventIcon className="home-inline-icon" />
-            事件表
-          </span>
-          <span>
-            <AssistantIcon className="home-inline-icon" />
-            Discord / Telegram
-          </span>
-        </div>
         <div className="home-section-heading">
           <div>
             <p className="section__label">A · 首页核心</p>
