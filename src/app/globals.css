@@ -602,6 +602,15 @@ html[data-theme="pixel"] .assistant-chat__badge {
   border-radius: 12px;
 }
 
+html[data-theme="pixel"] .site-header__nav-item,
+html[data-theme="pixel"] .site-header__nav-item--assistant,
+html[data-theme="pixel"] .site-header__nav-item--planned {
+  padding: 0;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 html[data-theme="pixel"] .site-header__link,
 html[data-theme="pixel"] .tag-pill,
 html[data-theme="pixel"] .theme-select,
@@ -610,6 +619,28 @@ html[data-theme="pixel"] .admin-filter-bar,
 html[data-theme="pixel"] .admin-review-actions,
 html[data-theme="pixel"] .admin-tab-links {
   background: #ffffff;
+}
+
+html[data-theme="pixel"] .site-header__link,
+html[data-theme="pixel"] .home-chip,
+html[data-theme="pixel"] .home-select-pill {
+  background: #ffffff !important;
+  color: #1b1b20 !important;
+  border: 4px solid #151515 !important;
+  border-radius: 14px !important;
+  box-shadow: inset 0 -5px 0 #dfdfd8, 4px 4px 0 rgba(21, 21, 21, 0.24) !important;
+}
+
+html[data-theme="pixel"] .site-header__link:hover,
+html[data-theme="pixel"] .site-header__link--active,
+html[data-theme="pixel"] .home-chip--highlight,
+html[data-theme="pixel"] .home-chip--highlight-soft,
+html[data-theme="pixel"] .home-select-pill--active,
+html[data-theme="pixel"] .site-header__link--assistant {
+  background: #f3e0a0 !important;
+  color: #2a2110 !important;
+  border: 4px solid #151515 !important;
+  box-shadow: inset 0 -5px 0 #d1b56b, 4px 4px 0 rgba(21, 21, 21, 0.24) !important;
 }
 
 html[data-theme="pixel"] .hero__description,
