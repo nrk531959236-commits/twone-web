@@ -1049,6 +1049,13 @@ html[data-theme="pixel"] .ai-assistant-banner {
   box-shadow: inset 0 -4px 0 #414b9a, 4px 4px 0 rgba(21, 21, 21, 0.3) !important;
 }
 
+html[data-theme="pixel"] .trade-plan-column__stance {
+  padding: 14px 20px !important;
+  min-width: 148px;
+  justify-content: center;
+  font-size: 15px;
+}
+
 html[data-theme="pixel"] .home-indicator-tone--bullish,
 html[data-theme="pixel"] .home-indicator-signal--bullish,
 html[data-theme="pixel"] .review-badge--approved,
