@@ -875,7 +875,14 @@ html[data-theme="pixel"] .home-bias-box__head strong {
   color: #ffffff !important;
 }
 
+html[data-theme="pixel"] .home-bias-box .home-highlight-label,
+html[data-theme="pixel"] .home-bias-box .home-highlight-label span,
+html[data-theme="pixel"] .home-bias-box .home-highlight-label svg {
+  color: #1b1b20 !important;
+}
+
 html[data-theme="pixel"] .home-daily-main__signal-block h3,
+html[data-theme="pixel"] .home-daily-main__signal-head strong,
 html[data-theme="pixel"] .home-signal-card span,
 html[data-theme="pixel"] .home-signal-card strong,
 html[data-theme="pixel"] .home-signal-card em,
