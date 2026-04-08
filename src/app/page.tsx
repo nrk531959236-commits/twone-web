@@ -123,10 +123,10 @@ export default async function Home() {
         { label: "CVD", value: signalSnapshot.cvdState, metric: signalSnapshot.cvdValue },
       ]
     : [
-        { label: "结构", value: dailyAnalysis.structure, metric: undefined },
-        { label: "VWAP", value: dailyAnalysis.vwap, metric: undefined },
-        { label: "MACD", value: dailyAnalysis.macd, metric: undefined },
-        { label: "RSI", value: dailyAnalysis.rsi, metric: undefined },
+        { label: "OI", value: dailyAnalysis.structure, metric: "fallback" },
+        { label: "Funding", value: dailyAnalysis.summary, metric: undefined },
+        { label: "Liq", value: dailyAnalysis.headline, metric: undefined },
+        { label: "CVD", value: dailyAnalysis.conviction, metric: undefined },
       ];
   const tradeReviewCalendar =
     dailyAnalysis.tradeReviewCalendar ?? {
